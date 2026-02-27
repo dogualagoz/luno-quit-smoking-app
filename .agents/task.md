@@ -2,12 +2,12 @@
 
 ## Faz 0 — Setup
 
-- [ ] Klasör yapısını oluştur (`core/`, `features/`, `services/`)
-- [ ] Gerekli paketleri `pubspec.yaml`'a ekle
-- [ ] `core/theme/app_colors.dart` — Renk token'ları
-- [ ] `core/theme/app_text_styles.dart` — Tipografi ölçeği
-- [ ] `core/theme/app_spacing.dart` — Spacing + radius sabitleri
-- [ ] `core/theme/app_theme.dart` — ThemeData (light + dark)
+- [X] Klasör yapısını oluştur (`core/`, `features/`, `services/`)
+- [X] Gerekli paketleri `pubspec.yaml`'a ekle
+- [X] `core/theme/app_colors.dart` — Renk token'ları
+- [X] `core/theme/app_text_styles.dart` — Tipografi ölçeği
+- [X] `core/theme/app_spacing.dart` — Spacing + radius sabitleri
+- [X] `core/theme/app_theme.dart` — ThemeData (light + dark)
 - [ ] `main.dart` — Entry point
 - [ ] `app.dart` — MaterialApp + ProviderScope + GoRouter
 - [ ] `core/router/app_router.dart` — GoRouter yapılandırması
