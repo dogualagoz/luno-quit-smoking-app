@@ -308,3 +308,13 @@ Her fazın sonunda:
 - Ekranları gözle kontrol et
 - Bottom navigation geçişlerini test et
 - Light/dark tema geçişini kontrol et
+
+---
+
+## Referans Tasarımlar (Figma)
+
+![Ana Sayfa (Dashboard)](file:///Users/dogualagoz/.gemini/antigravity/brain/6da3c845-6669-4f7e-b3a9-605a7730277d/media__1772303876854.png)
+_Şekil 1: Ana Sayfa (Dashboard) Tasarımı_
+
+![Ayarlar (Settings)](file:///Users/dogualagoz/.gemini/antigravity/brain/6da3c845-6669-4f7e-b3a9-605a7730277d/media__1772303876906.png)
+_Şekil 2: Ayarlar (Settings) Tasarımı_

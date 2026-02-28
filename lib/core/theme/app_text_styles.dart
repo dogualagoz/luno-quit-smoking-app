@@ -19,44 +19,25 @@ abstract final class AppTextStyles {
       GoogleFonts.nunito(fontSize: 24, fontWeight: FontWeight.w700);
 
   static TextStyle get summaryValue =>
-      GoogleFonts.nunito(fontSize: 20.8, fontWeight: FontWeight.w800);
+      GoogleFonts.nunito(fontSize: 20.8, fontWeight: FontWeight.w900);
 
-  static TextStyle get body => GoogleFonts.nunito(
-    fontSize: 14.1,
-    fontWeight: FontWeight.w400,
-  );
+  static TextStyle get body =>
+      GoogleFonts.nunito(fontSize: 14.1, fontWeight: FontWeight.w400);
 
-   static TextStyle get bodySemibold => GoogleFonts.nunito(
-        fontSize: 13.6,
-        fontWeight: FontWeight.w600,
-      );
-  static TextStyle get label => GoogleFonts.nunito(
-        fontSize: 13.1,
-        fontWeight: FontWeight.w600,
-      );
+  static TextStyle get bodySemibold =>
+      GoogleFonts.nunito(fontSize: 13.6, fontWeight: FontWeight.w600);
+  static TextStyle get label =>
+      GoogleFonts.nunito(fontSize: 13.1, fontWeight: FontWeight.w600);
 
   // Yardımcı Metinler
-  static TextStyle get buttonQuickPick => GoogleFonts.nunito(
-        fontSize: 12.8,
-        fontWeight: FontWeight.w600,
-      );
-  static TextStyle get caption => GoogleFonts.nunito(
-        fontSize: 12.5,
-        fontWeight: FontWeight.w400,
-      );
-  static TextStyle get hint => GoogleFonts.nunito(
-        fontSize: 11.5,
-        fontWeight: FontWeight.w400,
-      );
-  static TextStyle get micro => GoogleFonts.nunito(
-        fontSize: 10.9,
-        fontWeight: FontWeight.w400,
-      );
-  static TextStyle get navLabel => GoogleFonts.nunito(
-        fontSize: 9.6,
-        fontWeight: FontWeight.w600,
-      );
-
-
-  
+  static TextStyle get buttonQuickPick =>
+      GoogleFonts.nunito(fontSize: 12.8, fontWeight: FontWeight.w600);
+  static TextStyle get caption =>
+      GoogleFonts.nunito(fontSize: 12.5, fontWeight: FontWeight.w400);
+  static TextStyle get hint =>
+      GoogleFonts.nunito(fontSize: 11.5, fontWeight: FontWeight.w400);
+  static TextStyle get micro =>
+      GoogleFonts.nunito(fontSize: 10.9, fontWeight: FontWeight.w400);
+  static TextStyle get navLabel =>
+      GoogleFonts.nunito(fontSize: 9.6, fontWeight: FontWeight.w600);
 }

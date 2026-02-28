@@ -34,6 +34,7 @@ abstract final class AppTheme {
       onPrimary: Colors.white,
       onSecondary: AppColors.lightForeground,
       onSurface: AppColors.lightForeground,
+      outline: AppColors.lightBorder,
     ),
 
     // Metin Teması
@@ -43,7 +44,14 @@ abstract final class AppTheme {
       titleMedium: AppTextStyles.cardHeader,
       bodyLarge: AppTextStyles.body,
       bodyMedium: AppTextStyles.bodySemibold,
-      labelSmall: AppTextStyles.navLabel,
+      titleLarge: AppTextStyles.summaryValue, // 20.8px/w800
+      headlineSmall: AppTextStyles.statValue, // 24px/w700
+      bodySmall: AppTextStyles.caption.copyWith(
+        color: AppColors.lightMutedForeground,
+      ), // 12.5px/w400
+      labelSmall: AppTextStyles.hint.copyWith(
+        color: AppColors.lightMutedForeground,
+      ), // 11.5px/w400
     ),
     // Kart Teması
     cardTheme: CardThemeData(
@@ -81,6 +89,7 @@ abstract final class AppTheme {
       onPrimary: Colors.white,
       onSecondary: AppColors.darkForeground,
       onSurface: AppColors.darkForeground,
+      outline: AppColors.darkBorder,
     ),
     // Metin Teması (Aynı stiller, Flutter renkleri otomatik ayarlar)
     textTheme: TextTheme(
@@ -89,6 +98,14 @@ abstract final class AppTheme {
       titleMedium: AppTextStyles.cardHeader,
       bodyLarge: AppTextStyles.body,
       bodyMedium: AppTextStyles.bodySemibold,
+      titleLarge: AppTextStyles.summaryValue, // 20.8px/w900
+      headlineSmall: AppTextStyles.statValue, // 24px/w700
+      bodySmall: AppTextStyles.caption.copyWith(
+        color: AppColors.darkMutedForeground,
+      ), // 12.5px/w400
+      labelSmall: AppTextStyles.hint.copyWith(
+        color: AppColors.darkMutedForeground,
+      ), // 11.5px/w400
     ),
     // Kart Teması
     cardTheme: CardThemeData(

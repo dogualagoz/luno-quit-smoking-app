@@ -1,63 +1,69 @@
 # Luno — Görev Listesi
 
+> **Strateji:** Önce Ana Sayfa (Dashboard) ve Ayarlar'ı front+back tamamen bitir,
+> sonra diğer sayfalara geç. Hızlı çalışan ürün öncelikli.
+
 ## Faz 0 — Setup
 
-- [X] Klasör yapısını oluştur (`core/`, `features/`, `services/`)
-- [X] Gerekli paketleri `pubspec.yaml`'a ekle
-- [X] `core/theme/app_colors.dart` — Renk token'ları
-- [X] `core/theme/app_text_styles.dart` — Tipografi ölçeği
-- [X] `core/theme/app_spacing.dart` — Spacing + radius sabitleri
-- [X] `core/theme/app_theme.dart` — ThemeData (light + dark)
-- [ ] `main.dart` — Entry point
-- [ ] `app.dart` — MaterialApp + ProviderScope + GoRouter
-- [ ] `core/router/app_router.dart` — GoRouter yapılandırması
-- [ ] Bottom Navigation Shell (6 tab, MVP'de olmayanlar "yakında")
-- [ ] `core/constants/app_constants.dart` — Sabit değerler
+- [x] Klasör yapısını oluştur (`core/`, `features/`, `services/`)
+- [x] Gerekli paketleri `pubspec.yaml`'a ekle (ihtiyaç oldukça)
+- [x] `core/theme/app_colors.dart` — Renk token'ları
+- [x] `core/theme/app_text_styles.dart` — Tipografi ölçeği
+- [x] `core/theme/app_spacing.dart` — Spacing sabitleri
+- [x] `core/theme/app_radius.dart` — Radius sabitleri
+- [x] `core/theme/app_theme.dart` — ThemeData (light + dark + shadows)
+- [x] `main.dart` — Entry point
+- [x] `app.dart` — MaterialApp + tema bağlantısı
+- [x] `go_router` paketi eklendi
+- [x] `core/router/app_router.dart` — GoRouter yapılandırması
+- [x] Bottom Navigation Shell (6 tab, aktif olmayanlar "yakında")
+- [x] Router'ı `app.dart`'a bağla
 
-## Faz 1 — Foundation (Temel Bileşenler)
+## Faz 1 — Ana Sayfa (Dashboard) — Front + Back
 
 - [ ] `core/widgets/luno_card.dart` — Standart kart widget
-- [ ] `core/widgets/luno_button.dart` — CTA butonları (primary, success, disabled)
+- [ ] `core/widgets/luno_button.dart` — CTA butonları
 - [ ] `core/widgets/stat_card.dart` — İstatistik kartı
 - [ ] `core/widgets/speech_bubble.dart` — Konuşma balonu
-- [ ] `core/widgets/cigerito_mascot.dart` — Maskot widget (modlar)
-- [ ] Firebase initialization setup
-- [ ] `services/firebase/firebase_auth_service.dart` — Anonymous Auth
-- [ ] `services/local_storage/shared_prefs_service.dart` — Local storage
-- [ ] `core/providers/firebase_providers.dart` — Global provider'lar
-
-## Faz 2 — MVP Ekranları
-
-- [ ] Onboarding akışı UI
-- [ ] Onboarding veri kayıt mantığı (provider + repository)
-- [ ] `features/onboarding/data/models/user_profile.dart` — Model
-- [ ] Dashboard ekranı — summary bar
-- [ ] Dashboard ekranı — stat grid (para, sigara, zaman, zarar)
-- [ ] Dashboard ekranı — mascot section + speech bubble
-- [ ] Dashboard ekranı — recovery progress bar
+- [ ] `core/widgets/cigerito_mascot.dart` — Maskot widget
+- [ ] Onboarding akışı (sorular + veri kayıt)
+- [ ] `features/dashboard/presentation/dashboard_screen.dart` — UI
+- [ ] Dashboard — summary bar
+- [ ] Dashboard — stat grid (para, sigara, zaman, zarar)
+- [ ] Dashboard — mascot section + speech bubble
+- [ ] Dashboard — recovery progress bar
 - [ ] Dashboard provider + repository
-- [ ] Hasar Raporu — genel hasar skoru
-- [ ] Hasar Raporu — organ kartları (akciğer, kalp, beyin, cilt vb.)
-- [ ] Hasar Raporu — provider + repository
-- [ ] `features/damage/data/models/damage_constants.dart` — Hasar sabitleri
-- [ ] Ayarlar ekranı — profil bilgileri
-- [ ] Ayarlar ekranı — tema geçişi (light/dark)
+- [ ] `services/local_storage/shared_prefs_service.dart` — Local storage
+- [ ] `features/onboarding/data/models/user_profile.dart` — Model
+
+## Faz 2 — Ayarlar — Front + Back
+
+- [ ] `features/settings/presentation/settings_screen.dart` — UI
+- [ ] Ayarlar — profil bilgileri düzenleme
+- [ ] Ayarlar — tema geçişi (light/dark)
+- [ ] Ayarlar — bildirim tercihleri (altyapı hazır, aktif değil)
+- [ ] Ayarlar — hakkında bölümü
 - [ ] Ayarlar provider + repository
 
-## Faz 3 — Polish
+## Faz 3 — Diğer Sayfalar
 
-- [ ] Animasyonlar ve micro-interactions
-- [ ] Firebase Analytics event'leri
-- [ ] Error handling iyileştirmesi
+- [ ] Hasar Raporu ekranı (organ kartları, genel skor)
+- [ ] Hasar provider + repository
 - [ ] Coming soon placeholder ekranları (İyileşme, Kriz, Geçmiş)
-- [ ] Final derleme + test
+
+## Faz 4 — Polish & Firebase
+
+- [ ] Firebase initialization + Anonymous Auth
+- [ ] Firebase Analytics event'leri
+- [ ] Animasyonlar ve micro-interactions
+- [ ] Error handling iyileştirmesi
 
 ## Post-MVP
 
 - [ ] Geçmiş & Kayıt ekranı
 - [ ] İyileşme Yolculuğu ekranı
 - [ ] Kriz Modu ekranı
-- [ ] Push Notifications altyapısı
+- [ ] Push Notifications
 - [ ] Gerçek Authentication (email/Google)
 - [ ] AI özellikleri
 - [ ] Ödeme sistemi
