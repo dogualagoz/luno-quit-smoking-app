@@ -35,7 +35,9 @@ class StatCard extends StatelessWidget {
               Container(
                 padding: AppSpacing.iconPadding, // 10px (tema.md)
                 decoration: BoxDecoration(
-                  color: (iconColor ?? colorScheme.primary).withOpacity(0.12),
+                  color: (iconColor ?? colorScheme.primary).withValues(
+                    alpha: 0.12,
+                  ),
                   borderRadius: AppRadius.iconContainer, // 12px (tema.md)
                 ),
                 child: Icon(

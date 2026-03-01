@@ -15,7 +15,7 @@ class QuoteCard extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return LunoCard(
-      color: colorScheme.primary.withOpacity(0.08), // Hafif pembe/vurgu rengi
+      color: colorScheme.primary.withValues(alpha: 0.08), 
       padding: AppSpacing.cardPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,7 +24,7 @@ class QuoteCard extends StatelessWidget {
             '"$quote"',
             style: textTheme.bodyMedium?.copyWith(
               fontStyle: FontStyle.italic,
-              color: colorScheme.onSurface.withOpacity(0.8),
+              color: colorScheme.onSurface.withValues(alpha: 0.8),
               height: 1.5,
             ),
           ),
@@ -32,7 +32,7 @@ class QuoteCard extends StatelessWidget {
           Text(
             "— $author",
             style: textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.5),
+              color: colorScheme.onSurface.withValues(alpha: 0.5),
               fontWeight: FontWeight.w600,
             ),
           ),

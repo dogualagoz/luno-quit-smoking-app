@@ -21,7 +21,7 @@ class StatGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
+
     // GridView'un Sütun içinde düzgün çalışması için ShrinkWrap: true
     // ve physics: NeverScrollableScrollPhysics kullanıyoruz.
 

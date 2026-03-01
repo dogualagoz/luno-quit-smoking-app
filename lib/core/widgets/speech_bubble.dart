@@ -22,12 +22,12 @@ class SpeechBubble extends StatelessWidget {
               color: colorScheme.surface,
               borderRadius: AppRadius.mascotBubble,
               border: Border.all(
-                color: colorScheme.primary.withOpacity(0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
+                  color: Colors.black.withValues(alpha: 0.02),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -37,7 +37,7 @@ class SpeechBubble extends StatelessWidget {
               text,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface.withOpacity(0.8),
+                color: colorScheme.onSurface.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -55,11 +55,11 @@ class SpeechBubble extends StatelessWidget {
                   color: colorScheme.surface,
                   border: Border(
                     left: BorderSide(
-                      color: colorScheme.primary.withOpacity(0.1),
+                      color: colorScheme.primary.withValues(alpha: 0.1),
                       width: 2,
                     ),
                     top: BorderSide(
-                      color: colorScheme.primary.withOpacity(0.1),
+                      color: colorScheme.primary.withValues(alpha: 0.1),
                       width: 2,
                     ),
                   ),

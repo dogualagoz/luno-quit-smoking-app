@@ -36,7 +36,7 @@ class RecoveryProgress extends StatelessWidget {
               Container(
                 padding: AppSpacing.iconPadding,
                 decoration: BoxDecoration(
-                  color: colors.first.withOpacity(0.15),
+                  color: colors.first.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -56,7 +56,7 @@ class RecoveryProgress extends StatelessWidget {
                 height: 12,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: colorScheme.secondary.withOpacity(0.3),
+                  color: colorScheme.secondary.withValues(alpha: 0.3),
                   borderRadius: AppRadius.progressBar,
                 ),
               ),

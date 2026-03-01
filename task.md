@@ -11,7 +11,7 @@
 - [x] `main.dart` — Entry point
 - [x] `app.dart` — MaterialApp + ProviderScope + GoRouter
 - [x] `core/router/app_router.dart` — GoRouter yapılandırması
-- [ ] Bottom Navigation Shell (6 tab, MVP'de olmayanlar "yakında")
+- [x] Bottom Navigation Shell (6 tab, MVP'de olmayanlar "yakında")
 - [ ] `core/constants/app_constants.dart` — Sabit değerler
 
 ## Faz 1 — Foundation (Temel Bileşenler)
@@ -52,7 +52,7 @@
 - [ ] Animasyonlar ve micro-interactions
 - [ ] Firebase Analytics event'leri
 - [ ] Error handling iyileştirmesi
-- [ ] Coming soon placeholder ekranları (İyileşme, Kriz, Geçmiş)
+- [x] Coming soon placeholder ekranları (İyileşme, Kriz, Geçmiş)
 - [ ] Final derleme + test
 
 ## Post-MVP

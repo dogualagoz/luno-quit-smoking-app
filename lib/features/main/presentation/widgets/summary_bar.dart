@@ -20,9 +20,12 @@ class SummaryBar extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return LunoCard(
-      color: colorScheme.primary.withOpacity(0.2),
+      color: colorScheme.primary.withValues(alpha: 0.2),
       shadow: const [],
-      border: Border.all(color: colorScheme.primary.withOpacity(0.2), width: 1),
+      border: Border.all(
+        color: colorScheme.primary.withValues(alpha: 0.2),
+        width: 1,
+      ),
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -58,7 +61,7 @@ Widget _divider(ColorScheme colorScheme) {
   return Container(
     width: 1,
     height: 24,
-    color: colorScheme.outline.withOpacity(0.3),
+    color: colorScheme.outline.withValues(alpha: 0.3),
   );
 }
 

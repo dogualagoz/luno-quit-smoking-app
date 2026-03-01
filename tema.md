@@ -132,10 +132,10 @@
 
 ## Gölgeler (Shadows)
 
-| İsim               | Flutter                                                                                 |
-| ------------------ | --------------------------------------------------------------------------------------- |
-| shadow-sm (Kart)   | `BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: Offset(0, 1))` |
-| shadow-lg (Button) | `BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 15, offset: Offset(0, 4))` |
+| İsim               | Flutter                                                                                       |
+| ------------------ | --------------------------------------------------------------------------------------------- |
+| shadow-sm (Kart)   | `BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: Offset(0, 1))` |
+| shadow-lg (Button) | `BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 15, offset: Offset(0, 4))` |
 
 ---
 

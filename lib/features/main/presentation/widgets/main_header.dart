@@ -33,7 +33,7 @@ class MainHeader extends StatelessWidget {
               subText,
               style: textTheme.bodySmall?.copyWith(
                 fontSize: 12.5,
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -44,7 +44,7 @@ class MainHeader extends StatelessWidget {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: theme.colorScheme.secondary.withOpacity(0.4),
+            color: theme.colorScheme.secondary.withValues(alpha: 0.4),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.nightlight_outlined, size: 20),
