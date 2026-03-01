@@ -9,6 +9,8 @@ abstract final class AppSpacing {
   static const double p16 = 16.0;
   static const double p20 = 20.0;
   static const double p24 = 24.0;
+  static const double p32 = 32.0;
+  static const double p40 = 40.0;
   static const double p96 = 96.0;
 
   //EdgeInsets (Direkt kullanım için)
@@ -25,7 +27,8 @@ abstract final class AppSpacing {
 
   // SizedBox (boşluklar)x
   static const sectionGap = SizedBox(height: p20);
-  static const sectionGapLarge = SizedBox(height: p24);
+  static const sectionGapMedium = SizedBox(height: p24);
+  static const sectionGapLarge = SizedBox(height: p32);
 
   // CardGap
   static const cardGap = SizedBox(width: p12, height: p12);

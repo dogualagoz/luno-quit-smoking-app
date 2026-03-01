@@ -46,9 +46,7 @@ abstract final class AppTheme {
       bodyMedium: AppTextStyles.bodySemibold,
       titleLarge: AppTextStyles.summaryValue, // 20.8px/w800
       headlineSmall: AppTextStyles.statValue, // 24px/w700
-      bodySmall: AppTextStyles.caption.copyWith(
-        color: AppColors.lightMutedForeground,
-      ), // 12.5px/w400
+      bodySmall: AppTextStyles.caption, // 12.5px/w400
       labelSmall: AppTextStyles.hint.copyWith(
         color: AppColors.lightMutedForeground,
       ), // 11.5px/w400

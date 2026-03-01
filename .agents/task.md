@@ -21,15 +21,15 @@
 
 ## Faz 1 — Ana Sayfa (Dashboard) — Front + Back
 
-- [ ] `core/widgets/luno_card.dart` — Standart kart widget
-- [ ] `core/widgets/luno_button.dart` — CTA butonları
-- [ ] `core/widgets/stat_card.dart` — İstatistik kartı
+- [x] `core/widgets/luno_card.dart` — Standart kart widget
+- [x] `core/widgets/luno_button.dart` — CTA butonları
+- [x] `core/widgets/stat_card.dart` — İstatistik kartı
 - [ ] `core/widgets/speech_bubble.dart` — Konuşma balonu
 - [ ] `core/widgets/cigerito_mascot.dart` — Maskot widget
 - [ ] Onboarding akışı (sorular + veri kayıt)
 - [ ] `features/dashboard/presentation/dashboard_screen.dart` — UI
-- [ ] Dashboard — summary bar
-- [ ] Dashboard — stat grid (para, sigara, zaman, zarar)
+- [x] Dashboard — summary bar
+- [x] Dashboard — stat grid (para, sigara, zaman, zarar)
 - [ ] Dashboard — mascot section + speech bubble
 - [ ] Dashboard — recovery progress bar
 - [ ] Dashboard provider + repository

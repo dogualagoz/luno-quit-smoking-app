@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
-import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 
 class SummaryBar extends StatelessWidget {
   final String cigContent;
