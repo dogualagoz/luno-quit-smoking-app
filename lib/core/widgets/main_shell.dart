@@ -13,13 +13,19 @@ class MainShell extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Yanlardan 16'şar (toplam 32) padding veriyoruz
+    const double horizontalPadding = 16.0;
+    final navWidth = screenWidth - (horizontalPadding * 2);
+    final itemWidth = navWidth / 6;
 
     return Scaffold(
       body: navigationShell,
       extendBody: true,
       bottomNavigationBar: Container(
-        // Yüksekliği güvenli bir sınıra (64px + alt pay) çekiyoruz
-        height: 64 + (bottomPadding > 0 ? bottomPadding * 0.5 : 12),
+        // Yüksekliği biraz daha artırarak (68px) elemanlara nefes aldırıyoruz
+        height: 68 + (bottomPadding > 0 ? bottomPadding * 0.5 : 12),
         decoration: BoxDecoration(
           color: colorScheme.surface.withValues(alpha: 0.92),
           border: Border(
@@ -32,58 +38,94 @@ class MainShell extends StatelessWidget {
         child: ClipRect(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-            child: Theme(
-              data: theme.copyWith(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
               ),
-              child: BottomNavigationBar(
-                currentIndex: navigationShell.currentIndex,
-                onTap: (index) => navigationShell.goBranch(index),
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                iconSize: 20,
-                selectedItemColor: colorScheme.primary,
-                unselectedItemColor: theme.hintColor,
-                selectedLabelStyle: AppTextStyles.navLabel.copyWith(
-                  fontSize: 9.6,
-                  height: 1.0, // Yazının dikeyde yer kaplamasını önlüyoruz
-                ),
-                unselectedLabelStyle: AppTextStyles.navLabel.copyWith(
-                  fontSize: 9.6,
-                  height: 1.0,
-                ),
-                items: [
-                  _buildNavItem(
-                    Icons.home_outlined,
-                    Icons.home_rounded,
-                    "Ana Sayfa",
+              child: Stack(
+                children: [
+                  Theme(
+                    data: theme.copyWith(
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                    ),
+                    child: BottomNavigationBar(
+                      currentIndex: navigationShell.currentIndex,
+                      onTap: (index) => navigationShell.goBranch(index),
+                      type: BottomNavigationBarType.fixed,
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      iconSize: 20,
+                      selectedItemColor: colorScheme.primary,
+                      unselectedItemColor: theme.hintColor,
+                      selectedLabelStyle: AppTextStyles.navLabel.copyWith(
+                        fontSize: 9.6,
+                        height: 1.4, // Yazıyı biraz daha aşağı iter
+                      ),
+                      unselectedLabelStyle: AppTextStyles.navLabel.copyWith(
+                        fontSize: 9.6,
+                        height: 1.4,
+                      ),
+                      items: [
+                        _buildNavItem(
+                          Icons.home_outlined,
+                          Icons.home_rounded,
+                          "Ana Sayfa",
+                        ),
+                        _buildNavItem(
+                          Icons.warning_amber_rounded,
+                          Icons.warning_rounded,
+                          "Zararlar",
+                        ),
+                        _buildNavItem(
+                          Icons.show_chart_rounded,
+                          Icons.insert_chart_rounded,
+                          "İyileşme",
+                        ),
+                        _buildNavItem(
+                          Icons.flash_on_outlined,
+                          Icons.flash_on_rounded,
+                          "Kriz",
+                        ),
+                        _buildNavItem(
+                          Icons.history_rounded,
+                          Icons.history_toggle_off_rounded,
+                          "Geçmiş",
+                        ),
+                        _buildNavItem(
+                          Icons.settings_outlined,
+                          Icons.settings_rounded,
+                          "Ayarlar",
+                        ),
+                      ],
+                    ),
                   ),
-                  _buildNavItem(
-                    Icons.warning_amber_rounded,
-                    Icons.warning_rounded,
-                    "Zararlar",
-                  ),
-                  _buildNavItem(
-                    Icons.show_chart_rounded,
-                    Icons.insert_chart_rounded,
-                    "İyileşme",
-                  ),
-                  _buildNavItem(
-                    Icons.flash_on_outlined,
-                    Icons.flash_on_rounded,
-                    "Kriz",
-                  ),
-                  _buildNavItem(
-                    Icons.history_rounded,
-                    Icons.history_toggle_off_rounded,
-                    "Geçmiş",
-                  ),
-                  _buildNavItem(
-                    Icons.settings_outlined,
-                    Icons.settings_rounded,
-                    "Ayarlar",
+
+                  // ─── KAYAN NOKTA ANİMASYONU ───
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    // Noktanın yataydaki konumu: (index * parça_genişliği) + yarım_parça - yarım_nokta
+                    left:
+                        (navigationShell.currentIndex * itemWidth) +
+                        (itemWidth / 2) -
+                        2,
+                    top: 28, // Dot'u 4px daha aşağı aldık (24 -> 28)
+                    child: Container(
+                      width: 4,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.primary.withValues(alpha: 0.3),
+                            blurRadius: 4,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -101,21 +143,7 @@ class MainShell extends StatelessWidget {
   ) {
     return BottomNavigationBarItem(
       icon: Icon(icon),
-      activeIcon: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(activeIcon),
-          const SizedBox(height: 1),
-          Container(
-            width: 4,
-            height: 4,
-            decoration: const BoxDecoration(
-              color: Color(0xFFE8A0BF),
-              shape: BoxShape.circle,
-            ),
-          ),
-        ],
-      ),
+      activeIcon: Icon(activeIcon),
       label: label,
     );
   }

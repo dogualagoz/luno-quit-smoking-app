@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:luno_quit_smoking_app/features/main/presentation/main_screen.dart';
 import 'package:luno_quit_smoking_app/core/widgets/main_shell.dart';
+import 'package:luno_quit_smoking_app/features/settings/presentation/pages/settings_page.dart';
 
 class AppRouter {
   // Sayfa isimleriin (adreslerini tanımlıyoruz)
@@ -36,7 +37,7 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: root,
+                path: damage,
                 builder: (context, state) =>
                     const _PlaceholderScreen(title: "Zararlar"),
               ),
@@ -45,7 +46,7 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: root,
+                path: recovery,
                 builder: (context, state) =>
                     const _PlaceholderScreen(title: "İyileşme"),
               ),
@@ -54,7 +55,7 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: root,
+                path: crisis,
                 builder: (context, state) =>
                     const _PlaceholderScreen(title: "Kriz"),
               ),
@@ -63,7 +64,7 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: root,
+                path: history,
                 builder: (context, state) =>
                     const _PlaceholderScreen(title: "Geçmiş"),
               ),
@@ -73,8 +74,7 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: settings,
-                builder: (context, state) =>
-                    const _PlaceholderScreen(title: "Ayarlar"),
+                builder: (context, state) => const SettingsPage(),
               ),
             ],
           ),

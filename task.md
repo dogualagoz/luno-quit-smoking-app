@@ -1,4 +1,4 @@
-# Luno — Görev Listesi
+    # Luno — Görev Listesi
 
 ## Faz 0 — Setup
 
