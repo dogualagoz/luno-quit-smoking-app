@@ -5,7 +5,7 @@ import 'package:luno_quit_smoking_app/core/widgets/quote_card.dart';
 import 'package:luno_quit_smoking_app/core/widgets/stat_grid.dart';
 import 'package:luno_quit_smoking_app/core/widgets/speech_bubble.dart';
 import 'package:luno_quit_smoking_app/features/main/presentation/widgets/main_header.dart';
-import 'package:luno_quit_smoking_app/features/main/presentation/widgets/summary_bar.dart';
+import 'package:luno_quit_smoking_app/core/widgets/swipeable_damage_cards.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -46,12 +46,8 @@ class MainScreen extends StatelessWidget {
                 ),
                 AppSpacing.sectionGap,
 
-                // Özet çubuğu
-                SummaryBar(
-                  cigContent: "25.550",
-                  spentContent: "95.813",
-                  lossContent: "124",
-                ),
+                // Organ Hasar Kartları (Swipeable)
+                const SwipeableDamageCards(),
                 AppSpacing.sectionGap,
 
                 // İstatistikler (ilerde sayaç eklenecek)

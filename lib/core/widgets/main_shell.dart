@@ -79,17 +79,17 @@ class MainShell extends StatelessWidget {
                         ),
                         _buildNavItem(
                           Icons.show_chart_rounded,
-                          Icons.insert_chart_rounded,
+                          Icons.show_chart_outlined,
                           "İyileşme",
                         ),
                         _buildNavItem(
-                          Icons.flash_on_outlined,
+                          Icons.flash_on,
                           Icons.flash_on_rounded,
                           "Kriz",
                         ),
                         _buildNavItem(
                           Icons.history_rounded,
-                          Icons.history_toggle_off_rounded,
+                          Icons.history_outlined,
                           "Geçmiş",
                         ),
                         _buildNavItem(

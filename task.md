@@ -43,8 +43,8 @@
 - [ ] Hasar Raporu — organ kartları (akciğer, kalp, beyin, cilt vb.)
 - [ ] Hasar Raporu — provider + repository
 - [ ] `features/damage/data/models/damage_constants.dart` — Hasar sabitleri
-- [ ] Ayarlar ekranı — profil bilgileri
-- [ ] Ayarlar ekranı — tema geçişi (light/dark)
+- [x] Ayarlar ekranı — profil bilgileri
+- [x] Ayarlar ekranı — tema geçişi (light/dark)
 - [ ] Ayarlar provider + repository
 
 ## Faz 3 — Polish

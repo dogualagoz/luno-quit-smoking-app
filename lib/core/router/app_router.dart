@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:luno_quit_smoking_app/features/main/presentation/main_screen.dart';
 import 'package:luno_quit_smoking_app/core/widgets/main_shell.dart';
 import 'package:luno_quit_smoking_app/features/settings/presentation/pages/settings_page.dart';
+import 'package:luno_quit_smoking_app/features/damage/presentation/damage_screen.dart';
 
 class AppRouter {
   // Sayfa isimleriin (adreslerini tanımlıyoruz)
@@ -38,8 +39,7 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: damage,
-                builder: (context, state) =>
-                    const _PlaceholderScreen(title: "Zararlar"),
+                builder: (context, state) => const DamageScreen(),
               ),
             ],
           ),
