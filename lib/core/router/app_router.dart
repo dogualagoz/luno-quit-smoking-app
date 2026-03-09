@@ -4,24 +4,27 @@ import 'package:luno_quit_smoking_app/features/main/presentation/main_screen.dar
 import 'package:luno_quit_smoking_app/core/widgets/main_shell.dart';
 import 'package:luno_quit_smoking_app/features/settings/presentation/pages/settings_page.dart';
 import 'package:luno_quit_smoking_app/features/damage/presentation/damage_screen.dart';
+import 'package:luno_quit_smoking_app/features/onboarding/presentation/onboarding_screen.dart';
 
 class AppRouter {
   // Sayfa isimleriin (adreslerini tanımlıyoruz)
 
   // Ana sayfanın adresi
   static const String root = '/';
+  static const String onboarding = '/onboarding';
   static const String damage = '/damage';
   static const String recovery = '/recovery';
   static const String crisis = '/crisis';
   static const String history = '/history';
   static const String settings = '/settings';
 
-  // router ayarlarını yapıyoruz
   static final router = GoRouter(
-    // uygulama ilk açıldığında hangi adrese gidecek ?
-    initialLocation: root, //
+    initialLocation: onboarding,
     routes: [
-      // Ana sayfa tanımı
+      GoRoute(
+        path: onboarding,
+        builder: (context, state) => const OnboardingScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainShell(navigationShell: navigationShell);
