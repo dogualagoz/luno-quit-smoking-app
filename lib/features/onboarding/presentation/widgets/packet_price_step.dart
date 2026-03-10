@@ -81,7 +81,7 @@ class _PacketPriceStepState extends State<PacketPriceStep> {
                 Text(
                   "Bir paket sigara kaç TL?",
                   style: AppTextStyles.label.copyWith(
-                    color: AppColors.lightForeground.withOpacity(0.6),
+                    color: AppColors.lightForeground.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.p20),
@@ -93,9 +93,9 @@ class _PacketPriceStepState extends State<PacketPriceStep> {
                 SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     activeTrackColor: AppColors.lightPrimary,
-                    inactiveTrackColor: AppColors.lightPrimary.withOpacity(0.1),
+                    inactiveTrackColor: AppColors.lightPrimary.withValues(alpha: 0.1),
                     thumbColor: Colors.white,
-                    overlayColor: AppColors.lightPrimary.withOpacity(0.2),
+                    overlayColor: AppColors.lightPrimary.withValues(alpha: 0.2),
                     thumbShape: const RoundSliderThumbShape(
                       enabledThumbRadius: 12,
                       elevation: 4,
@@ -116,13 +116,13 @@ class _PacketPriceStepState extends State<PacketPriceStep> {
                       Text(
                         "₺20",
                         style: AppTextStyles.micro.copyWith(
-                          color: AppColors.lightForeground.withOpacity(0.3),
+                          color: AppColors.lightForeground.withValues(alpha: 0.3),
                         ),
                       ),
                       Text(
                         "₺250",
                         style: AppTextStyles.micro.copyWith(
-                          color: AppColors.lightForeground.withOpacity(0.3),
+                          color: AppColors.lightForeground.withValues(alpha: 0.3),
                         ),
                       ),
                     ],
@@ -147,7 +147,7 @@ class _PacketPriceStepState extends State<PacketPriceStep> {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.lightPrimary.withOpacity(0.05)
+                          ? AppColors.lightPrimary.withValues(alpha: 0.05)
                           : AppColors.lightCard,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
@@ -161,7 +161,7 @@ class _PacketPriceStepState extends State<PacketPriceStep> {
                       style: TextStyle(
                         color: isSelected
                             ? AppColors.lightPrimary
-                            : AppColors.lightForeground.withOpacity(0.7),
+                            : AppColors.lightForeground.withValues(alpha: 0.7),
                         fontWeight: isSelected
                             ? FontWeight.bold
                             : FontWeight.normal,
@@ -177,7 +177,7 @@ class _PacketPriceStepState extends State<PacketPriceStep> {
             width: double.infinity,
             padding: AppSpacing.cardPadding,
             decoration: BoxDecoration(
-              color: AppColors.lightDestructive.withOpacity(0.05),
+              color: AppColors.lightDestructive.withValues(alpha: 0.05),
               borderRadius: AppRadius.mainCard,
             ),
             child: Column(
@@ -185,7 +185,7 @@ class _PacketPriceStepState extends State<PacketPriceStep> {
                 RichText(
                   text: TextSpan(
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.lightForeground.withOpacity(0.7),
+                      color: AppColors.lightForeground.withValues(alpha: 0.7),
                     ),
                     children: [
                       const TextSpan(text: "Aylık harcaman: "),
@@ -201,7 +201,7 @@ class _PacketPriceStepState extends State<PacketPriceStep> {
                   "Bu parayla her ay güzel bir restoranda yemek yiyebilirdin.",
                   textAlign: TextAlign.center,
                   style: AppTextStyles.caption.copyWith(
-                    color: AppColors.lightForeground.withOpacity(0.5),
+                    color: AppColors.lightForeground.withValues(alpha: 0.5),
                   ),
                 ),
               ],

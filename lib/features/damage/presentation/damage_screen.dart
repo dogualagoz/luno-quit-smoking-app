@@ -63,7 +63,7 @@ class DamageScreen extends StatelessWidget {
                         ),
                       ),
                     )
-                    .toList(),
+                    ,
 
                 const SizedBox(height: AppSpacing.p24),
 

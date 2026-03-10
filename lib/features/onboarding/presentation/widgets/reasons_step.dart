@@ -98,7 +98,7 @@ class _ReasonsStepState extends State<ReasonsStep> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.lightChartSuccess.withOpacity(0.1)
+                          ? AppColors.lightChartSuccess.withValues(alpha: 0.1)
                           : AppColors.lightCard,
                       borderRadius: AppRadius.mainCard,
                       border: Border.all(
@@ -115,15 +115,19 @@ class _ReasonsStepState extends State<ReasonsStep> {
                           style: const TextStyle(fontSize: 20),
                         ),
                         const SizedBox(width: 12),
-                        Text(
-                          reason['title']!,
-                          style: TextStyle(
-                            fontWeight: isSelected
-                                ? FontWeight.bold
-                                : FontWeight.w500,
-                            color: isSelected
-                                ? AppColors.lightChartSuccess
-                                : AppColors.lightForeground,
+                        Expanded(
+                          child: Text(
+                            reason['title']!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
+                              color: isSelected
+                                  ? AppColors.lightChartSuccess
+                                  : AppColors.lightForeground,
+                            ),
                           ),
                         ),
                       ],

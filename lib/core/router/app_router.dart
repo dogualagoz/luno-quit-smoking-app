@@ -5,6 +5,9 @@ import 'package:luno_quit_smoking_app/core/widgets/main_shell.dart';
 import 'package:luno_quit_smoking_app/features/settings/presentation/pages/settings_page.dart';
 import 'package:luno_quit_smoking_app/features/damage/presentation/damage_screen.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/presentation/onboarding_screen.dart';
+import 'package:luno_quit_smoking_app/features/auth/presentation/auth_selection_screen.dart';
+import 'package:luno_quit_smoking_app/features/auth/presentation/email_login_screen.dart';
+import 'package:luno_quit_smoking_app/features/auth/presentation/email_register_screen.dart';
 
 class AppRouter {
   // Sayfa isimleriin (adreslerini tanımlıyoruz)
@@ -12,6 +15,9 @@ class AppRouter {
   // Ana sayfanın adresi
   static const String root = '/';
   static const String onboarding = '/onboarding';
+  static const String authSelection = '/auth-selection';
+  static const String emailLogin = '/email-login';
+  static const String register = '/register';
   static const String damage = '/damage';
   static const String recovery = '/recovery';
   static const String crisis = '/crisis';
@@ -24,6 +30,21 @@ class AppRouter {
       GoRoute(
         path: onboarding,
         builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: authSelection,
+        builder: (context, state) {
+          final userName = state.extra as String? ?? "Dostum";
+          return AuthSelectionScreen(userName: userName);
+        },
+      ),
+      GoRoute(
+        path: emailLogin,
+        builder: (context, state) => const EmailLoginScreen(),
+      ),
+      GoRoute(
+        path: register,
+        builder: (context, state) => const EmailRegisterScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

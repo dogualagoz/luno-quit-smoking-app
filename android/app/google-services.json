@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "763643886491",
+    "project_id": "luno-quit-smoking-app",
+    "storage_bucket": "luno-quit-smoking-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:763643886491:android:e275f82b8db451d67bff3e",
+        "android_client_info": {
+          "package_name": "com.example.luno_quit_smoking_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "763643886491-an75feffflt5vmi6i511tg6rkp544s0k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.luno_quit_smoking_app",
+            "certificate_hash": "741cea70b93ae4fdbf8b04151a1c0e065f14c845"
+          }
+        },
+        {
+          "client_id": "763643886491-jfgsib89pj00qrcl69532t5q9u7kuumd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFd9Vf0n2-oOQAI3pf_yBeBd1i_ySClzI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "763643886491-jfgsib89pj00qrcl69532t5q9u7kuumd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "763643886491-cr8214f4enrgugdn4cu6ur70hrlbumoj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.lunoQuitSmokingApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

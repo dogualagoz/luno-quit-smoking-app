@@ -73,7 +73,7 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
                 Text(
                   "Günde kaç sigara içiyorsun?",
                   style: AppTextStyles.label.copyWith(
-                    color: AppColors.lightForeground.withOpacity(0.6),
+                    color: AppColors.lightForeground.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.p20),
@@ -101,7 +101,7 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
                 Text(
                   "adet / gün",
                   style: AppTextStyles.body.copyWith(
-                    color: AppColors.lightForeground.withOpacity(0.4),
+                    color: AppColors.lightForeground.withValues(alpha: 0.4),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.p24),
@@ -120,7 +120,7 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? AppColors.lightPrimary.withOpacity(0.05)
+                                ? AppColors.lightPrimary.withValues(alpha: 0.05)
                                 : AppColors.lightCard,
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
@@ -134,7 +134,7 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
                             style: TextStyle(
                               color: isSelected
                                   ? AppColors.lightPrimary
-                                  : AppColors.lightForeground.withOpacity(0.7),
+                                  : AppColors.lightForeground.withValues(alpha: 0.7),
                               fontWeight: isSelected
                                   ? FontWeight.bold
                                   : FontWeight.normal,
@@ -154,14 +154,14 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
             width: double.infinity,
             padding: AppSpacing.cardPadding,
             decoration: BoxDecoration(
-              color: AppColors.lightPrimary.withOpacity(0.05),
+              color: AppColors.lightPrimary.withValues(alpha: 0.05),
               borderRadius: AppRadius.mainCard,
             ),
             child: Text(
               _getDynamicMessage(),
               textAlign: TextAlign.center,
               style: AppTextStyles.caption.copyWith(
-                color: AppColors.lightForeground.withOpacity(0.6),
+                color: AppColors.lightForeground.withValues(alpha: 0.6),
               ),
             ),
           ),

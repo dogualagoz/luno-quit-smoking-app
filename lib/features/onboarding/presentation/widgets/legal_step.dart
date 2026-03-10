@@ -66,7 +66,7 @@ class _LegalStepState extends State<LegalStep> {
                   "Bu yolculuk senin iradenle ve doğru verilerle şekillenecek. Lütfen sorulara en dürüst halinle yanıt ver.",
                   textAlign: TextAlign.center,
                   style: AppTextStyles.body.copyWith(
-                    color: AppColors.lightForeground.withOpacity(0.6),
+                    color: AppColors.lightForeground.withValues(alpha: 0.6),
                   ),
                 ),
               ],

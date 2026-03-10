@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 
 class DamageHeader extends StatelessWidget {
   const DamageHeader({super.key});

@@ -60,7 +60,7 @@ class SettingsSlider extends StatelessWidget {
                     ),
                   ),
                   TextSpan(
-                    text: '$unit',
+                    text: unit,
                     style: AppTextStyles.caption.copyWith(
                       // color: ... siliyoruz, böylece yukarıdaki yeşili alır
                       fontSize: 18,

@@ -15,9 +15,10 @@
 - [x] `main.dart` — Entry point
 - [x] `app.dart` — MaterialApp + tema bağlantısı
 - [x] `go_router` paketi eklendi
-- [x] `core/router/app_router.dart` — GoRouter yapılandırması
+- [x] `core/router/app_router.dart` — GoRouter yapılandırması (onboarding, auth, main shell rotaları)
 - [x] Bottom Navigation Shell (`core/widgets/main_shell.dart`)
 - [x] Router'ı `app.dart`'a bağla
+- [x] `core/constants/app_constants.dart` — İş kuralları ve mock veri sabitleri
 
 ## Faz 1 — Paylaşılan Widget'lar ✅
 
@@ -29,16 +30,20 @@
 - [x] `core/widgets/luno_progress_bar.dart` — Genel amaçlı progress bar
 - [x] `core/widgets/quote_card.dart` — Alıntı/mesaj kartı
 - [x] `core/widgets/swipeable_damage_cards.dart` — Kaydırılabilir hasar kartları
-- [ ] `core/widgets/luno_button.dart` — CTA butonları
-- [ ] `core/widgets/cigerito_mascot.dart` — Maskot widget
+- [x] `core/widgets/luno_button.dart` — CTA butonları
+- [x] `core/widgets/cigerito_mascot.dart` — Maskot widget (MascotMode: normal/happy/proud/sad/worried/sarcastic)
 
-## Faz 2 — Ana Sayfa (Main Screen) — Front
+## Faz 2 — Ana Sayfa (Main Screen)
 
 - [x] `features/main/presentation/main_screen.dart` — Ana ekran iskeleti
 - [x] `features/main/presentation/widgets/main_header.dart` — Üst başlık
-- [ ] Ana Sayfa — summary bar (statik/mock)
-- [ ] Ana Sayfa — mascot section + speech bubble
-- [ ] Ana Sayfa — provider bağlantısı (gerçek data)
+- [x] Ana Sayfa — swipeable damage cards
+- [x] Ana Sayfa — speech bubble (maskot ile birlikte)
+- [x] Ana Sayfa — stat grid (mock data ile)
+- [x] Ana Sayfa — recovery progress (mock data ile)
+- [x] Ana Sayfa — quote card
+- [ ] Ana Sayfa — Ciğerito maskot bölümü (şu an `Icons.monitor_heart` placeholder var)
+- [ ] Ana Sayfa — provider bağlantısı (Hive'dan gerçek UserProfile verisi)
 
 ## Faz 3 — Hasar Raporu (Damage) — Front ✅
 
@@ -57,38 +62,59 @@
 - [x] `features/settings/presentation/widgets/settings_slider.dart`
 - [x] `features/settings/presentation/widgets/settings_toggle_tile.dart`
 
-## Faz 5 — Veri Katmanı & Onboarding (Sıradaki 🎯)
+## Faz 5 — Veri Katmanı & Onboarding ✅
 
-- [ ] `core/constants/app_constants.dart` — Anahtar string sabitleri (SharedPrefs key'leri)
-- [ ] `services/local_storage/shared_prefs_service.dart` — Local storage altyapısı
-- [ ] `features/onboarding/data/models/user_profile.dart` — UserProfile modeli
-- [ ] `features/onboarding/data/onboarding_repository.dart` — Repository
-- [ ] `features/onboarding/application/onboarding_provider.dart` — Provider
-- [ ] `features/onboarding/presentation/onboarding_screen.dart` — UI (sorular akışı)
-- [ ] Router guard — onboarding tamamlandı mı kontrolü
+- [x] `services/local_storage/hive_service.dart` — Hive başlatma ve box yönetimi
+- [x] `features/onboarding/data/models/user_profile.dart` — UserProfile modeli (copyWith, toJson, fromJson dahil)
+- [x] `features/onboarding/data/models/user_profile.g.dart` — Hive adapter (build_runner ile üretildi)
+- [x] `features/onboarding/data/onboarding_repository.dart` — Repository (save/get/delete/isCreated)
+- [x] `features/onboarding/application/onboarding_provider.dart` — Provider (completeOnboarding + updateProfileAuth)
+- [x] `features/onboarding/presentation/onboarding_screen.dart` — 10 adımlık onboarding akışı
+- [x] Onboarding adım widget'ları (intro, legal, smokingYears, dailyCigarettes, packetPrice, tryingCount, reasons, triggerMoments, finalLegal, summary)
+- [ ] Router guard — uygulama açılışında "onboarding bitti mi?" kontrolü (şu an her açılışta onboarding gösteriyor)
 
-## Faz 6 — Provider Bağlantıları
+## Faz 5.5 — Auth Ekranları ✅
 
-- [ ] Dashboard provider → SharedPrefs'ten UserProfile oku
+- [x] `features/auth/presentation/auth_selection_screen.dart` — Apple / Google / Email / Anonim seçim ekranı
+- [x] `features/auth/presentation/email_login_screen.dart` — E-posta giriş ekranı
+- [x] `features/auth/presentation/email_register_screen.dart` — Hesap oluşturma ekranı
+- [x] Onboarding → Auth Selection yönlendirmesi
+- [x] Auth Selection → Email Login / Register yönlendirmesi
+- [ ] Auth ekranları → Ana Sayfa yönlendirmesi (şu an context.go('/') ile gidiyor, Firebase Auth sonrası düzelecek)
+
+## Faz 6 — Firebase & Gerçek Auth 🎯 (Sıradaki)
+
+- [ ] Firebase projesi oluştur (Firebase Console)
+- [ ] FlutterFire CLI ile `firebase_options.dart` yapılandır
+- [ ] `firebase_core`, `firebase_auth` paketlerini ekle
+- [ ] `main.dart`'ta Firebase.initializeApp() çağrısı
+- [ ] `features/auth/application/auth_provider.dart` — AuthNotifier (signInWithGoogle, signInWithApple, signInWithEmail, signInAnonymously, signOut)
+- [ ] `features/auth/data/auth_repository.dart` — Firebase Auth işlemleri
+- [ ] Giriş başarısında `updateProfileAuth(userId, email)` ile Hive güncelleme
+- [ ] Router guard — `isProfileCreated()` && `isSignedIn()` kontrolü
+- [ ] `firebase_firestore` paketi ekle
+- [ ] `features/onboarding/data/firestore_sync_service.dart` — Hive → Firestore senkronizasyonu
+
+## Faz 7 — Provider Bağlantıları (Faz 6 bittikten sonra)
+
+- [ ] Dashboard provider → Hive'dan UserProfile oku, ana sayfaya bağla
 - [ ] Hasar provider → UserProfile'dan organ hasarlarını hesapla
-- [ ] Settings provider + repository
-- [ ] Ayarlar — profil bilgileri düzenleme (kaydet/oku)
+- [ ] Settings provider + repository — profil bilgilerini okuma/kaydetme
+- [ ] Ayarlar — profil bilgileri düzenleme (packPrice, dailyCigarettes vb. güncellenebilir)
 - [ ] Ayarlar — tema geçişi (light/dark)
 
-## Faz 7 — Polish & Firebase
+## Faz 8 — Polish & Placeholder Ekranlar
 
-- [ ] Firebase initialization + Anonymous Auth
-- [ ] Firebase Analytics event'leri (`onboarding_completed`, `damage_report_viewed`, vb.)
+- [ ] Coming soon ekranları — İyileşme, Kriz, Geçmiş (şu an `_PlaceholderScreen` var)
 - [ ] Animasyonlar ve micro-interactions
 - [ ] Error handling iyileştirmesi
-- [ ] Coming soon placeholder ekranları (İyileşme, Kriz, Geçmiş)
+- [ ] Firebase Analytics event'leri (`onboarding_completed`, `damage_report_viewed` vb.)
 
 ## Post-MVP
 
-- [ ] Geçmiş & Kayıt ekranı
+- [ ] Geçmiş & Kayıt ekranı (tam versiyon)
 - [ ] İyileşme Yolculuğu ekranı
 - [ ] Kriz Modu ekranı
 - [ ] Push Notifications
-- [ ] Gerçek Authentication (email/Google)
-- [ ] AI özellikleri
+- [ ] AI özellikleri (Ciğerito konuşmaları, öneri motoru)
 - [ ] Ödeme sistemi

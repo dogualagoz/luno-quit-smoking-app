@@ -48,7 +48,7 @@ class _IntroStepState extends State<IntroStep> {
             "Birlikte planlayacağız, birlikte savaşacağız ve en sonunda sen kazanacaksın. Hazırsan başlayalım mı?",
             textAlign: TextAlign.center,
             style: AppTextStyles.body.copyWith(
-              color: AppColors.lightForeground.withOpacity(0.6),
+              color: AppColors.lightForeground.withValues(alpha: 0.6),
             ),
           ),
           const Spacer(),

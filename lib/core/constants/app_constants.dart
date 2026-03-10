@@ -25,4 +25,5 @@ class AppMockData {
 
 class AppBusinessRules {
   static const int minuesLostPerCigarette = 11;
+  static const int defaultCigarettesPerPack = 20;
 }

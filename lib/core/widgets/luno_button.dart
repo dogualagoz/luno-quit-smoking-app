@@ -28,7 +28,7 @@ class LunoButton extends StatelessWidget {
         borderRadius: AppRadius.button,
         boxShadow: [
           BoxShadow(
-            color: AppColors.lightPrimary.withOpacity(0.3),
+            color: AppColors.lightPrimary.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

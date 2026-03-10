@@ -24,13 +24,18 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
       cigarettesPerPack: fields[4] as int,
       quitDate: fields[5] as DateTime?,
       createdAt: fields[6] as DateTime,
+      tryingToQuitCount: fields[7] as String?,
+      quitReasons: (fields[8] as List).cast<String>(),
+      triggerMoment: fields[9] as String?,
+      userId: fields[10] as String?,
+      email: fields[11] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserProfile obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.nickname)
       ..writeByte(1)
@@ -44,7 +49,17 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
       ..writeByte(5)
       ..write(obj.quitDate)
       ..writeByte(6)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(7)
+      ..write(obj.tryingToQuitCount)
+      ..writeByte(8)
+      ..write(obj.quitReasons)
+      ..writeByte(9)
+      ..write(obj.triggerMoment)
+      ..writeByte(10)
+      ..write(obj.userId)
+      ..writeByte(11)
+      ..write(obj.email);
   }
 
   @override

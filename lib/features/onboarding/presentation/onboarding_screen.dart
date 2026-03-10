@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/luno_button.dart';
 import '../../../core/widgets/luno_progress_bar.dart';
 import 'widgets/intro_step.dart';
@@ -15,6 +15,8 @@ import 'widgets/reasons_step.dart';
 import 'widgets/trigger_moments_step.dart';
 import 'widgets/final_legal_step.dart';
 import 'widgets/summary_step.dart';
+import '../application/onboarding_provider.dart';
+import '../../../core/constants/app_constants.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -70,10 +72,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
-  void _finishOnboarding() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Onboarding bitti! Hoşgeldin $_userName')),
-    );
+  Future<void> _finishOnboarding() async {
+    await ref
+        .read(onboardingProvider.notifier)
+        .completeOnboarding(
+          nickname: _userName.trim().isEmpty ? AppMockData.userName : _userName,
+          dailyCigarettes: _dailyCigarettes,
+          smokingYears: _smokingYears,
+          packPrice: _packetPrice,
+          tryingToQuitCount: _tryingCount,
+          quitReasons: _selectedReasons,
+          triggerMoment: _triggerMoment,
+          quitDate: DateTime.now(),
+        );
+
+    if (mounted) {
+      context.go('/auth-selection', extra: _userName);
+    }
   }
 
   @override

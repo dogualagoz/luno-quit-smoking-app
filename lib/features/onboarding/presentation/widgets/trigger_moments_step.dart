@@ -101,7 +101,7 @@ class _TriggerMomentsStepState extends State<TriggerMomentsStep> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? AppColors.lightPrimary.withOpacity(0.05)
+                            ? AppColors.lightPrimary.withValues(alpha:0.05)
                             : AppColors.lightCard,
                         borderRadius: AppRadius.mainCard,
                         border: Border.all(
@@ -137,7 +137,7 @@ class _TriggerMomentsStepState extends State<TriggerMomentsStep> {
                                   opt['desc']!,
                                   style: AppTextStyles.micro.copyWith(
                                     color: AppColors.lightForeground
-                                        .withOpacity(0.4),
+                                        .withValues(alpha: 0.4),
                                   ),
                                 ),
                               ],
