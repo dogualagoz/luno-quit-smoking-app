@@ -1,4 +1,3 @@
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/models/user_profile.dart';
 
