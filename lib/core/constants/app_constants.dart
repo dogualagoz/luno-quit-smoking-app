@@ -24,6 +24,30 @@ class AppMockData {
 }
 
 class AppBusinessRules {
-  static const int minuesLostPerCigarette = 11;
+  /// Her sigara hayattan çaldığı dakika
+  static const int minutesLostPerCigarette = 11;
+
+  /// Bir paketteki varsayılan sigara sayısı
   static const int defaultCigarettesPerPack = 20;
+
+  /// Bir günün dakika cinsinden karşılığı
+  static const int minutesPerDay = 1440;
+
+  /// Bir saatin dakika cinsinden karşılığı
+  static const int minutesPerHour = 60;
+
+  /// Bir sigaranın metre cinsinden uzunluğu (filtre dahil)
+  static const double cigaretteLengthMeters = 0.084;
+
+  /// Metreyi kilometreye çevirmek için bölücü
+  static const double metersPerKilometer = 1000;
+
+  /// Sigara içilen yıl başına iyileşme süresi katsayısı (yıl cinsinden)
+  static const double recoveryFactor = 0.75;
+
+  /// Bir yıldaki gün sayısı
+  static const int daysPerYear = 365;
+
+  /// Bir aydaki ortalama gün sayısı
+  static const int daysPerMonth = 30;
 }

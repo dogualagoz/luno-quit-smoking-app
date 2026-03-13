@@ -1,0 +1,38 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
+import 'package:luno_quit_smoking_app/features/main/application/quit_calculator.dart';
+import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart';
+
+// Dashboard istatistiklerini sağlayan provider
+final statsProvider = Provider<QuitStats>((ref) {
+  final userProfile = ref.watch(onboardingRepositoryProvider).getProfile();
+
+  if (userProfile == null) {
+    // Profil yoksa varsayılan (boş) verileri dön
+    return QuitStats(
+      moneyLabel: "Harcanan Para",
+      moneyValue: "₺ 0",
+      moneyDecimal: ",00",
+      moneySubtext: "₺0.0/dk yanıyor",
+      moneyAction: "başlamak için dokun",
+      timeLabel: "Kaybedilen Zaman",
+      timeValue: "0",
+      timeSubtext: "Henüz başlamadın",
+      timeDigits: List.filled(8, "0"),
+      countLabel: "İçilen Sigara",
+      countValue: "0",
+      countSubtext: "Henüz ölçülmedi",
+      recoveryLabel: "İyileşme Süresi",
+      recoveryYears: 0,
+      recoveryMonths: 0,
+      recoveryDays: 0,
+      recoverySubtext: "Henüz ölçülmedi",
+      recoveryAction: "başlamak için dokun",
+      progress: 0.0,
+      type: QuitStatType.loss,
+    );
+  }
+
+  // Her iki durumda da hasar hesaplaması yap
+  return QuitCalculator.calculate(userProfile);
+});

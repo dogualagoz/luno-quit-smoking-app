@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/widgets/recovery_progress.dart';
 import 'package:luno_quit_smoking_app/core/widgets/quote_card.dart';
@@ -6,69 +7,71 @@ import 'package:luno_quit_smoking_app/core/widgets/stat_grid.dart';
 import 'package:luno_quit_smoking_app/core/widgets/speech_bubble.dart';
 import 'package:luno_quit_smoking_app/features/main/presentation/widgets/main_header.dart';
 import 'package:luno_quit_smoking_app/core/widgets/swipeable_damage_cards.dart';
+import 'package:luno_quit_smoking_app/features/main/application/stats_provider.dart';
+import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
+import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart';
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends ConsumerWidget {
   const MainScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Gerçek istatistikleri ve kullanıcı profilini dinle
+    final stats = ref.watch(statsProvider);
+    final profile = ref.watch(onboardingRepositoryProvider).getProfile();
+
+    final userName = profile?.nickname ?? "Kullanıcı";
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Padding(
-            padding: const EdgeInsets.all(20.0), // Ekran kenarından boşluk
-
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Başlık
-                MainHeader(userName: "Doğukan", subText: "Bugün 25 tane içtin"),
+                // Dinamik Başlık
+                MainHeader(userName: userName, subText: stats.recoverySubtext),
 
                 AppSpacing.sectionGapLarge,
 
-                //Ciğer ikonu
+                // Dinamik Maskot Bölümü
                 Center(
                   child: Icon(
                     Icons.monitor_heart,
                     size: 80,
-                    color: Colors.pink.shade200,
+                    color: stats.type == QuitStatType.success
+                        ? Colors.pink.shade200
+                        : Colors.redAccent.withValues(alpha: 0.5),
                   ),
                 ),
 
                 const SizedBox(height: 8),
 
-                // Konuşma balonu
-                const SpeechBubble(
-                  text:
-                      "Bugün kaç tane içtin ? Saymayı bıraktım, kalbim kaldırmıyor.",
-                ),
+                // Konuşma Balonu
+                SpeechBubble(text: stats.recoverySubtext),
                 AppSpacing.sectionGap,
 
-                // Organ Hasar Kartları (Swipeable)
+                // Organ Hasar Kartları
                 const SwipeableDamageCards(),
                 AppSpacing.sectionGap,
 
-                // İstatistikler (ilerde sayaç eklenecek)
-                StatGrid(
-                  spentMoney: "₺95.813",
-                  lostTime: "12 Gün",
-                  smokedCount: "25.550",
-                  healthRisk: "%85",
-                ),
+                // Dinamik İstatistik Grid'i
+                StatGrid(stats: stats),
                 AppSpacing.sectionGap,
 
-                // Toparlanma ilerlemesi (başka bir şeye değiştirilebilir)
-                const RecoveryProgress(
-                  progress: 0.8,
-                  progressText: "%80",
-                  statusText: "Akciğerlerin temizleniyor",
+                // Dinamik Toparlanma İlerlemesi
+                RecoveryProgress(
+                  progress: stats.progress,
+                  progressText: "%${(stats.progress * 100).toInt()}",
+                  statusText: stats.recoverySubtext,
                 ),
 
                 AppSpacing.sectionGap,
 
-                // MOTİVASYON KARTI (Quote Card)
+                // Motivasyon Kartı (Quote Card)
                 const QuoteCard(
                   quote:
                       "Her sigara hayatından 11 dakika çalar. Ama sen zaten zamanı dumanla harcamayı seviyorsun, değil mi?",
