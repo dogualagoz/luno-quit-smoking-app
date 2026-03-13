@@ -94,8 +94,12 @@ class AuthService {
     }
   }
 
-  /// Oturumu kapatır ve local verileri (isteğe bağlı) temizler.
+  /// Oturumu kapatır ve cihazdaki yerel verileri tamamen temizler.
   Future<void> signOut() async {
+    // 1. Firebase ve Google oturumunu kapat
     await _authRepository.signOut();
+    // 2. ÖNEMLİ: Cihazdaki yerel onboarding verilerini sil
+    // Bu sayede yeni bir hesapla girince eski veriler karışmaz.
+    await _onboardingRepository.deleteProfile();
   }
 }

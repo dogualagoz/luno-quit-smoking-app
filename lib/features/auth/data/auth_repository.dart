@@ -9,6 +9,10 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(FirebaseAuth.instance, GoogleSignIn.instance);
 });
 
+final authStateProvider = StreamProvider<User?>((ref) {
+  return ref.watch(authRepositoryProvider).authStateChanges();
+});
+
 /// [AuthRepository], Firebase ve Google Sign-In paketleriyle doğrudan konuşan "Repository" katmanıdır.
 /// Sadece veri alışverişinden (Auth servislerini çağırmaktan) sorumludur.
 class AuthRepository {

@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
+import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../widgets/settings_header.dart';
 import '../widgets/profile_card.dart';
 import '../widgets/settings_slider.dart';
 import '../widgets/settings_toggle_tile.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -111,6 +113,66 @@ class SettingsPage extends StatelessWidget {
                 ),
 
                 const SizedBox(height: AppSpacing.p24),
+
+                // 5. Hesap İşlemleri
+                LunoCard(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        onTap: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Çıkış yap?'),
+                              content: const Text(
+                                'Oturumu kapatmak istediğine emin misin?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: const Text('Vazgeç'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: const Text(
+                                    'Çıkış Yap',
+                                    style: TextStyle(
+                                      color: AppColors.lightDestructive,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirm == true) {
+                            await ref
+                                .read(authControllerProvider.notifier)
+                                .signOut();
+                          }
+                        },
+                        leading: Icon(
+                          Icons.logout_rounded,
+                          color: AppColors.lightDestructive.withValues(
+                            alpha: 0.8,
+                          ),
+                        ),
+                        title: Text(
+                          'Çıkış Yap',
+                          style: AppTextStyles.body.copyWith(
+                            color: AppColors.lightDestructive,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        trailing: const Icon(Icons.chevron_right, size: 20),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: AppSpacing.p40),
               ],
             ),
           ),
