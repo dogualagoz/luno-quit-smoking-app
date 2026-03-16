@@ -7,13 +7,15 @@ import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_reposi
 final onboardingProvider =
     StateNotifierProvider<OnboardingNotifier, AsyncValue<void>>((ref) {
       final repository = ref.watch(onboardingRepositoryProvider);
-      return OnboardingNotifier(repository);
+      return OnboardingNotifier(repository, ref);
     });
 
 class OnboardingNotifier extends StateNotifier<AsyncValue<void>> {
   final OnboardingRepository _repository;
+  final Ref _ref;
 
-  OnboardingNotifier(this._repository) : super(const AsyncValue.data(null));
+  OnboardingNotifier(this._repository, this._ref)
+    : super(const AsyncValue.data(null));
 
   // Kullanıcı verilerini toplar ve Hive'a kaydeder
 
@@ -49,6 +51,7 @@ class OnboardingNotifier extends StateNotifier<AsyncValue<void>> {
       );
 
       await _repository.saveProfile(profile);
+      _ref.read(userProfileProvider.notifier).state = profile;
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -62,8 +65,11 @@ class OnboardingNotifier extends StateNotifier<AsyncValue<void>> {
   }) async {
     final currentProfile = _repository.getProfile();
     if (currentProfile == null) return;
-    await _repository.saveProfile(
-      currentProfile.copyWith(userId: userId, email: email),
+    final updatedProfile = currentProfile.copyWith(
+      userId: userId,
+      email: email,
     );
+    await _repository.saveProfile(updatedProfile);
+    _ref.read(userProfileProvider.notifier).state = updatedProfile;
   }
 }

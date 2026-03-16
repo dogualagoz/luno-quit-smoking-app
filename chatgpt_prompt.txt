@@ -1,0 +1,191 @@
+Rol: Sen, dijital sağlık uygulamaları ve davranışsal psikoloji konusunda uzmanlaşmış bir ürün danışmanısın. Sigara bırakma (smoking cessation) alanında akademik araştırmaları, klinik çalışmaları ve piyasadaki dijital ürünleri derinlemesine analiz edebilen bir araştırmacısın.
+
+Görev: "Luno" adlı bir sigara bırakma farkındalık uygulamasına eklenebilecek yeni, bilimsel temelli ve kullanıcı bağlılığını artıracak özellik önerileri üret. Önerilerini aşağıda tanımlanan uygulamanın mevcut yapısını, tonunu ve felsefesini koruyarak yap.
+
+---
+
+UYGULAMA HAKKINDA: LUNO
+
+Luno, hâlâ sigara içen ama bırakmak isteyen kullanıcılar için tasarlanmış bir farkındalık ve davranış yönlendirme uygulamasıdır. Flutter ile geliştirilmiş, iOS ve Android'de çalışan cross-platform bir mobil uygulamadır.
+
+TEMEL FELSEFE VE FARKI
+
+Luno, klasik sigara bırakma uygulamalarından temelden farklıdır:
+- Rozet, ödül, pozitif motivasyon sistemi KULLANMAZ
+- Kullanıcıyı acı gerçeklerle yüzleştirme stratejisi uygular (harcanan para, verilen organ hasarı, kaybedilen ömür)
+- "Ciğerito" adında tatlı ama alaycı bir akciğer maskotu kullanıcıya eşlik eder — sarkastik, iğneleyici ama sevimli yorumlar yapar
+- Tatlı, hafif kara mizahi ve iğneleyici bir ton benimser
+
+Örnek Ciğerito yorumu: "Her sigara hayatından 11 dakika çalar. Ama sen zaten zamanı dumanla harcamayı seviyorsun, değil mi?"
+
+TEKNİK ALTYAPI
+
+- Framework: Flutter 3.x (cross-platform)
+- State Management: Riverpod
+- Backend: Firebase (Firestore, Auth, Analytics)
+- Mimari: Feature-first + Lightweight Clean Architecture
+- Routing: GoRouter
+- Veri Katmanı: Repository Pattern + Hive (local storage)
+
+ŞU AN MEVCUT ÖZELLİKLER (MVP — v1.0)
+
+1. Onboarding Akışı
+   - Kullanıcıdan günlük sigara sayısı, paket fiyatı, kaç yıldır içtiği ve bırakma nedenleri alınır
+   - Kişiselleştirilmiş istatistikler bu verilere göre hesaplanır
+   - Yasal uyarı ve sorumluluk reddi adımları içerir
+
+2. Dashboard (Ana Ekran)
+   - Harcanan Para kartı — Toplam harcama, dakika başına yanan para, "ne alabilirdin?" aksiyonu
+   - Kaybedilen Zaman kartı — Gün cinsinden kayıp, dijital sayaç animasyonu
+   - İçilen Sigara kartı — Toplam içilen sigara sayısı, uçtan uca dizilse kaç km eder hesabı
+   - İyileşme Süresi kartı — Organların tamamen iyileşmesi için gereken süre (yıl/ay/gün)
+   - Ciğerito maskot bölümü — 6 farklı ruh haline göre maskotan sarkastik yorumlar
+   - İyileşme ilerleme çubuğu — Bırakanlar için organ iyileşme timeline'ı
+   - Günlük motivasyon kartı — Ciğerito'dan iğneleyici alıntılar
+
+3. Hasar Raporu Ekranı
+   - 6 organ bazlı hasar skoru (Akciğerler, Kalp, Kan Dolaşımı, Beyin, Ağız & Boğaz, Mide & Sindirim)
+   - Her organa özel hasar yüzdesi — kullanıcının sigara geçmişine göre dinamik hesaplama
+   - Bilimsel kaynaklara dayalı hasar formülü (yıl × günlük adet × ağır içici çarpanı)
+   - Her organa özel iyileşme süresi (gün cinsinden)
+   - Swipeable kartlar ile görselleştirme
+   - Kaynaklar: U.S. Surgeon General (2014), CDC, American Cancer Society, WHO
+
+4. Bilimsel İyileşme Zaman Çizelgesi
+   - 11 milestone: 20 dakikadan → 15 yıla kadar iyileşme aşamaları
+   - Her aşama için bilimsel kaynak referansı (ACS, WHO, Surgeon General, NHS)
+   - Hakkında sayfasında görsel timeline olarak sunulur
+
+5. Ayarlar Ekranı
+   - Profil bilgileri düzenleme (günlük sigara, paket fiyatı, hedef)
+   - Light/Dark tema geçişi
+   - Çıkış yapma
+
+6. Kimlik Doğrulama
+   - Email ile kayıt/giriş
+   - Google ile giriş
+   - Firebase Authentication entegrasyonu
+
+7. Hakkında Sayfası
+   - Uygulama amacı ve sorumluluk reddi
+   - Bilimsel kaynakların listesi
+   - İyileşme zaman çizelgesi
+
+PLANLANAN AMA HENÜZ GELİŞTİRİLMEMİŞ ÖZELLİKLER
+
+- İyileşme Yolculuğu ekranı (bıraktıktan sonra vücut toparlanma timeline'ı — aktif takip)
+- Kriz Modu (sigara isteği gelince acil destek)
+- Geçmiş & Kayıt (günlük sigara takibi + haftalık istatistikler)
+- Push Notifications (hatırlatma ve motivasyon)
+- AI Özellikleri (kişiselleştirilmiş mesajlar)
+- Ödeme sistemi
+
+---
+
+SENDEN İSTENEN ARAŞTIRMA VE ÇIKTI
+
+1. PAZAR ARAŞTIRMASI — RAKİP ANALİZİ
+
+Liderlik eden sigara bırakma uygulamalarını detaylı incele:
+- Smoke Free, QuitNow!, Kwit, EasyQuit, Flamy, Quit Genius, Livewell (NHS), quitSTART (CDC)
+- Her uygulamanın öne çıkan özelliklerini, kullanıcı geri bildirimlerini ve farklılaşma noktalarını analiz et
+- Bu uygulamaların Luno'da bulunmayan hangi özelliklerinin gerçekten etkili olduğunu belirle
+- Luno'nun "acı gerçeklerle yüzleştirme" yaklaşımını bu uygulamalar neden kullanmıyor, avantajları/dezavantajları neler?
+
+2. BİLİMSEL VE KLİNİK ARAŞTIRMA TARAMASI
+
+Aşağıdaki kurumların çalışmalarını ve yayınlarını tara:
+- WHO (World Health Organization) — Tobacco cessation guidelines, mCessation programı
+- CDC (Centers for Disease Control and Prevention) — Tips From Former Smokers kampanyası
+- ACS (American Cancer Society) — Quitting smoking resources
+- NHS (National Health Service) — Stop smoking services and digital tools
+- Cochrane Library — Sigara bırakma müdahaleleri sistematik derlemeleri
+- Journal of Medical Internet Research (JMIR) — mHealth uygulamaları araştırmaları
+- Nicotine & Tobacco Research — Davranışsal müdahale çalışmaları
+- Society for Research on Nicotine and Tobacco (SRNT) — Güncel araştırma bulguları
+
+Özellikle şu konulardaki bulguları incele:
+- Dijital müdahalelerin sigara bırakma başarı oranlarına etkisi
+- Gamification vs. fear appeal (korku çekiciliği) yaklaşımlarının karşılaştırması
+- Sosyal destek mekanizmalarının etkinliği
+- Nikotin krizi yönetim stratejileri
+- Relapse (nüks) önleme teknikleri
+- CBT (Bilişsel Davranışçı Terapi) temelli dijital müdahaleler
+- Motivational Interviewing tekniklerinin mobil uygulamalardaki kullanımı
+
+3. ÖZELLİK ÖNERİLERİ
+
+Yukarıdaki araştırma sonuçlarına dayanarak, Luno'ya eklenebilecek özellik önerileri yap. Her öneri için şunları belirt:
+
+- Özellik Adı: Kısa, akılda kalıcı bir isim
+- Açıklama: Ne yapacağı, nasıl çalışacağı
+- Bilimsel Dayanak: Hangi araştırma/çalışma bu özelliği destekliyor (kaynak belirt)
+- Luno'ya Uyumu: Bu özellik Luno'nun "acı gerçeklerle yüzleştirme" felsefesiyle nasıl örtüşür
+- Ciğerito Entegrasyonu: Maskot bu özelliğe nasıl dahil edilebilir (örnek diyalog/yorum)
+- Teknik Zorluk: Düşük / Orta / Yüksek (Flutter + Firebase bağlamında)
+- Kullanıcı Etkisi: Bu özelliğin kullanıcı bağlılığı ve bırakma başarısına tahmini etkisi
+- Öncelik: Must-have / Nice-to-have / İleri faz
+- Rakip Referans: Bu özellik hangi rakip uygulamalarda var, onlardan farkı ne olmalı
+- Ücretsiz/Premium: Bu özellik ücretsiz mi olmalı yoksa premium (paralı) mı? Neden?
+
+4. GELİR MODELİ & MONETİZASYON ARAŞTIRMASI
+
+Bu kısım çok önemli. Luno'nun sürdürülebilir bir gelir modeli oluşturması gerekiyor. Aşağıdakileri detaylı araştır:
+
+a) Rakip Gelir Modelleri Analizi:
+- Smoke Free, QuitNow!, Kwit, Quit Genius gibi uygulamalar nasıl para kazanıyor?
+- Hangi özelliklerini ücretsiz, hangilerini premium (paralı) tutuyorlar?
+- Abonelik fiyatları ne kadar? (aylık/yıllık)
+- Kullanıcılar hangi premium özelliklere gerçekten para ödüyor? (App Store/Play Store yorumlarından çıkarım yap)
+
+b) Luno İçin Spesifik Monetizasyon Önerileri:
+Her öneri için şunları belirt:
+- Premium Özellik Adı: Kısa isim
+- Açıklama: Ne sunuyor
+- Neden Paralı Olmalı: Kullanıcı neden buna para öder? Hangi psikolojik tetikleyici?
+- Ücretsiz Versiyonda Alternatifi: Free kullanıcıya ne gösterilmeli (teaser/kısıtlı versiyon)
+- Tahmini Fiyatlandırma: Tek seferlik / aylık / yıllık abonelik önerisi
+- Rakip Referans: Benzer bir modeli başarıyla kullanan uygulama örneği
+
+c) Fiyatlandırma Stratejisi:
+- Freemium model mi, subscription model mi, yoksa hibrit mi daha uygun?
+- Türkiye pazarı için uygun fiyat aralığı ne olmalı? (satın alma gücü ve App Store ortalamaları dikkate alınarak)
+- Ücretsiz içerik ile premium içerik arasındaki denge nasıl kurulmalı? (kullanıcıyı kaybetmeden nasıl para kazanılır)
+- Sağlık uygulamalarında "paywall" yerleştirmenin etik boyutu nasıl dengelenmeli?
+
+d) Alternatif Gelir Kaynakları:
+- In-app purchase (tek seferlik satın alımlar) fırsatları
+- Sponsorluk modeli (NRT markaları, sağlık kuruluşları ile)
+- B2B modeli (şirketlerin çalışanlarına sunması)
+- Veri anonimleştirme ve araştırma iş birlikleri
+
+5. EK BEKLENTİLER
+
+- Önerileri kısa vadeli (1-3 ay), orta vadeli (3-6 ay) ve uzun vadeli (6-12 ay) olarak kategorize et
+- En az 15-20 farklı özellik önerisi sun
+- Halihazırda planlanan özellikleri (İyileşme Yolculuğu, Kriz Modu, Geçmiş & Kayıt, Push Notifications, AI Özellikleri) de araştırma sonuçlarıyla zenginleştir
+- Her özellik önerisinde o özelliğin ücretsiz mi yoksa premium mi olması gerektiğini de belirt ve nedenini açıkla
+- Önerilerin Türk kullanıcı kitlesine uygunluğunu da değerlendir (Türkiye'deki sigara kullanım istatistikleri, kültürel faktörler)
+- Tüm öneriler için spesifik akademik kaynak (DOI, makale adı, yayın yılı) veya kurum raporu belirt
+
+---
+
+ÇIKTI FORMATI
+
+Raporunu aşağıdaki yapıda oluştur:
+
+1. Yönetici Özeti — En kritik 5 bulgu ve öneri
+2. Pazar Analizi — Rakip karşılaştırma tablosu + Luno'nun konumlandırması
+3. Bilimsel Literatür Özeti — Temel bulgular ve Luno'ya uygulanabilir çıkarımlar
+4. Özellik Önerileri — Yukarıdaki formata uygun, öncelik sırasına göre (her öneride ücretsiz/premium etiketi)
+5. Gelir Modeli & Monetizasyon Stratejisi — Detaylı gelir planı, premium özellikler, fiyatlandırma önerileri, rakiplerin gelir model karşılaştırması
+6. Yol Haritası Önerisi — Zaman bazlı geliştirme planı
+7. Kaynakça — Tüm referansların tam listesi
+
+---
+
+ÖNEMLİ NOTLAR:
+- Luno'nun temel farklılaştırıcısı "acı gerçeklerle yüzleştirme" ve Ciğerito maskotu. Öneriler bu kimliği korumalı, genel pozitif motivasyon uygulamasına dönüştürmemeli, mizahi ögeler korunmalı.
+- Bilimsel dayanağı olmayan trendy özellikler önerme. Her önerinin arkasında bir araştırma veya kanıt olsun.
+- Teknik olarak Flutter + Firebase + Riverpod stack'inde implementasyonun mümkün olduğundan emin ol.
+- Türkiye pazarına özel fırsatları ve zorlukları da değerlendir (yerel NRT erişimi, sağlık sistemi entegrasyonu, kültürel yaklaşımlar).

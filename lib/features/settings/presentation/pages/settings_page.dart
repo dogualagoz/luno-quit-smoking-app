@@ -9,6 +9,7 @@ import '../widgets/settings_header.dart';
 import '../widgets/profile_card.dart';
 import '../widgets/settings_slider.dart';
 import '../widgets/settings_toggle_tile.dart';
+import 'about_page.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -114,7 +115,38 @@ class SettingsPage extends ConsumerWidget {
 
                 const SizedBox(height: AppSpacing.p24),
 
-                // 5. Hesap İşlemleri
+                // 4.5 Hakkında
+                LunoCard(
+                  child: ListTile(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const AboutPage()),
+                      );
+                    },
+                    leading: Icon(
+                      Icons.info_outline_rounded,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    title: Text(
+                      'Hakkında',
+                      style: AppTextStyles.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Kaynaklar, sorumluluk reddi ve uygulama bilgileri',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(
+                          context,
+                        ).hintColor.withValues(alpha: 0.6),
+                        fontSize: 11,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.chevron_right, size: 20),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+
                 LunoCard(
                   child: Column(
                     children: [

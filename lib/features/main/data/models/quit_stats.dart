@@ -1,3 +1,5 @@
+import 'package:luno_quit_smoking_app/core/constants/damage_model.dart';
+
 /// İstatistiklerin tipini belirler:
 /// [success] -> Bıraktıktan sonraki kazanımlar
 /// [loss] -> Bırakmadan önceki veya devam eden zararlar
@@ -30,6 +32,12 @@ class QuitStats {
   final String recoverySubtext; // "içmeye devam ettikçe artıyor"
   final String recoveryAction; // "🌱 bırakırsan ne olur? — dokun"
 
+  // — Organ Hasar Verileri —
+  final List<OrganDamageModel> organDamages;
+
+  // — Genel Hasar Skoru (0.0 – 1.0) —
+  final double totalDamageScore;
+
   final double progress; // 0.0 - 1.0
   final QuitStatType type; // success or loss
 
@@ -52,6 +60,8 @@ class QuitStats {
     required this.recoveryDays,
     required this.recoverySubtext,
     required this.recoveryAction,
+    this.organDamages = const [],
+    this.totalDamageScore = 0.0,
     required this.progress,
     required this.type,
   });

@@ -18,7 +18,7 @@ class MainScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Gerçek istatistikleri ve kullanıcı profilini dinle
     final stats = ref.watch(statsProvider);
-    final profile = ref.watch(onboardingRepositoryProvider).getProfile();
+    final profile = ref.watch(userProfileProvider);
 
     final userName = profile?.nickname ?? "Kullanıcı";
 

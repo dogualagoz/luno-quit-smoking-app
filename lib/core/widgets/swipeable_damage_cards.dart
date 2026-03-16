@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luno_quit_smoking_app/core/constants/damage_model.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_progress_bar.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
+import 'package:luno_quit_smoking_app/features/main/application/stats_provider.dart';
 
-class SwipeableDamageCards extends StatefulWidget {
+class SwipeableDamageCards extends ConsumerStatefulWidget {
   const SwipeableDamageCards({super.key});
 
   @override
-  State<SwipeableDamageCards> createState() => _SwipeableDamageCardsState();
+  ConsumerState<SwipeableDamageCards> createState() =>
+      _SwipeableDamageCardsState();
 }
 
-class _SwipeableDamageCardsState extends State<SwipeableDamageCards>
+class _SwipeableDamageCardsState extends ConsumerState<SwipeableDamageCards>
     with SingleTickerProviderStateMixin {
   // Kaydırma miktarını takip eden değer
   double _dragX = 0.0;
@@ -22,9 +25,6 @@ class _SwipeableDamageCardsState extends State<SwipeableDamageCards>
   late AnimationController _animController;
   late Animation<double> _animX;
   bool _isAnimating = false;
-
-  // Sağa mı sola mı çıktığını takip edelim
-  int _exitDirection = 0; // -1 sol, 1 sağ
 
   @override
   void initState() {
@@ -40,8 +40,10 @@ class _SwipeableDamageCardsState extends State<SwipeableDamageCards>
     });
     _animController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
+        final organs = ref.read(statsProvider).organDamages;
+        final count = organs.isNotEmpty ? organs.length : 1;
         setState(() {
-          _currentIndex = (_currentIndex + 1) % organDamages.length;
+          _currentIndex = (_currentIndex + 1) % count;
           _dragX = 0.0;
           _isAnimating = false;
         });
@@ -70,12 +72,12 @@ class _SwipeableDamageCardsState extends State<SwipeableDamageCards>
 
     if (_dragX.abs() > threshold) {
       // Kartı ekrandan çıkar
-      _exitDirection = _dragX > 0 ? 1 : -1;
+      final exitDirection = _dragX > 0 ? 1 : -1;
       _isAnimating = true;
       _animX =
           Tween<double>(
             begin: _dragX,
-            end: _exitDirection * screenWidth * 1.5,
+            end: exitDirection * screenWidth * 1.5,
           ).animate(
             CurvedAnimation(parent: _animController, curve: Curves.easeInCubic),
           );
@@ -93,6 +95,13 @@ class _SwipeableDamageCardsState extends State<SwipeableDamageCards>
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final screenWidth = MediaQuery.of(context).size.width;
+
+    // Dinamik organ hasar verilerini al
+    final organs = ref.watch(statsProvider).organDamages;
+
+    if (organs.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,16 +134,16 @@ class _SwipeableDamageCardsState extends State<SwipeableDamageCards>
           height: 160,
           child: Stack(
             clipBehavior: Clip.none,
-            children: _buildCardStack(screenWidth, theme, textTheme),
+            children: _buildCardStack(screenWidth, theme, textTheme, organs),
           ),
         ),
 
         // Sayfa Göstergesi (Dots)
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(organDamages.length, (index) {
+          children: List.generate(organs.length, (index) {
             final isActive = index == _currentIndex;
-            final organ = organDamages[_currentIndex];
+            final organ = organs[_currentIndex];
 
             return AnimatedContainer(
               duration: const Duration(milliseconds: 200),
@@ -143,10 +152,8 @@ class _SwipeableDamageCardsState extends State<SwipeableDamageCards>
               height: 5,
               decoration: BoxDecoration(
                 color: isActive
-                    ? organ
-                          .colors
-                          .first // Daha opak (tam renk)
-                    : theme.hintColor.withValues(alpha: 0.2), // Daha görünür
+                    ? organ.colors.first
+                    : theme.hintColor.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(3),
               ),
             );
@@ -160,14 +167,14 @@ class _SwipeableDamageCardsState extends State<SwipeableDamageCards>
     double screenWidth,
     ThemeData theme,
     TextTheme textTheme,
+    List<OrganDamageModel> organs,
   ) {
     final List<Widget> cards = [];
-    // Alttan 2 kart göster (arkadaki kartlar)
     const visibleCards = 3;
 
     for (int i = visibleCards - 1; i >= 0; i--) {
-      final dataIndex = (_currentIndex + i) % organDamages.length;
-      final organ = organDamages[dataIndex];
+      final dataIndex = (_currentIndex + i) % organs.length;
+      final organ = organs[dataIndex];
 
       final isTop = i == 0;
 

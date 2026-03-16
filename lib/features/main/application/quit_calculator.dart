@@ -1,20 +1,35 @@
+import 'dart:math';
+
 import 'package:luno_quit_smoking_app/core/constants/app_constants.dart';
+import 'package:luno_quit_smoking_app/core/constants/damage_model.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/models/user_profile.dart';
 import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart';
 
 /// Kullanıcının sigara geçmişine dayalı hasar istatistiklerini hesaplar.
 ///
-/// Bu sınıf, kullanıcının onboarding'de girdiği verileri (günlük sigara,
-/// paket fiyatı, içme süresi vb.) kullanarak toplam harcama, kaybedilen
-/// zaman, mesafe kıyaslaması ve iyileşme süresi gibi metrikleri üretir.
+/// Tüm hesaplamalar bilimsel kaynaklara dayanır:
+///   • ACS — "Benefits of Quitting Smoking Over Time"
+///   • U.S. Surgeon General — "Smoking Cessation" (2020)
+///   • CDC — "Health Effects of Cigarette Smoking"
 class QuitCalculator {
   const QuitCalculator._();
 
   /// Kullanıcının bugüne kadar sigaraya verdiği toplam bedeli hesaplar.
   static QuitStats calculate(UserProfile profile) {
     final damage = _calculateDamageMetrics(profile);
-    final recovery = _calculateRecoveryDuration(profile);
     final burnRate = _calculateBurnRate(profile);
+    final organs = _calculateOrganDamages(profile);
+    final totalDamageScore = _calculateTotalDamageScore(organs);
+
+    // İyileşme: en uzun iyileşme süresine sahip organı baz al
+    final maxRecoveryDays = organs.fold<int>(
+      0,
+      (prev, organ) => max(prev, organ.recoveryDays),
+    );
+    final recoveryYears = maxRecoveryDays ~/ AppBusinessRules.daysPerYear;
+    final remainingAfterYears = maxRecoveryDays % AppBusinessRules.daysPerYear;
+    final recoveryMonths = remainingAfterYears ~/ AppBusinessRules.daysPerMonth;
+    final recoveryDays = remainingAfterYears % AppBusinessRules.daysPerMonth;
 
     return QuitStats(
       moneyLabel: "Harcanan Para",
@@ -31,12 +46,14 @@ class QuitCalculator {
       countSubtext:
           "${damage.distanceKm.toStringAsFixed(1)} km — Everest'e tırmanabilirdin",
       recoveryLabel: "İyileşme Süresi",
-      recoveryYears: recovery.years,
-      recoveryMonths: recovery.months,
-      recoveryDays: recovery.days,
-      recoverySubtext: "içmeye devam ettikçe artıyor",
+      recoveryYears: recoveryYears,
+      recoveryMonths: recoveryMonths,
+      recoveryDays: recoveryDays,
+      recoverySubtext: "bırakırsan vücudun seni affedecek",
       recoveryAction: "🌱 bırakırsan ne olur? — dokun",
-      progress: 0.23,
+      organDamages: organs,
+      totalDamageScore: totalDamageScore,
+      progress: totalDamageScore,
       type: QuitStatType.loss,
     );
   }
@@ -45,7 +62,93 @@ class QuitCalculator {
   static QuitStats calculateLifetimeDamage(UserProfile profile) =>
       calculate(profile);
 
-  // — Private Hesaplama Yardımcıları —
+  // ─── Organ Hasar Hesaplaması ──────────────────────────────────────────────
+  //
+  // Her organ için:
+  //   hasar = min(1.0, (yıl / maxDamageYears) × baseDamagePerYear × yıl × çarpan)
+  //
+  // Günlük 20+ sigara içenler: heavySmokerMultiplier uygulanır.
+  // Kaynak: CDC — "Health Effects" tablosundaki risk katlanma oranları.
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /// Kullanıcının profilindeki verilere göre organ bazlı hasar hesaplar.
+  static List<OrganDamageModel> _calculateOrganDamages(UserProfile profile) {
+    final years = profile.smokingYears;
+    final daily = profile.dailyCigarettes;
+
+    return organDamageConfigs.map((config) {
+      // Yıl bazlı baz hasar (0.0 – 1.0)
+      final yearRatio = (years / config.maxDamageYears).clamp(0.0, 1.0);
+      var damage = yearRatio * config.baseDamagePerYear * years;
+
+      // Ağır içiciler için çarpan (günlük 20+)
+      if (daily >= AppBusinessRules.defaultCigarettesPerPack) {
+        damage *= config.heavySmokerMultiplier;
+      }
+
+      // Hafif içiciler için düşürme (günlük 10 altı)
+      if (daily < 10) {
+        damage *= 0.7;
+      }
+
+      damage = damage.clamp(0.0, 0.95); // Maksimum %95
+
+      // Açıklama metnini hasara göre dinamik oluştur
+      final damagePercent = (damage * 100).toInt();
+      final description = _generateDamageDescription(
+        config.title,
+        damagePercent,
+      );
+
+      return OrganDamageModel(
+        title: config.title,
+        description: description,
+        quote: config.quote,
+        damage: damage,
+        icon: config.icon,
+        colors: config.colors,
+        recoveryDays: config.recoveryDays,
+        source: config.source,
+      );
+    }).toList();
+  }
+
+  /// Organ ve hasar yüzdesine göre açıklama metni üretir.
+  static String _generateDamageDescription(String organ, int percent) {
+    if (percent < 15) return "Henüz ciddi hasar yok, ama risk artıyor.";
+    if (percent < 35) return "Erken dönem hasar belirtileri — %$percent risk.";
+    if (percent < 60) return "Orta seviye hasar — %$percent etkilenmiş.";
+    if (percent < 80) return "Yüksek hasar — %$percent kapasitede kayıp.";
+    return "Kritik seviye — %$percent ciddi risk altında.";
+  }
+
+  /// Tüm organların ağırlıklı ortalamasıyla genel hasar skoru hesaplar.
+  static double _calculateTotalDamageScore(List<OrganDamageModel> organs) {
+    if (organs.isEmpty) return 0.0;
+
+    // Akciğer ve kalp daha yüksek ağırlıklı
+    const weights = {
+      "Akciğerler": 1.5,
+      "Kalp": 1.3,
+      "Kan Dolaşımı": 1.0,
+      "Beyin": 1.0,
+      "Ağız & Boğaz": 0.8,
+      "Mide & Sindirim": 0.8,
+    };
+
+    double weightedSum = 0;
+    double totalWeight = 0;
+
+    for (final organ in organs) {
+      final weight = weights[organ.title] ?? 1.0;
+      weightedSum += organ.damage * weight;
+      totalWeight += weight;
+    }
+
+    return (weightedSum / totalWeight).clamp(0.0, 1.0);
+  }
+
+  // ─── Finansal Hesaplamalar ────────────────────────────────────────────────
 
   /// Finansal hasar, zaman kaybı ve mesafe metriklerini hesaplar.
   static _DamageMetrics _calculateDamageMetrics(UserProfile profile) {
@@ -99,20 +202,6 @@ class QuitCalculator {
         AppBusinessRules.minutesPerDay;
   }
 
-  /// Sigarayı bıraktığında vücudun tam iyileşme süresini hesaplar.
-  static _RecoveryDuration _calculateRecoveryDuration(UserProfile profile) {
-    final totalRecoveryDays =
-        profile.smokingYears *
-        AppBusinessRules.daysPerYear *
-        AppBusinessRules.recoveryFactor;
-    final years = totalRecoveryDays ~/ AppBusinessRules.daysPerYear;
-    final remainingDays = totalRecoveryDays % AppBusinessRules.daysPerYear;
-    final months = remainingDays ~/ AppBusinessRules.daysPerMonth;
-    final days = (remainingDays % AppBusinessRules.daysPerMonth).floor();
-
-    return _RecoveryDuration(years: years, months: months, days: days);
-  }
-
   /// Binlik ayırıcı ekler (Örn: 292075 → 292.075)
   static String _formatWithThousandSeparator(String value) {
     return value.replaceAllMapped(
@@ -138,18 +227,5 @@ class _DamageMetrics {
     required this.daysLost,
     required this.timeDigits,
     required this.distanceKm,
-  });
-}
-
-/// İyileşme süresi sonuçlarını taşıyan veri sınıfı.
-class _RecoveryDuration {
-  final int years;
-  final int months;
-  final int days;
-
-  const _RecoveryDuration({
-    required this.years,
-    required this.months,
-    required this.days,
   });
 }

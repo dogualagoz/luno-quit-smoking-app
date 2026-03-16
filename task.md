@@ -12,7 +12,7 @@
 - [x] `app.dart` — MaterialApp + ProviderScope + GoRouter
 - [x] `core/router/app_router.dart` — GoRouter yapılandırması (Auth Gate dahil)
 - [x] Bottom Navigation Shell (6 tab, MVP'de olmayanlar "yakında")
-- [ ] `core/constants/app_constants.dart` — Sabit değerler
+- [x] `core/constants/app_constants.dart` — Sabit değerler
 
 ## Faz 1 — Foundation (Temel Bileşenler)
 
@@ -38,13 +38,14 @@
 - [x] Dashboard ekranı — mascot section + speech bubble
 - [x] Dashboard ekranı — recovery progress bar
 - [x] Dashboard ekranı — motivasyon kartı (quote card)
-- [ ] Dashboard: Dummy verileri gerçek verilerle bağla (Provider + Calculator)
-- [ ] Hasar Raporu: Swipeable kartları gerçek hasar verilerine bağla (Dashboard ile entegre)
-- [ ] Hasar Raporu: Organ bazlı iyileşme sürelerini hesapla
+- [x] Dashboard: Dummy verileri gerçek verilerle bağla (Provider + Calculator)
+- [x] Hasar Raporu: Swipeable kartları gerçek hasar verilerine bağla (Dashboard ile entegre)
+- [x] Hasar Raporu: Organ bazlı iyileşme sürelerini hesapla
 - [x] `lib/core/constants/damage_model.dart` — Hasar sabitleri (model/data)
 - [x] Ayarlar ekranı — profil bilgileri
 - [x] Ayarlar ekranı — tema geçişi (light/dark)
 - [x] Ayarlar provider + repository (çıkış yapma dahil)
+- [x] Hakkında sayfası — disclaimer, bilimsel kaynaklar, iyileşme zaman çizelgesi
 
 ## Faz 3 — Polish
 

@@ -5,7 +5,7 @@ import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart'
 
 // Dashboard istatistiklerini sağlayan provider
 final statsProvider = Provider<QuitStats>((ref) {
-  final userProfile = ref.watch(onboardingRepositoryProvider).getProfile();
+  final userProfile = ref.watch(userProfileProvider);
 
   if (userProfile == null) {
     // Profil yoksa varsayılan (boş) verileri dön

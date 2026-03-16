@@ -6,9 +6,13 @@ import 'models/user_profile.dart';
 // Bu repository'i uygulamanın her yerinden çağırmak için bir provider oluşturuyoruz
 final onboardingRepositoryProvider = Provider((ref) => OnboardingRepository());
 
+// Kullanıcı profilini reaktif olarak takip eden provider
+final userProfileProvider = StateProvider<UserProfile?>((ref) {
+  final repo = ref.watch(onboardingRepositoryProvider);
+  return repo.getProfile();
+});
+
 class OnboardingRepository {
-
-
   Box<UserProfile> get _box => HiveService.getUserBox();
 
   //Kullanıcı profilini kaydeder
