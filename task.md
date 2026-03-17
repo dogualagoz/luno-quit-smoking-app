@@ -27,7 +27,7 @@
 - [x] `services/local_storage/hive_service.dart` — Local storage (Hive)
 - [x] `core/providers/firebase_providers.dart` — Global provider'lar (Auth, Firestore)
 
-## Faz 2 — MVP Ekranları
+## Faz 2 — MVP Ekranları (Tamamlandı ✅)
 
 - [x] Onboarding akışı UI
 - [x] Onboarding veri kayıt mantığı (Hive + Firestore)
@@ -47,8 +47,9 @@
 - [x] Ayarlar provider + repository (çıkış yapma dahil)
 - [x] Hakkında sayfası — disclaimer, bilimsel kaynaklar, iyileşme zaman çizelgesi
 
-## Faz 3 — Polish
+## Faz 3 — Polish & Core Extensions
 
+- [ ] **İyileşme Yolculuğu ekranı** (Zaman çizelgesi ve ilerleme takibi)
 - [ ] Animasyonlar ve micro-interactions
 - [ ] Firebase Analytics event'leri
 - [ ] Error handling iyileştirmesi
@@ -58,7 +59,6 @@
 ## Post-MVP
 
 - [ ] Geçmiş & Kayıt ekranı
-- [ ] İyileşme Yolculuğu ekranı
 - [ ] Kriz Modu ekranı
 - [ ] Push Notifications altyapısı
 - [x] Gerçek Authentication (email/Google)

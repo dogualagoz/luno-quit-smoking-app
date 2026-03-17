@@ -24,64 +24,71 @@ class MainScreen extends ConsumerWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Dinamik Başlık
-                MainHeader(userName: userName, subText: stats.recoverySubtext),
-
-                AppSpacing.sectionGapLarge,
-
-                // Dinamik Maskot Bölümü
-                Center(
-                  child: Icon(
-                    Icons.monitor_heart,
-                    size: 80,
-                    color: stats.type == QuitStatType.success
-                        ? Colors.pink.shade200
-                        : Colors.redAccent.withValues(alpha: 0.5),
+        child: stats.when(
+          data: (statsData) => SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Dinamik Başlık
+                  MainHeader(
+                    userName: userName,
+                    subText: statsData.recoverySubtext,
                   ),
-                ),
 
-                const SizedBox(height: 8),
+                  AppSpacing.sectionGapLarge,
 
-                // Konuşma Balonu
-                SpeechBubble(text: stats.recoverySubtext),
-                AppSpacing.sectionGap,
+                  // Dinamik Maskot Bölümü
+                  Center(
+                    child: Icon(
+                      Icons.monitor_heart,
+                      size: 80,
+                      color: statsData.type == QuitStatType.success
+                          ? Colors.pink.shade200
+                          : Colors.redAccent.withValues(alpha: 0.5),
+                    ),
+                  ),
 
-                // Organ Hasar Kartları
-                const SwipeableDamageCards(),
-                AppSpacing.sectionGap,
+                  const SizedBox(height: 8),
 
-                // Dinamik İstatistik Grid'i
-                StatGrid(stats: stats),
-                AppSpacing.sectionGap,
+                  // Konuşma Balonu
+                  SpeechBubble(text: statsData.recoverySubtext),
+                  AppSpacing.sectionGap,
 
-                // Dinamik Toparlanma İlerlemesi
-                RecoveryProgress(
-                  progress: stats.progress,
-                  progressText: "%${(stats.progress * 100).toInt()}",
-                  statusText: stats.recoverySubtext,
-                ),
+                  // Organ Hasar Kartları
+                  SwipeableDamageCards(organs: statsData.organDamages),
+                  AppSpacing.sectionGap,
 
-                AppSpacing.sectionGap,
+                  // Dinamik İstatistik Grid'i
+                  StatGrid(stats: statsData),
+                  AppSpacing.sectionGap,
 
-                // Motivasyon Kartı (Quote Card)
-                const QuoteCard(
-                  quote:
-                      "Her sigara hayatından 11 dakika çalar. Ama sen zaten zamanı dumanla harcamayı seviyorsun, değil mi?",
-                  author: "Ciğerito, senin akciğer dostun",
-                ),
+                  // Dinamik Toparlanma İlerlemesi
+                  RecoveryProgress(
+                    progress: statsData.progress,
+                    progressText: "%${(statsData.progress * 100).toInt()}",
+                    statusText: statsData.recoverySubtext,
+                  ),
 
-                const SizedBox(height: AppSpacing.p96),
-              ],
+                  AppSpacing.sectionGap,
+
+                  // Motivasyon Kartı (Quote Card)
+                  const QuoteCard(
+                    quote:
+                        "Her sigara hayatından 11 dakika çalar. Ama sen zaten zamanı dumanla harcamayı seviyorsun, değil mi?",
+                    author: "Ciğerito, senin akciğer dostun",
+                  ),
+
+                  const SizedBox(height: AppSpacing.p96),
+                ],
+              ),
             ),
           ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text('Error: $err')),
         ),
       ),
     );

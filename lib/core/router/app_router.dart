@@ -11,6 +11,7 @@ import '../../features/auth/presentation/email_login_screen.dart';
 import '../../features/auth/presentation/email_register_screen.dart';
 import '../../features/auth/data/auth_repository.dart';
 import '../../features/onboarding/data/onboarding_repository.dart';
+import '../../features/recovery/presentation/pages/recovery_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -86,8 +87,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: AppRouter.recovery,
-                builder: (context, state) =>
-                    const _PlaceholderScreen(title: "İyileşme"),
+                builder: (context, state) => const RecoveryScreen(),
               ),
             ],
           ),

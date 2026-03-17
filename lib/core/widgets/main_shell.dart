@@ -24,8 +24,8 @@ class MainShell extends StatelessWidget {
       body: navigationShell,
       extendBody: true,
       bottomNavigationBar: Container(
-        // Yüksekliği biraz daha artırarak (68px) elemanlara nefes aldırıyoruz
-        height: 68 + (bottomPadding > 0 ? bottomPadding * 0.5 : 12),
+        // Yüksekliği 4px daha artırdık (68 -> 72)
+        height: 72 + (bottomPadding > 0 ? bottomPadding * 0.5 : 12),
         decoration: BoxDecoration(
           color: colorScheme.surface.withValues(alpha: 0.92),
           border: Border(
@@ -55,7 +55,7 @@ class MainShell extends StatelessWidget {
                       type: BottomNavigationBarType.fixed,
                       backgroundColor: Colors.transparent,
                       elevation: 0,
-                      iconSize: 20,
+                      iconSize: 24, // 20'den 24'e çıkarıldı
                       selectedItemColor: colorScheme.primary,
                       unselectedItemColor: theme.hintColor,
                       selectedLabelStyle: AppTextStyles.navLabel.copyWith(
@@ -110,7 +110,8 @@ class MainShell extends StatelessWidget {
                         (navigationShell.currentIndex * itemWidth) +
                         (itemWidth / 2) -
                         2,
-                    top: 28, // Dot'u 4px daha aşağı aldık (24 -> 28)
+                    top:
+                        32, // Navbar büyüdüğü için nokta 4px aşağı kaydırıldı (28 -> 32)
                     child: Container(
                       width: 4,
                       height: 4,

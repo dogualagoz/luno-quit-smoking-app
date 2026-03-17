@@ -4,10 +4,11 @@ import 'package:luno_quit_smoking_app/core/constants/damage_model.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_progress_bar.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
-import 'package:luno_quit_smoking_app/features/main/application/stats_provider.dart';
 
 class SwipeableDamageCards extends ConsumerStatefulWidget {
-  const SwipeableDamageCards({super.key});
+  final List<OrganDamageModel> organs;
+
+  const SwipeableDamageCards({super.key, required this.organs});
 
   @override
   ConsumerState<SwipeableDamageCards> createState() =>
@@ -40,7 +41,7 @@ class _SwipeableDamageCardsState extends ConsumerState<SwipeableDamageCards>
     });
     _animController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        final organs = ref.read(statsProvider).organDamages;
+        final organs = widget.organs;
         final count = organs.isNotEmpty ? organs.length : 1;
         setState(() {
           _currentIndex = (_currentIndex + 1) % count;
@@ -97,7 +98,7 @@ class _SwipeableDamageCardsState extends ConsumerState<SwipeableDamageCards>
     final screenWidth = MediaQuery.of(context).size.width;
 
     // Dinamik organ hasar verilerini al
-    final organs = ref.watch(statsProvider).organDamages;
+    final organs = widget.organs;
 
     if (organs.isEmpty) {
       return const SizedBox.shrink();
@@ -131,7 +132,7 @@ class _SwipeableDamageCardsState extends ConsumerState<SwipeableDamageCards>
 
         // Kart Yığını
         SizedBox(
-          height: 160,
+          height: 132,
           child: Stack(
             clipBehavior: Clip.none,
             children: _buildCardStack(screenWidth, theme, textTheme, organs),

@@ -18,7 +18,10 @@ abstract final class AppSpacing {
   static const pageTop = EdgeInsets.only(top: p24);
 
   // Card Padding
-  static const cardPadding = EdgeInsets.all(p16); // default
+  static const cardPadding = EdgeInsets.symmetric(
+    horizontal: p12,
+    vertical: p8,
+  ); // default
   static const cardPaddingLarge = EdgeInsets.all(p24); // relaxed
 
   static const iconPadding = EdgeInsets.all(p10);
@@ -26,7 +29,7 @@ abstract final class AppSpacing {
   static const contentBottom = EdgeInsets.only(bottom: p96);
 
   // SizedBox (boşluklar)x
-  static const sectionGap = SizedBox(height: p20);
+  static const sectionGap = SizedBox(height: p16);
   static const sectionGapMedium = SizedBox(height: p24);
   static const sectionGapLarge = SizedBox(height: p32);
 
@@ -39,5 +42,4 @@ abstract final class AppSpacing {
 
   // Sabit yükseklikler
   static const double bottomNavHeight = 80.0;
-
 }

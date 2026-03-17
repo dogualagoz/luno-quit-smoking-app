@@ -15,8 +15,14 @@ class QuitCalculator {
   const QuitCalculator._();
 
   /// Kullanıcının bugüne kadar sigaraya verdiği toplam bedeli hesaplar.
-  static QuitStats calculate(UserProfile profile) {
-    final damage = _calculateDamageMetrics(profile);
+  /// [atTime] parametresi verilirse, o anki saate göre canlı hesaplama yapar.
+  static QuitStats calculate(UserProfile profile, {DateTime? atTime}) {
+    final now = atTime ?? DateTime.now();
+
+    // Profil oluşturulduğundan beri geçen süre (canlı artış için)
+    final liveDuration = now.difference(profile.createdAt);
+
+    final damage = _calculateDamageMetrics(profile, liveDuration);
     final burnRate = _calculateBurnRate(profile);
     final organs = _calculateOrganDamages(profile);
     final totalDamageScore = _calculateTotalDamageScore(organs);
@@ -33,23 +39,26 @@ class QuitCalculator {
 
     return QuitStats(
       moneyLabel: "Harcanan Para",
-      moneyValue: "₺ ${damage.formattedMoney}",
+      moneyValue: damage.formattedMoney,
       moneyDecimal: ",${damage.moneyDecimalPart}",
-      moneySubtext: "₺${burnRate.toStringAsFixed(1)}/dk yanıyor",
+      moneySubtext:
+          "₺${(burnRate * 60).toStringAsFixed(1)}/dk yanıyor", // Dakika hızına çevir
       moneyAction: "ne alabilirdin? — dokun",
       timeLabel: "Kaybedilen Zaman",
       timeValue: damage.daysLost.toString(),
-      timeSubtext: "Şu an da sayaç işliyor... ⌛",
+      timeSubtext: "Şu an da sayaç işliyor...",
       timeDigits: damage.timeDigits,
       countLabel: "İçilen Sigara",
-      countValue: _formatWithThousandSeparator(damage.totalSmoked.toString()),
+      countValue: _formatWithThousandSeparator(
+        damage.totalSmoked.toInt().toString(),
+      ),
       countSubtext:
           "${damage.distanceKm.toStringAsFixed(1)} km — Everest'e tırmanabilirdin",
       recoveryLabel: "İyileşme Süresi",
       recoveryYears: recoveryYears,
       recoveryMonths: recoveryMonths,
       recoveryDays: recoveryDays,
-      recoverySubtext: "bırakırsan vücudun seni affedecek",
+      recoverySubtext: "içmeye devam ettikçe artıyor",
       recoveryAction: "🌱 bırakırsan ne olur? — dokun",
       organDamages: organs,
       totalDamageScore: totalDamageScore,
@@ -58,9 +67,19 @@ class QuitCalculator {
     );
   }
 
-  /// [calculate] ile aynı mantığı kullanır.
-  static QuitStats calculateLifetimeDamage(UserProfile profile) =>
-      calculate(profile);
+  /// Saniye başına kayıp hızlarını hesaplar (Para, Zaman, Sigara)
+  static _LossRates calculateRates(UserProfile profile) {
+    final pricePerCigarette = profile.packPrice / profile.cigarettesPerPack;
+    final dailyCost = profile.dailyCigarettes * pricePerCigarette;
+    final dailyTimeLost =
+        profile.dailyCigarettes * AppBusinessRules.minutesLostPerCigarette;
+
+    return _LossRates(
+      moneyPerSecond: dailyCost / 86400,
+      minutesPerSecond: dailyTimeLost / 86400,
+      cigarettesPerSecond: profile.dailyCigarettes / 86400,
+    );
+  }
 
   // ─── Organ Hasar Hesaplaması ──────────────────────────────────────────────
   //
@@ -78,13 +97,18 @@ class QuitCalculator {
 
     return organDamageConfigs.map((config) {
       // Yıl bazlı baz hasar (0.0 – 1.0)
-      final yearRatio = (years / config.maxDamageYears).clamp(0.0, 1.0);
-      var damage = yearRatio * config.baseDamagePerYear * years;
+      // Logaritmik/Saturasyon hasar eğrisi:
+      // İlk yıllar hasar hızlı artar, sonra yavaşlar.
+      // y = 1 - e^(-x/k) mantığına benzer bir clamping.
+      final yearFactor = years / config.maxDamageYears;
+      var damageScore = 1.0 - exp(-yearFactor * config.baseDamagePerYear * 5);
 
-      // Ağır içiciler için çarpan (günlük 20+)
+      // Ağır içiciler için ek yük (logaritmik)
       if (daily >= AppBusinessRules.defaultCigarettesPerPack) {
-        damage *= config.heavySmokerMultiplier;
+        damageScore *= config.heavySmokerMultiplier;
       }
+
+      var damage = damageScore.clamp(0.0, 0.98);
 
       // Hafif içiciler için düşürme (günlük 10 altı)
       if (daily < 10) {
@@ -151,33 +175,50 @@ class QuitCalculator {
   // ─── Finansal Hesaplamalar ────────────────────────────────────────────────
 
   /// Finansal hasar, zaman kaybı ve mesafe metriklerini hesaplar.
-  static _DamageMetrics _calculateDamageMetrics(UserProfile profile) {
-    final totalSmoked =
+  static _DamageMetrics _calculateDamageMetrics(
+    UserProfile profile,
+    Duration liveDuration,
+  ) {
+    // 1. Geçmiş Yılların Zararı (SmokingYears bazlı)
+    final historicalSmoked =
         profile.smokingYears *
         AppBusinessRules.daysPerYear *
         profile.dailyCigarettes;
+
+    // 2. Uygulama Kullanıldığından Beri Canlı Zarar
+    final rates = calculateRates(profile);
+    final liveSmoked = rates.cigarettesPerSecond * liveDuration.inSeconds;
+
+    final totalSmoked = historicalSmoked + liveSmoked;
 
     final pricePerCigarette = profile.packPrice / profile.cigarettesPerPack;
     final totalSpent = totalSmoked * pricePerCigarette;
 
     // Para formatlama
-    final moneyStr = totalSpent.toStringAsFixed(2);
-    final moneyParts = moneyStr.split('.');
+    final moneyValue = totalSpent.floor();
+    final moneyDecimalPart = ((totalSpent - moneyValue) * 100)
+        .toInt()
+        .toString()
+        .padLeft(2, '0');
 
     // Zaman kaybı
     final totalMinsLost =
         totalSmoked * AppBusinessRules.minutesLostPerCigarette;
+    final totalSecondsLost =
+        totalMinsLost * 60; // Saniye cinsinden toplam kayıp
+
     final daysLost = totalMinsLost ~/ AppBusinessRules.minutesPerDay;
     final remainingMins = totalMinsLost % AppBusinessRules.minutesPerDay;
-    final hours = remainingMins ~/ AppBusinessRules.minutesPerHour;
-    final mins = remainingMins % AppBusinessRules.minutesPerHour;
+    final hours = (remainingMins ~/ AppBusinessRules.minutesPerHour).toInt();
+    final mins = (remainingMins % AppBusinessRules.minutesPerHour).toInt();
+    final secs = (totalSecondsLost % 60).toInt();
 
     // Sayaç rakamları: [gün1, gün2, saat1, saat2, dk1, dk2, sn1, sn2]
     final timeDigits = [
       ...daysLost.toString().padLeft(2, '0').split(''),
       ...hours.toString().padLeft(2, '0').split(''),
       ...mins.toString().padLeft(2, '0').split(''),
-      ...'00'.split(''), // Saniye — canlı sayaçta güncellenecek
+      ...secs.toString().padLeft(2, '0').split(''),
     ];
 
     // Mesafe kıyaslaması
@@ -187,19 +228,19 @@ class QuitCalculator {
 
     return _DamageMetrics(
       totalSmoked: totalSmoked,
-      formattedMoney: _formatWithThousandSeparator(moneyParts[0]),
-      moneyDecimalPart: moneyParts[1],
+      formattedMoney: _formatWithThousandSeparator(moneyValue.toString()),
+      moneyDecimalPart: moneyDecimalPart,
       daysLost: daysLost,
       timeDigits: timeDigits,
       distanceKm: distanceKm,
     );
   }
 
-  /// Dakika başına yanma hızını (₺/dk) hesaplar.
+  /// Dakika başına yanma hızını (₺/sn) hesaplar.
   static double _calculateBurnRate(UserProfile profile) {
     final pricePerCigarette = profile.packPrice / profile.cigarettesPerPack;
-    return (profile.dailyCigarettes * pricePerCigarette) /
-        AppBusinessRules.minutesPerDay;
+    // Saniye hızı döndür, calculate metodunda dk'ya çevrilecek
+    return (profile.dailyCigarettes * pricePerCigarette) / 86400;
   }
 
   /// Binlik ayırıcı ekler (Örn: 292075 → 292.075)
@@ -213,7 +254,7 @@ class QuitCalculator {
 
 /// Hasar hesaplama sonuçlarını taşıyan veri sınıfı.
 class _DamageMetrics {
-  final int totalSmoked;
+  final double totalSmoked;
   final String formattedMoney;
   final String moneyDecimalPart;
   final int daysLost;
@@ -227,5 +268,18 @@ class _DamageMetrics {
     required this.daysLost,
     required this.timeDigits,
     required this.distanceKm,
+  });
+}
+
+/// Saniye başına kayıp hızlarını taşıyan sınıf
+class _LossRates {
+  final double moneyPerSecond;
+  final double minutesPerSecond;
+  final double cigarettesPerSecond;
+
+  const _LossRates({
+    required this.moneyPerSecond,
+    required this.minutesPerSecond,
+    required this.cigarettesPerSecond,
   });
 }
