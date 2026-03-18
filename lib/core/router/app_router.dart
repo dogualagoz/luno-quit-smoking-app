@@ -11,6 +11,8 @@ import '../../features/auth/presentation/email_login_screen.dart';
 import '../../features/auth/presentation/email_register_screen.dart';
 import '../../features/auth/data/auth_repository.dart';
 import '../../features/onboarding/data/onboarding_repository.dart';
+import '../../features/history/presentation/pages/craving_screen.dart';
+import '../../features/history/presentation/pages/history_screen.dart';
 import '../../features/recovery/presentation/pages/recovery_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -62,6 +64,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRouter.register,
         builder: (context, state) => const EmailRegisterScreen(),
       ),
+      GoRoute(
+        path: AppRouter.craving,
+        builder: (context, state) => const CravingScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainShell(navigationShell: navigationShell);
@@ -104,8 +110,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: AppRouter.history,
-                builder: (context, state) =>
-                    const _PlaceholderScreen(title: "Geçmiş"),
+                builder: (context, state) => const HistoryScreen(),
               ),
             ],
           ),
@@ -137,6 +142,7 @@ class AppRouter {
   static const String crisis = '/crisis';
   static const String history = '/history';
   static const String settings = '/settings';
+  static const String craving = '/craving';
 }
 
 class _PlaceholderScreen extends StatelessWidget {

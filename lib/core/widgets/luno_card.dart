@@ -35,7 +35,7 @@ class LunoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color ?? cardTheme.color,
         borderRadius: AppRadius.mainCard,
-        border: border ?? Border.all(color: colorScheme.outline, width: 1),
+        border: border ?? Border.all(color: colorScheme.outline, width: 2),
         boxShadow: shadow ?? AppTheme.shadowSm,
       ),
       child: child,

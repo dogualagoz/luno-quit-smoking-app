@@ -93,7 +93,9 @@ class _PacketPriceStepState extends State<PacketPriceStep> {
                 SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     activeTrackColor: AppColors.lightPrimary,
-                    inactiveTrackColor: AppColors.lightPrimary.withValues(alpha: 0.1),
+                    inactiveTrackColor: AppColors.lightPrimary.withValues(
+                      alpha: 0.1,
+                    ),
                     thumbColor: Colors.white,
                     overlayColor: AppColors.lightPrimary.withValues(alpha: 0.2),
                     thumbShape: const RoundSliderThumbShape(
@@ -116,13 +118,17 @@ class _PacketPriceStepState extends State<PacketPriceStep> {
                       Text(
                         "₺20",
                         style: AppTextStyles.micro.copyWith(
-                          color: AppColors.lightForeground.withValues(alpha: 0.3),
+                          color: AppColors.lightForeground.withValues(
+                            alpha: 0.3,
+                          ),
                         ),
                       ),
                       Text(
                         "₺250",
                         style: AppTextStyles.micro.copyWith(
-                          color: AppColors.lightForeground.withValues(alpha: 0.3),
+                          color: AppColors.lightForeground.withValues(
+                            alpha: 0.3,
+                          ),
                         ),
                       ),
                     ],

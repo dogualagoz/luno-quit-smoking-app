@@ -134,7 +134,9 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
                             style: TextStyle(
                               color: isSelected
                                   ? AppColors.lightPrimary
-                                  : AppColors.lightForeground.withValues(alpha: 0.7),
+                                  : AppColors.lightForeground.withValues(
+                                      alpha: 0.7,
+                                    ),
                               fontWeight: isSelected
                                   ? FontWeight.bold
                                   : FontWeight.normal,

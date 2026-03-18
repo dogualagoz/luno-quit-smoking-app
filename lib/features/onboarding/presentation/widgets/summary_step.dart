@@ -104,14 +104,14 @@ class _SummaryStepState extends State<SummaryStep> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.lightPrimary.withValues(alpha:0.05),
+              color: AppColors.lightPrimary.withValues(alpha: 0.05),
               borderRadius: AppRadius.mainCard,
             ),
             child: Text(
               "${_currencyFormat.format(totalMoneySpent)} ile sıfırdan bir araba alabilirdin.",
               textAlign: TextAlign.center,
               style: AppTextStyles.micro.copyWith(
-                color: AppColors.lightForeground.withValues(alpha:0.7),
+                color: AppColors.lightForeground.withValues(alpha: 0.7),
                 fontWeight: FontWeight.bold,
                 fontSize: 11,
               ),
@@ -191,7 +191,7 @@ class _SummaryStepState extends State<SummaryStep> {
           Text(
             label,
             style: AppTextStyles.micro.copyWith(
-              color: AppColors.lightForeground.withValues(alpha:0.5),
+              color: AppColors.lightForeground.withValues(alpha: 0.5),
               fontSize: 11,
               fontWeight: FontWeight.bold,
             ),

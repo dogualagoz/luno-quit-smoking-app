@@ -63,9 +63,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '763643886491',
     projectId: 'luno-quit-smoking-app',
     storageBucket: 'luno-quit-smoking-app.firebasestorage.app',
-    androidClientId: '763643886491-an75feffflt5vmi6i511tg6rkp544s0k.apps.googleusercontent.com',
-    iosClientId: '763643886491-cr8214f4enrgugdn4cu6ur70hrlbumoj.apps.googleusercontent.com',
+    androidClientId:
+        '763643886491-an75feffflt5vmi6i511tg6rkp544s0k.apps.googleusercontent.com',
+    iosClientId:
+        '763643886491-cr8214f4enrgugdn4cu6ur70hrlbumoj.apps.googleusercontent.com',
     iosBundleId: 'com.example.lunoQuitSmokingApp',
   );
-
 }

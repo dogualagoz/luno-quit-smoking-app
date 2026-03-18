@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 
 // Uygulama renk paleti
 abstract final class AppColors {
-
-
-
   // Açık Tema
   static const Color lightBackground = Color(0xFFFAF8F5);
   static const lightForeground = Color(0xFF2D2A3E);
@@ -46,25 +43,21 @@ abstract final class AppColors {
   static const darkChartWarning = Color(0xFFDBB06E);
   static const darkChartPurple = Color(0xFFA87FD4);
 
-
-  
   // Primary Gradient
   static const gradientPrimaryLight = [Color(0xFFE8A0BF), Color(0xFFD4789E)];
-  static const gradientPrimaryDark  = [Color(0xFFD4789E), Color(0xFFB85E82)];
+  static const gradientPrimaryDark = [Color(0xFFD4789E), Color(0xFFB85E82)];
   // Success Gradient (Recovery Bar)
   static const gradientSuccessLight = [Color(0xFFA8D8B9), Color(0xFF7BC49A)];
-  static const gradientSuccessDark  = [Color(0xFF7BC49A), Color(0xFF5AAF7A)];
+  static const gradientSuccessDark = [Color(0xFF7BC49A), Color(0xFF5AAF7A)];
 
-  // 
+  //
 
-
-    // ─── Ciğerito Maskot Renkleri ───
-  static const mascotBody    = Color(0xFFF4C2D7);
-  static const mascotBlush   = Color(0xFFF0A0B8);
+  // ─── Ciğerito Maskot Renkleri ───
+  static const mascotBody = Color(0xFFF4C2D7);
+  static const mascotBlush = Color(0xFFF0A0B8);
   static const mascotBandaid = Color(0xFFFFE0B2);
   static const mascotOutline = Color(0xFFD4789E);
-  static const mascotFace    = Color(0xFF2D2A3E); // eyes / mouth
-  static const mascotTear    = Color(0xFFA8D8E8);
+  static const mascotFace = Color(0xFF2D2A3E); // eyes / mouth
+  static const mascotTear = Color(0xFFA8D8E8);
   static const mascotSparkle = Color(0xFFF0C987);
 }
-

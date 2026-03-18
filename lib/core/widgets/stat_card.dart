@@ -502,17 +502,17 @@ class _DigitCounter extends StatelessWidget {
         key: ValueKey(key),
         margin: const EdgeInsets.only(right: 2.5),
         padding: EdgeInsets.symmetric(
-          horizontal: isSmall ? 6 : 8,
-          vertical: isSmall ? 4 : 6,
+          horizontal: isSmall ? 4 : 6,
+          vertical: isSmall ? 2 : 3,
         ),
         decoration: BoxDecoration(
           color: const Color(0xFFF5F0F2),
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 2,
-              offset: const Offset(0, 1),
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 1,
+              offset: const Offset(0, 1.5),
             ),
           ],
         ),
@@ -525,7 +525,7 @@ class _DigitCounter extends StatelessWidget {
                   ?.copyWith(
                     fontWeight: FontWeight.w900,
                     color: theme.colorScheme.onSurface,
-                    fontSize: isSmall ? 16 : 22, // Çok daha büyük ve okunaklı
+                    fontSize: isSmall ? 19 : 26, // Rakamlar büyütüldü
                     fontFamily: 'Courier',
                   ),
         ),

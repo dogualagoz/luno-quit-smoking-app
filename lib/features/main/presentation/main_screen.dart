@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:luno_quit_smoking_app/core/router/app_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/widgets/recovery_progress.dart';
@@ -9,13 +11,48 @@ import 'package:luno_quit_smoking_app/features/main/presentation/widgets/main_he
 import 'package:luno_quit_smoking_app/core/widgets/swipeable_damage_cards.dart';
 import 'package:luno_quit_smoking_app/features/main/application/stats_provider.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
+import 'package:luno_quit_smoking_app/features/history/application/history_provider.dart';
 import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart';
 
-class MainScreen extends ConsumerWidget {
+class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends ConsumerState<MainScreen> {
+  bool _hasCheckedCraving = false;
+
+  @override
+  Widget build(BuildContext context) {
+    // Uygulama ilk açıldığında bugün log var mı kontrol et, yoksa Craving ekranını aç
+    ref.listen(historyLogsProvider, (previous, next) {
+      if (!_hasCheckedCraving && next is AsyncData) {
+        _hasCheckedCraving = true;
+        final logs = next.value ?? [];
+        final today = DateTime.now();
+        final hasLogForToday = logs.any(
+          (log) =>
+              log.date.year == today.year &&
+              log.date.month == today.month &&
+              log.date.day == today.day,
+        );
+
+        if (!hasLogForToday) {
+          // Asenkron navigasyon uyarılarını engellemek için post-frame callback içinde çağır
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (GoRouter.of(
+                  context,
+                ).routerDelegate.currentConfiguration.uri.toString() !=
+                AppRouter.craving) {
+              context.push(AppRouter.craving);
+            }
+          });
+        }
+      }
+    });
+
     // Gerçek istatistikleri ve kullanıcı profilini dinle
     final stats = ref.watch(statsProvider);
     final profile = ref.watch(userProfileProvider);
@@ -90,6 +127,11 @@ class MainScreen extends ConsumerWidget {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (err, stack) => Center(child: Text('Error: $err')),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push(AppRouter.craving),
+        backgroundColor: Colors.pink.shade200,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

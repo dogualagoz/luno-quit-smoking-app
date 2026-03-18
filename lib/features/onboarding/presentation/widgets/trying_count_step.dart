@@ -134,8 +134,9 @@ class _TryingCountStepState extends State<TryingCountStep> {
                                 Text(
                                   opt['desc']!,
                                   style: AppTextStyles.micro.copyWith(
-                                    color: AppColors.lightForeground
-                                        .withValues(alpha: 0.4),
+                                    color: AppColors.lightForeground.withValues(
+                                      alpha: 0.4,
+                                    ),
                                   ),
                                 ),
                               ],

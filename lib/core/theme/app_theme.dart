@@ -8,7 +8,7 @@ abstract final class AppTheme {
     BoxShadow(
       color: Color(0x0D000000), // black %5 opacity
       blurRadius: 4,
-      offset: Offset(0, 1),
+      offset: Offset(0, 2),
     ),
   ];
   static const shadowLg = [

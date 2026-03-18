@@ -69,7 +69,7 @@ class _SmokingYearsStepState extends State<SmokingYearsStep> {
                 Text(
                   "Ne kadar süredir sigara içiyorsun?",
                   style: AppTextStyles.label.copyWith(
-                    color: AppColors.lightForeground.withValues(alpha:0.6),
+                    color: AppColors.lightForeground.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.p24),
@@ -80,16 +80,18 @@ class _SmokingYearsStepState extends State<SmokingYearsStep> {
                 Text(
                   "yıl",
                   style: AppTextStyles.body.copyWith(
-                    color: AppColors.lightForeground.withValues(alpha:0.4),
+                    color: AppColors.lightForeground.withValues(alpha: 0.4),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.p32),
                 SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     activeTrackColor: AppColors.lightPrimary,
-                    inactiveTrackColor: AppColors.lightPrimary.withValues(alpha:0.1),
+                    inactiveTrackColor: AppColors.lightPrimary.withValues(
+                      alpha: 0.1,
+                    ),
                     thumbColor: Colors.white,
-                    overlayColor: AppColors.lightPrimary.withValues(alpha:0.2),
+                    overlayColor: AppColors.lightPrimary.withValues(alpha: 0.2),
                     thumbShape: const RoundSliderThumbShape(
                       enabledThumbRadius: 12,
                       elevation: 4,
@@ -110,13 +112,17 @@ class _SmokingYearsStepState extends State<SmokingYearsStep> {
                       Text(
                         "1 yıl",
                         style: AppTextStyles.micro.copyWith(
-                          color: AppColors.lightForeground.withValues(alpha:0.3),
+                          color: AppColors.lightForeground.withValues(
+                            alpha: 0.3,
+                          ),
                         ),
                       ),
                       Text(
                         "40 yıl",
                         style: AppTextStyles.micro.copyWith(
-                          color: AppColors.lightForeground.withValues(alpha:0.3),
+                          color: AppColors.lightForeground.withValues(
+                            alpha: 0.3,
+                          ),
                         ),
                       ),
                     ],
@@ -139,7 +145,7 @@ class _SmokingYearsStepState extends State<SmokingYearsStep> {
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? AppColors.lightPrimary.withValues(alpha:0.05)
+                        ? AppColors.lightPrimary.withValues(alpha: 0.05)
                         : AppColors.lightCard,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
@@ -153,7 +159,7 @@ class _SmokingYearsStepState extends State<SmokingYearsStep> {
                     style: TextStyle(
                       color: isSelected
                           ? AppColors.lightPrimary
-                          : AppColors.lightForeground.withValues(alpha:0.7),
+                          : AppColors.lightForeground.withValues(alpha: 0.7),
                       fontWeight: isSelected
                           ? FontWeight.bold
                           : FontWeight.normal,

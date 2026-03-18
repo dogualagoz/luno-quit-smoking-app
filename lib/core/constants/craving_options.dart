@@ -1,0 +1,60 @@
+/// Craving ekranında gösterilecek seçeneklerin listeleri
+class CravingOptions {
+  static const List<String> activities = [
+    'Araba kullanırken',
+    'Barda/Etkinlikte',
+    'Beklerken',
+    'Çalışırken',
+    'Çay/Kahve içerken',
+    'Dinlenirken',
+    'Düşünürken',
+    'İçerken',
+    'İş molası',
+    'Kitap okurken',
+    'Mangalda',
+    'Mola sırasında',
+    'Oyun oynarken',
+    'Seks sonrası',
+    'Sohbet ederken',
+    'Sosyalleşirken',
+    'Telefondayken',
+    'Temizlik yaparken',
+    'TV izlerken',
+    'Uyku tutmadı',
+    'Uyanırken',
+    'Yatarken',
+    'Yemek yaparken',
+    'Yeni yemek yemişken',
+    'Yürürken',
+    'Diğer',
+  ];
+
+  static const List<String> companions = [
+    'Aileyle',
+    'Arkadaşlarla',
+    'İş arkadaşlarıyla',
+    'Partnerle',
+    'Yabancılarla',
+    'Yalnız',
+  ];
+
+  static const List<String> moods = [
+    'Aç',
+    'Depresif',
+    'Endişeli',
+    'Hayal kırıklığına uğramış',
+    'Hüsrana uğramış',
+    'Kaygılı',
+    'Kızgın',
+    'Kötü',
+    'Mutlu',
+    'Mutsuz',
+    'Rahatlamış',
+    'Sıkılmış',
+    'Stresli',
+    'Üzgün',
+    'Yalnız',
+    'Yorgun',
+    'Diğer',
+  ];
+}

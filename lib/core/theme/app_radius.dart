@@ -20,7 +20,4 @@ abstract final class AppRadius {
 
   // Progress bar
   static final progressBar = BorderRadius.circular(circular);
-  
-
-
 }

@@ -15,7 +15,7 @@ class QuoteCard extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return LunoCard(
-      color: colorScheme.primary.withValues(alpha: 0.08), 
+      color: colorScheme.primary.withValues(alpha: 0.08),
       padding: AppSpacing.cardPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
