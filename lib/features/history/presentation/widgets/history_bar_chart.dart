@@ -18,7 +18,6 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
   @override
   void initState() {
     super.initState();
-    // Varsayılan olarak bugünü seçili gösterebiliriz
     int todayIndex = DateTime.now().weekday - 1;
     touchedIndex = todayIndex;
   }
@@ -26,9 +25,7 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = isDark
-        ? AppColors.darkPrimary
-        : AppColors.lightPrimary;
+    final primaryColor = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
 
     return AspectRatio(
       aspectRatio: 1.8,
@@ -48,11 +45,26 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
                 touchedIndex = barTouchResponse.spot!.touchedBarGroupIndex;
               });
             },
-            // Tooltip göstermiyoruz, daha temiz bir görünüm istendi
             touchTooltipData: BarTouchTooltipData(
-              getTooltipColor: (_) => Colors.transparent, // görünmez yapalım
-              tooltipMargin: 0,
-              getTooltipItem: (group, groupIndex, rod, rodIndex) => null,
+              getTooltipColor: (_) => isDark ? AppColors.darkForeground : AppColors.lightForeground,
+              tooltipMargin: 8,
+              getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                final value = widget.weeklyData[group.x + 1] ?? 0;
+                return BarTooltipItem(
+                  '$value \n',
+                  AppTextStyles.bodySemibold.copyWith(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: value == 1 ? 'sigara' : 'adet',
+                      style: AppTextStyles.micro.copyWith(
+                        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           titlesData: FlTitlesData(
@@ -75,7 +87,18 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
             ),
           ),
           borderData: FlBorderData(show: false),
-          gridData: const FlGridData(show: false),
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            horizontalInterval: _getMaxY() / 4,
+            getDrawingHorizontalLine: (value) {
+              return FlLine(
+                color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
+                strokeWidth: 1,
+                dashArray: [4, 4],
+              );
+            },
+          ),
           barGroups: [
             for (int i = 1; i <= 7; i++)
               makeGroupData(
@@ -95,7 +118,7 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
     final maxVal = widget.weeklyData.values.reduce(
       (curr, next) => curr > next ? curr : next,
     );
-    return maxVal < 10 ? 10 : (maxVal + 2).toDouble();
+    return maxVal < 10 ? 10 : (maxVal * 1.5); // Add some padding on top for tooltip
   }
 
   BarChartGroupData makeGroupData(
@@ -104,14 +127,20 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
     Color primaryColor,
     bool isTouched,
   ) {
-    // Tasarımdaki gibi: seçiliyse tam renk, değilse çok uçuk bir renk (%15)
-    final barColor = isTouched
-        ? primaryColor
-        : primaryColor.withValues(alpha: 0.15);
+    // Fotoğraftaki gibi: aktifse tam renk, inaktifse çok hafif pembe arka planı
+    final barColor = isTouched ? primaryColor : primaryColor.withValues(alpha: 0.12);
 
-    // Yüksekliği minimum bir değere sabitleyelim ki 0 da olsa yuvarlak bir bar görünsün
+    // Çubukların hap şeklinde kalması için minimum bir değere sahip olmaları gerek.
+    // Çünkü değer 0 olunca hiç bir şey çizilmiyor veya kutu gibi oluyor.
     double drawY = y;
-    if (drawY == 0) drawY = 0.5; // En azından bir ufak çıkıntı olsun
+    final maxY = _getMaxY();
+    // 0 ise bile en dibinde ufak bir yuvarlak olsun (MaxY değerinin %5'i kadar)
+    if (drawY == 0) {
+      drawY = maxY * 0.05; 
+    } else if (drawY < maxY * 0.05) {
+      // Y değeri çok küçükse mininum yüksekliğe sabitle
+      drawY = maxY * 0.05;
+    }
 
     return BarChartGroupData(
       x: x,
@@ -119,10 +148,13 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
         BarChartRodData(
           toY: drawY,
           color: barColor,
-          width: 28, // Sütunları çok daha kalınlaştırdık (mockupta olduğu gibi)
-          borderRadius: BorderRadius.circular(
-            8,
-          ), // Köşeleri hafif hatlı ama modern yuvarlaklıkta
+          width: 26, // Fotoğraftaki gibi dolgun çubuklar
+          borderRadius: BorderRadius.circular(100), // Tam yuvarlak kapama (hap şeklinde)
+          backDrawRodData: BackgroundBarChartRodData(
+            show: isTouched, // Yalnızca seçiliyken arkasında puslu bir şerit çıksın (opsiyonel vurgu)
+            toY: maxY,
+            color: primaryColor.withValues(alpha: 0.05),
+          ),
         ),
       ],
     );
@@ -133,39 +165,16 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
     final style = isTouched
         ? AppTextStyles.label.copyWith(
             color: Theme.of(context).colorScheme.onSurface,
+            fontWeight: FontWeight.bold,
           )
         : AppTextStyles.label.copyWith(
-            color: Colors.grey.withValues(alpha: 0.6),
+            color: Theme.of(context).hintColor.withValues(alpha: 0.6),
             fontWeight: FontWeight.normal,
           );
 
-    String text;
-    switch (value.toInt()) {
-      case 0:
-        text = 'Pzt';
-        break;
-      case 1:
-        text = 'Sal';
-        break;
-      case 2:
-        text = 'Çar';
-        break;
-      case 3:
-        text = 'Per';
-        break;
-      case 4:
-        text = 'Cum';
-        break;
-      case 5:
-        text = 'Cmt';
-        break;
-      case 6:
-        text = 'Paz';
-        break;
-      default:
-        text = '';
-        break;
-    }
+    final days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+    final text = (value.toInt() >= 0 && value.toInt() < 7) ? days[value.toInt()] : '';
+    
     return SideTitleWidget(
       meta: meta,
       space: 12,

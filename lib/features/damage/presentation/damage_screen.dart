@@ -1,3 +1,5 @@
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:luno_quit_smoking_app/core/constants/asset_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
@@ -6,6 +8,7 @@ import 'package:luno_quit_smoking_app/features/damage/widgets/total_damage_card.
 import 'package:luno_quit_smoking_app/features/damage/widgets/damage_header.dart';
 import 'package:luno_quit_smoking_app/core/widgets/speech_bubble.dart';
 import 'package:luno_quit_smoking_app/features/main/application/stats_provider.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
 
 class DamageScreen extends ConsumerWidget {
   const DamageScreen({super.key});
@@ -38,7 +41,12 @@ class DamageScreen extends ConsumerWidget {
                     const SizedBox(height: AppSpacing.p40),
 
                     // 2. Ciğerito (Mascot Placeholder)
-                    const Center(child: Icon(Icons.monitor_heart, size: 80)),
+                    Center(
+                      child: SvgPicture.asset(
+                        AssetConstants.cigeritoSad,
+                        height: AppMascotSizes.hero,
+                      ),
+                    ),
 
                     const SizedBox(height: 12),
 

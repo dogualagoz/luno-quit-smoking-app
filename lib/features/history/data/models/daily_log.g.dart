@@ -27,13 +27,14 @@ class DailyLogAdapter extends TypeAdapter<DailyLog> {
       context: (fields[7] as List).cast<String>(),
       companions: (fields[8] as List).cast<String>(),
       note: fields[9] as String?,
+      type: fields[10] == null ? 'craving' : fields[10] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, DailyLog obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -53,7 +54,9 @@ class DailyLogAdapter extends TypeAdapter<DailyLog> {
       ..writeByte(8)
       ..write(obj.companions)
       ..writeByte(9)
-      ..write(obj.note);
+      ..write(obj.note)
+      ..writeByte(10)
+      ..write(obj.type);
   }
 
   @override

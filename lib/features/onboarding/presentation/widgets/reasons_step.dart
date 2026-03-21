@@ -3,6 +3,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/speech_bubble.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/asset_constants.dart';
 
 class ReasonsStep extends StatefulWidget {
   final List<String> initialValues;
@@ -69,12 +72,9 @@ class _ReasonsStepState extends State<ReasonsStep> {
                 ),
               ),
               const SizedBox(width: AppSpacing.p12),
-              Icon(
-                Icons.monitor_heart_outlined,
-                size: 40,
-                color: _selectedReasons.isEmpty
-                    ? AppColors.lightDestructive
-                    : AppColors.lightChartSuccess,
+              SvgPicture.asset(
+                AssetConstants.cigeritoDefault,
+                height: AppMascotSizes.medium,
               ),
             ],
           ),

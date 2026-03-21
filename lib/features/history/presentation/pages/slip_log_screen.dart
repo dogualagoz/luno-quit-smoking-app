@@ -3,37 +3,36 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_button.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_progress_bar.dart';
 import 'package:luno_quit_smoking_app/features/history/application/history_provider.dart';
 import 'package:luno_quit_smoking_app/features/history/data/models/daily_log.dart';
 import 'package:uuid/uuid.dart';
 
-// Steps
-import '../widgets/craving_steps/date_time_step.dart';
-import '../widgets/craving_steps/intensity_step.dart';
-// Removed SmokedStatusStep and SmokeCountStep imports
+// Steps (reuse)
+import '../widgets/craving_steps/smoke_count_step.dart';
 import '../widgets/craving_steps/mood_step.dart';
 import '../widgets/craving_steps/activity_step.dart';
 import '../widgets/craving_steps/companion_step.dart';
 import '../widgets/craving_steps/location_step.dart';
 import '../widgets/craving_steps/notes_step.dart';
 
-class CravingScreen extends ConsumerStatefulWidget {
-  const CravingScreen({super.key});
+/// Geçmiş sekmesinden "Kayıt Ekle" butonuyla açılan sigara kayıt ekranı.
+/// Kullanıcı içtiği sigaraları kaydeder: kaç tane, nerede, hangi ruh halinde vs.
+class SlipLogScreen extends ConsumerStatefulWidget {
+  const SlipLogScreen({super.key});
 
   @override
-  ConsumerState<CravingScreen> createState() => _CravingScreenState();
+  ConsumerState<SlipLogScreen> createState() => _SlipLogScreenState();
 }
 
-class _CravingScreenState extends ConsumerState<CravingScreen> {
+class _SlipLogScreenState extends ConsumerState<SlipLogScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  
+
   // Form State
-  DateTime _selectedDate = DateTime.now();
-  double _intensity = 5;
-  // removed smoked status variables
+  int _smokeCount = 1;
   String? _location;
   final List<String> _selectedMoods = [];
   final List<String> _selectedContext = [];
@@ -42,65 +41,52 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
   final TextEditingController _otherMoodController = TextEditingController();
   final TextEditingController _otherActivityController = TextEditingController();
 
-  // Step Configuration
-  List<Widget> get _steps {
-    final steps = [
-      DateTimeStep(
-        selectedDate: _selectedDate,
-        onPickDate: _showDateTimePicker,
-      ),
-      IntensityStep(
-        value: _intensity,
-        onValueChanged: (val) => setState(() => _intensity = val),
-      ),
-      // Removed SmokedStatusStep and SmokeCountStep
-    ];
-
-    steps.addAll([
-      MoodStep(
-        selectedMoods: _selectedMoods,
-        otherController: _otherMoodController,
-        onMoodSelected: (val) {
-          setState(() {
-            if (_selectedMoods.contains(val)) {
-              _selectedMoods.remove(val);
-            } else {
-              _selectedMoods.add(val);
-            }
-          });
-        },
-      ),
-      ActivityStep(
-        selectedActivities: _selectedContext,
-        otherController: _otherActivityController,
-        onActivitySelected: (val) {
-          setState(() {
-            if (_selectedContext.contains(val)) {
-              _selectedContext.remove(val);
-            } else {
-              _selectedContext.add(val);
-            }
-          });
-        },
-      ),
-      CompanionStep(
-        selectedCompanions: _selectedCompanions,
-        onCompanionSelected: (val) {
-          setState(() {
-            _selectedCompanions.clear();
-            _selectedCompanions.add(val);
-          });
-        },
-      ),
-      LocationStep(
-        location: _location,
-        onLocationChanged: (val) => setState(() => _location = val),
-      ),
-      NotesStep(controller: _notesController),
-    ]);
-
-    return steps;
-  }
+  List<Widget> get _steps => [
+    SmokeCountStep(
+      count: _smokeCount,
+      onValueChanged: (val) => setState(() => _smokeCount = val),
+    ),
+    LocationStep(
+      location: _location,
+      onLocationChanged: (val) => setState(() => _location = val),
+    ),
+    MoodStep(
+      selectedMoods: _selectedMoods,
+      otherController: _otherMoodController,
+      onMoodSelected: (val) {
+        setState(() {
+          if (_selectedMoods.contains(val)) {
+            _selectedMoods.remove(val);
+          } else {
+            _selectedMoods.add(val);
+          }
+        });
+      },
+    ),
+    ActivityStep(
+      selectedActivities: _selectedContext,
+      otherController: _otherActivityController,
+      onActivitySelected: (val) {
+        setState(() {
+          if (_selectedContext.contains(val)) {
+            _selectedContext.remove(val);
+          } else {
+            _selectedContext.add(val);
+          }
+        });
+      },
+    ),
+    CompanionStep(
+      selectedCompanions: _selectedCompanions,
+      onCompanionSelected: (val) {
+        setState(() {
+          _selectedCompanions.clear();
+          _selectedCompanions.add(val);
+        });
+      },
+    ),
+    NotesStep(controller: _notesController),
+  ];
 
   int get _totalSteps => _steps.length;
 
@@ -135,36 +121,7 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
     }
   }
 
-  Future<void> _showDateTimePicker() async {
-    final date = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now(),
-    );
-
-    if (date != null && mounted) {
-      final time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(_selectedDate),
-      );
-
-      if (time != null) {
-        setState(() {
-          _selectedDate = DateTime(
-            date.year,
-            date.month,
-            date.day,
-            time.hour,
-            time.minute,
-          );
-        });
-      }
-    }
-  }
-
   void _submit() {
-    // Collect moods and activities, handling "Diğer" custom values
     final finalMoods = List<String>.from(_selectedMoods);
     if (_selectedMoods.contains('Diğer') && _otherMoodController.text.isNotEmpty) {
       finalMoods.add(_otherMoodController.text.trim());
@@ -177,11 +134,11 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
 
     final log = DailyLog(
       id: const Uuid().v4(),
-      date: _selectedDate,
-      cravingIntensity: _intensity.toInt(),
-      hasSmoked: false, // Artık bu sayfa sadece kriz kaydı
-      smokeCount: 0,
-      type: 'craving', // Sadece kriz
+      date: DateTime.now(),
+      cravingIntensity: 0,
+      hasSmoked: true,
+      smokeCount: _smokeCount,
+      type: 'slip',
       location: _location,
       moods: finalMoods,
       context: finalActivities,
@@ -190,7 +147,7 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
     );
 
     ref.read(historyLogsProvider.notifier).addLog(log);
-    context.pop();
+    if (mounted) context.pop();
   }
 
   @override
@@ -238,8 +195,7 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
           const SizedBox(width: 16),
           Text(
             "${_currentPage + 1}/$_totalSteps",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
+            style: AppTextStyles.bodySemibold.copyWith(
               color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
             ),
           ),

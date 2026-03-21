@@ -35,6 +35,9 @@ class DailyLog extends HiveObject {
   @HiveField(9)
   final String? note; // Ekstra notlar
 
+  @HiveField(10, defaultValue: 'craving')
+  final String type; // 'craving' veya 'slip'
+
   DailyLog({
     required this.id,
     required this.date,
@@ -46,6 +49,7 @@ class DailyLog extends HiveObject {
     required this.context,
     required this.companions,
     this.note,
+    this.type = 'craving', // Varsayılan olarak kriz
   });
 
   // Firestore'dan okuma için
@@ -61,6 +65,7 @@ class DailyLog extends HiveObject {
       context: List<String>.from(map['context'] ?? []),
       companions: List<String>.from(map['companions'] ?? []),
       note: map['note'] as String?,
+      type: map['type'] as String? ?? 'craving',
     );
   }
 
@@ -76,6 +81,7 @@ class DailyLog extends HiveObject {
       'context': context,
       'companions': companions,
       'note': note,
+      'type': type,
     };
   }
 
@@ -90,6 +96,7 @@ class DailyLog extends HiveObject {
     List<String>? context,
     List<String>? companions,
     String? note,
+    String? type,
   }) {
     return DailyLog(
       id: id ?? this.id,
@@ -102,6 +109,7 @@ class DailyLog extends HiveObject {
       context: context ?? this.context,
       companions: companions ?? this.companions,
       note: note ?? this.note,
+      type: type ?? this.type,
     );
   }
 }

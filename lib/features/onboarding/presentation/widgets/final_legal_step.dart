@@ -4,6 +4,9 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/speech_bubble.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/asset_constants.dart';
 
 class FinalLegalStep extends StatefulWidget {
   final Function(bool) onValidStateChanged;
@@ -29,15 +32,14 @@ class _FinalLegalStepState extends State<FinalLegalStep> {
         child: Column(
           children: [
             const SizedBox(height: AppSpacing.p20),
-            const Column(
+            Column(
               children: [
-                Icon(
-                  Icons.monitor_heart_outlined,
-                  size: 60,
-                  color: AppColors.lightPrimary,
+                SvgPicture.asset(
+                  AssetConstants.cigeritoDefault,
+                  height: AppMascotSizes.large,
                 ),
-                SizedBox(height: AppSpacing.p12),
-                SpeechBubble(
+                const SizedBox(height: AppSpacing.p12),
+                const SpeechBubble(
                   text: "Sıkıcı ama önemli kısım. Son bir şey, söz.",
                 ),
               ],

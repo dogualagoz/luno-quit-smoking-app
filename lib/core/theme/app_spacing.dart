@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // Boşluklar (Padding/Margin)
 abstract final class AppSpacing {
   // Sayısal değerler
+  static const double p4 = 4.0;
   static const double p8 = 8.0;
   static const double p10 = 10.0;
   static const double p12 = 12.0;

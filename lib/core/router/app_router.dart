@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/main/presentation/main_screen.dart';
@@ -12,8 +11,10 @@ import '../../features/auth/presentation/email_register_screen.dart';
 import '../../features/auth/data/auth_repository.dart';
 import '../../features/onboarding/data/onboarding_repository.dart';
 import '../../features/history/presentation/pages/craving_screen.dart';
+import '../../features/history/presentation/pages/slip_log_screen.dart';
 import '../../features/history/presentation/pages/history_screen.dart';
 import '../../features/recovery/presentation/pages/recovery_screen.dart';
+import '../../features/crisis/presentation/crisis_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -68,6 +69,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRouter.craving,
         builder: (context, state) => const CravingScreen(),
       ),
+      GoRoute(
+        path: AppRouter.slipLog,
+        builder: (context, state) => const SlipLogScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainShell(navigationShell: navigationShell);
@@ -101,8 +106,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: AppRouter.crisis,
-                builder: (context, state) =>
-                    const _PlaceholderScreen(title: "Kriz"),
+                builder: (context, state) => const CrisisScreen(),
               ),
             ],
           ),
@@ -143,12 +147,5 @@ class AppRouter {
   static const String history = '/history';
   static const String settings = '/settings';
   static const String craving = '/craving';
-}
-
-class _PlaceholderScreen extends StatelessWidget {
-  final String title;
-  const _PlaceholderScreen({required this.title});
-  @override
-  Widget build(BuildContext context) =>
-      Scaffold(body: Center(child: Text(title)));
+  static const String slipLog = '/slip-log';
 }

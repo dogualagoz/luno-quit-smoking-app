@@ -5,6 +5,9 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/speech_bubble.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/asset_constants.dart';
 
 class SummaryStep extends StatefulWidget {
   final int dailyCigarettes;
@@ -59,10 +62,9 @@ class _SummaryStepState extends State<SummaryStep> {
       child: Column(
         children: [
           const SizedBox(height: AppSpacing.p12),
-          const Icon(
-            Icons.monitor_heart_outlined,
-            size: 50,
-            color: AppColors.lightDestructive,
+          SvgPicture.asset(
+            AssetConstants.cigeritoDefault,
+            height: AppMascotSizes.medium,
           ),
           const SizedBox(height: AppSpacing.p8),
           const SpeechBubble(
@@ -120,10 +122,9 @@ class _SummaryStepState extends State<SummaryStep> {
           const SizedBox(height: 20),
           Row(
             children: [
-              const Icon(
-                Icons.monitor_heart_outlined,
-                size: 36,
-                color: AppColors.lightPrimary,
+              SvgPicture.asset(
+                AssetConstants.cigeritoDefault,
+                height: AppMascotSizes.small,
               ),
               const SizedBox(width: 8),
               const Expanded(

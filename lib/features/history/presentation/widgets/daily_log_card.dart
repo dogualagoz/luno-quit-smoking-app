@@ -1,155 +1,213 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
+import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
 import 'package:luno_quit_smoking_app/features/history/data/models/daily_log.dart';
 
 class DailyLogCard extends StatelessWidget {
   final DailyLog log;
+  final double pricePerCigarette; // Onboarding'den hesaplanan birim fiyat
 
-  const DailyLogCard({super.key, required this.log});
+  const DailyLogCard({
+    super.key,
+    required this.log,
+    this.pricePerCigarette = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final successColor = isDark
-        ? AppColors.darkChartSuccess
-        : AppColors.lightChartSuccess;
+    final successColor = isDark ? AppColors.darkChartSuccess : AppColors.lightChartSuccess;
+    final primaryColor = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+    final warningColor = isDark ? AppColors.darkChartWarning : AppColors.lightChartWarning;
 
-    // Basit bir yüz ifadesi mantığı (Geliştirilebilir)
-    String getEmoji() {
-      if (!log.hasSmoked) return '😁'; // İçmediyse süper
-      if (log.smokeCount < 5) return '😐';
-      return '😞'; // 5 ve üstüyse üzgün
-    }
+    final isCraving = _getLogType() == 'craving';
+    final statusColor = isCraving ? successColor : primaryColor;
+    final statusBgColor = statusColor.withValues(alpha: 0.1);
 
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
-        ),
-      ),
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ExpansionTile(
-        tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shape: const Border(), // Çizgisiz
-        title: Row(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.p12),
+      child: LunoCard(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: 8),
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            tilePadding: EdgeInsets.zero,
+            childrenPadding: const EdgeInsets.only(bottom: AppSpacing.p8),
+            iconColor: Theme.of(context).hintColor,
+            collapsedIconColor: Theme.of(context).hintColor,
+            title: Row(
               children: [
-                Text(
-                  _getRelativeDateString(log.date),
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-                Text(
-                  DateFormat('dd MMM').format(log.date),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(width: 16),
-            Container(
-              width: 1,
-              height: 30,
-              color: Colors.grey.withValues(alpha: 0.3),
-            ),
-            const SizedBox(width: 16),
-
-            // Sigara Sayısı ve Emoji
-            if (log.hasSmoked) ...[
-              const Icon(Icons.smoking_rooms, size: 16, color: Colors.grey),
-              const SizedBox(width: 4),
-              Text(
-                '${log.smokeCount} sigara',
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ] else ...[
-              const Icon(Icons.smoke_free, size: 16, color: Colors.green),
-              const SizedBox(width: 4),
-              const Text(
-                'Temiz gün',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ],
-            const SizedBox(width: 8),
-            Text(getEmoji(), style: const TextStyle(fontSize: 18)),
-
-            const Spacer(),
-
-            // Kriz Rozeti
-            if (log.cravingIntensity > 0)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: successColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
+                // Tarih
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${log.cravingIntensity} şiddet',
-                      style: TextStyle(
-                        color: successColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      _getRelativeDateString(log.date),
+                      style: AppTextStyles.caption.copyWith(color: Theme.of(context).hintColor),
+                    ),
+                    Text(
+                      DateFormat('dd MMM').format(log.date),
+                      style: AppTextStyles.bodySemibold,
                     ),
                   ],
                 ),
-              ),
-          ],
-        ),
-        subtitle: log.note != null && log.note!.isNotEmpty
-            ? Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  log.note!,
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                const SizedBox(width: AppSpacing.p16),
+
+                // Dikey Ayıraç
+                Container(
+                  width: 2,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppColors.lightBorder.withValues(alpha: isDark ? 0.1 : 0.05),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-              )
-            : null,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (log.location != null)
-                  _buildDetailRow('Konum:', log.location!),
-                if (log.moods.isNotEmpty)
-                  _buildDetailRow('Ruh Hali:', log.moods.join(', ')),
-                if (log.context.isNotEmpty)
-                  _buildDetailRow('Aktivite:', log.context.join(', ')),
-                if (log.companions.isNotEmpty)
-                  _buildDetailRow('Kiminle:', log.companions.join(', ')),
+                const SizedBox(width: AppSpacing.p16),
+
+                // Durum ikonu + Metin
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(AppSpacing.p8),
+                        decoration: BoxDecoration(
+                          color: statusBgColor,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isCraving ? Icons.shield_outlined : Icons.smoking_rooms,
+                          size: 16,
+                          color: statusColor,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.p8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isCraving ? 'Kriz Atlatıldı' : '${log.smokeCount} adet',
+                              style: AppTextStyles.bodySemibold.copyWith(
+                                color: isCraving ? successColor : Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                            if (isCraving && log.cravingIntensity > 0)
+                              Text(
+                                'Şiddet: ${log.cravingIntensity}/10',
+                                style: AppTextStyles.micro.copyWith(color: Theme.of(context).hintColor),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Emoji yerine: Fiyat veya Kalkan ikonu
+                if (!isCraving && pricePerCigarette > 0)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: warningColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '₺${(log.smokeCount * pricePerCigarette).toStringAsFixed(0)}',
+                      style: AppTextStyles.caption.copyWith(
+                        color: warningColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                else if (isCraving)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: successColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.emoji_events, size: 14, color: successColor),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Direnç',
+                          style: AppTextStyles.micro.copyWith(
+                            color: successColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
+            subtitle: log.note != null && log.note!.isNotEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(top: AppSpacing.p8),
+                    child: Text(
+                      log.note!,
+                      style: AppTextStyles.caption.copyWith(
+                        color: Theme.of(context).hintColor,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )
+                : null,
+            children: [
+              const SizedBox(height: AppSpacing.p8),
+              if (log.location != null) _buildDetailSection(context, 'Konum', [log.location!]),
+              if (log.moods.isNotEmpty) _buildDetailSection(context, 'Duygu Durumu', log.moods),
+              if (log.context.isNotEmpty) _buildDetailSection(context, 'Aktivite', log.context),
+              if (log.companions.isNotEmpty) _buildDetailSection(context, 'Kiminleydi', log.companions),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailSection(BuildContext context, String title, List<String> items) {
+    if (items.isEmpty) return const SizedBox.shrink();
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
+      padding: const EdgeInsets.only(bottom: AppSpacing.p12),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              label,
-              style: const TextStyle(color: Colors.grey, fontSize: 13),
+          Text(
+            title,
+            style: AppTextStyles.micro.copyWith(
+              color: Theme.of(context).hintColor,
+              letterSpacing: 1.1,
             ),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
-            ),
+          const SizedBox(height: AppSpacing.p8),
+          Wrap(
+            spacing: AppSpacing.p8,
+            runSpacing: AppSpacing.p8,
+            children: items.map((item) {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: AppColors.lightBorder.withValues(alpha: 0.1),
+                  ),
+                ),
+                child: Text(
+                  item,
+                  style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w500),
+                ),
+              );
+            }).toList(),
           ),
         ],
       ),
@@ -165,7 +223,14 @@ class DailyLogCard extends StatelessWidget {
     if (logDate == today) return "Bugün";
     if (logDate == yesterday) return "Dün";
 
-    // Geri kalan günler için haftanın gününü döndürebiliriz
-    return DateFormat('EEEE').format(date);
+    return DateFormat('EEEE', 'tr_TR').format(date);
+  }
+
+  String _getLogType() {
+    try {
+      return log.type;
+    } catch (_) {
+      return 'craving';
+    }
   }
 }

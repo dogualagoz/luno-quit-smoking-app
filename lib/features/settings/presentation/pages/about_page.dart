@@ -4,6 +4,9 @@ import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:luno_quit_smoking_app/core/constants/asset_constants.dart';
 
 /// Hakkında sayfası — Uygulama bilgileri, bilimsel kaynaklar ve sorumluluk reddi.
 class AboutPage extends StatelessWidget {
@@ -72,10 +75,9 @@ class AboutPage extends StatelessWidget {
                 Center(
                   child: Column(
                     children: [
-                      Icon(
-                        Icons.monitor_heart_outlined,
-                        size: 48,
-                        color: theme.colorScheme.primary,
+                      SvgPicture.asset(
+                        AssetConstants.cigeritoDefault,
+                        height: AppMascotSizes.large,
                       ),
                       const SizedBox(height: AppSpacing.p8),
                       Text(

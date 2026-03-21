@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/speech_bubble.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/asset_constants.dart';
 
 class TriggerMomentsStep extends StatefulWidget {
   final String? initialValue;
@@ -24,29 +26,15 @@ class TriggerMomentsStep extends StatefulWidget {
 class _TriggerMomentsStepState extends State<TriggerMomentsStep> {
   String? _selectedValue;
 
-  final List<Map<String, String>> _options = [
-    {
-      'title': 'Stresli anlarda',
-      'desc': 'İşte tartışma, trafik...',
-      'icon': '😨',
-    },
-    {
-      'title': 'Sosyal ortamlarda',
-      'desc': 'Arkadaşlarla, çay-kahve...',
-      'icon': '🍻',
-    },
-    {
-      'title': 'Canım sıkıldığında',
-      'desc': 'Boş zamanlar, bekleme...',
-      'icon': '😑',
-    },
-    {'title': 'Sabah ilk iş', 'desc': 'Kahveyle veya uyanınca', 'icon': '☕'},
-    {'title': 'Yemek sonrası', 'desc': 'Yemek bitince refleks', 'icon': '🍽️'},
-    {
-      'title': 'Araba kullanırken',
-      'desc': 'Trafikte, uzun yolda',
-      'icon': '🚗',
-    },
+  final List<Map<String, String>> _moments = [
+    {'title': 'Sabah kahvesi', 'icon': '☕'},
+    {'title': 'Stresli anlar', 'icon': '😫'},
+    {'title': 'Yemek sonrası', 'icon': '🍽️'},
+    {'title': 'Alkol ile', 'icon': '🍻'},
+    {'title': 'Can sıkıntısı', 'icon': '🥱'},
+    {'title': 'Mola anları', 'icon': '⏸️'},
+    {'title': 'Gece vakti', 'icon': '🌙'},
+    {'title': 'Diğer', 'icon': '✨'},
   ];
 
   @override
@@ -69,33 +57,32 @@ class _TriggerMomentsStepState extends State<TriggerMomentsStep> {
       child: Column(
         children: [
           const SizedBox(height: AppSpacing.p20),
-          const Row(
+          Row(
             children: [
-              Icon(
-                Icons.monitor_heart_outlined,
-                size: 40,
-                color: AppColors.lightPrimary,
-              ),
-              SizedBox(width: AppSpacing.p12),
-              Expanded(
+              const Expanded(
                 child: SpeechBubble(
                   text:
-                      "En çok ne zaman canın sigara ister? Düşmanını tanımak lazım...",
+                      "Tetikleyicini bil, düşmanını tanı. Ciğerito yanındayken stres yok!",
                 ),
+              ),
+              const SizedBox(width: AppSpacing.p12),
+              SvgPicture.asset(
+                AssetConstants.cigeritoDefault,
+                height: AppMascotSizes.medium,
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.p24),
           Expanded(
             child: ListView.builder(
-              itemCount: _options.length,
+              itemCount: _moments.length,
               itemBuilder: (context, index) {
-                final opt = _options[index];
-                final isSelected = _selectedValue == opt['title'];
+                final moment = _moments[index];
+                final isSelected = _selectedValue == moment['title'];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: InkWell(
-                    onTap: () => _onSelect(opt['title']!),
+                    onTap: () => _onSelect(moment['title']!),
                     borderRadius: AppRadius.mainCard,
                     child: Container(
                       padding: const EdgeInsets.all(16),
@@ -114,34 +101,21 @@ class _TriggerMomentsStepState extends State<TriggerMomentsStep> {
                       child: Row(
                         children: [
                           Text(
-                            opt['icon']!,
+                            moment['icon']!,
                             style: const TextStyle(fontSize: 24),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  opt['title']!,
-                                  style: TextStyle(
-                                    fontWeight: isSelected
-                                        ? FontWeight.bold
-                                        : FontWeight.w600,
-                                    color: isSelected
-                                        ? AppColors.lightPrimary
-                                        : AppColors.lightForeground,
-                                  ),
-                                ),
-                                Text(
-                                  opt['desc']!,
-                                  style: AppTextStyles.micro.copyWith(
-                                    color: AppColors.lightForeground.withValues(
-                                      alpha: 0.4,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              moment['title']!,
+                              style: TextStyle(
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w600,
+                                color: isSelected
+                                    ? AppColors.lightPrimary
+                                    : AppColors.lightForeground,
+                              ),
                             ),
                           ),
                           if (isSelected)

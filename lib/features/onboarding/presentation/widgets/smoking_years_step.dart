@@ -4,15 +4,20 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/speech_bubble.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/asset_constants.dart';
 
 class SmokingYearsStep extends StatefulWidget {
   final int initialValue;
   final Function(int) onValueChanged;
+  final Function(bool) onValidStateChanged;
 
   const SmokingYearsStep({
     super.key,
     required this.initialValue,
     required this.onValueChanged,
+    required this.onValidStateChanged,
   });
 
   @override
@@ -26,9 +31,11 @@ class _SmokingYearsStepState extends State<SmokingYearsStep> {
   void initState() {
     super.initState();
     _currentValue = widget.initialValue;
+    widget.onValidStateChanged(true);
   }
 
   void _updateValue(int value) {
+    if (value < 1) return;
     setState(() => _currentValue = value);
     widget.onValueChanged(value);
   }
@@ -40,18 +47,17 @@ class _SmokingYearsStepState extends State<SmokingYearsStep> {
       child: Column(
         children: [
           const SizedBox(height: AppSpacing.p20),
-          const Row(
+          Row(
             children: [
-              Expanded(
-                child: SpeechBubble(
-                  text: "Birkaç yıl olmuş... Hâlâ geç değil.",
-                ),
+              SvgPicture.asset(
+                AssetConstants.cigeritoDefault,
+                height: AppMascotSizes.medium,
               ),
-              SizedBox(width: AppSpacing.p12),
-              Icon(
-                Icons.monitor_heart_outlined,
-                size: 40,
-                color: AppColors.lightPrimary,
+              const SizedBox(width: AppSpacing.p12),
+              const Expanded(
+                child: SpeechBubble(
+                  text: "Daha yolun başındayız ya da yolun sonuna gelmişiz...",
+                ),
               ),
             ],
           ),

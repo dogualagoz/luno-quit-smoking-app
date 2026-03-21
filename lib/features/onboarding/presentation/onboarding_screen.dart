@@ -120,6 +120,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   SmokingYearsStep(
                     initialValue: _smokingYears,
                     onValueChanged: (val) => _smokingYears = val,
+                    onValidStateChanged: (isValid) =>
+                        _updateButtonState(isEnabled: isValid),
                   ),
                   DailyCigarettesStep(
                     initialValue: _dailyCigarettes,

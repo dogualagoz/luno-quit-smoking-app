@@ -19,6 +19,9 @@ class SelectionChipGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryColor = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+
     return Wrap(
       spacing: AppSpacing.p8,
       runSpacing: AppSpacing.p8,
@@ -26,22 +29,22 @@ class SelectionChipGrid extends StatelessWidget {
         final isSelected = selectedOptions.contains(option);
         return GestureDetector(
           onTap: () => onSelected(option),
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.p16,
-              vertical: AppSpacing.p8,
+              vertical: AppSpacing.p10,
             ),
             decoration: BoxDecoration(
-              color: isSelected
-                  ? (Theme.of(context).brightness == Brightness.dark
-                        ? AppColors.darkChartSuccess
-                        : AppColors.lightChartSuccess)
-                  : Theme.of(context).cardColor,
+              color: isSelected ? primaryColor : Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(
+                color: isSelected ? primaryColor : AppColors.lightBorder.withValues(alpha: isDark ? 0.1 : 0.08),
+              ),
               boxShadow: [
                 if (!isSelected)
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: Colors.black.withValues(alpha: 0.03),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -50,9 +53,7 @@ class SelectionChipGrid extends StatelessWidget {
             child: Text(
               option,
               style: TextStyle(
-                color: isSelected
-                    ? Colors.white
-                    : Theme.of(context).colorScheme.onSurface,
+                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 14,
               ),

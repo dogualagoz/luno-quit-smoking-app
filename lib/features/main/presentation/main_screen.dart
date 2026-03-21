@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:luno_quit_smoking_app/core/router/app_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:luno_quit_smoking_app/core/constants/asset_constants.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/widgets/recovery_progress.dart';
 import 'package:luno_quit_smoking_app/core/widgets/quote_card.dart';
@@ -13,6 +15,8 @@ import 'package:luno_quit_smoking_app/features/main/application/stats_provider.d
 import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
 import 'package:luno_quit_smoking_app/features/history/application/history_provider.dart';
 import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
+import 'package:luno_quit_smoking_app/core/widgets/mascot_animation.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -80,12 +84,13 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
                   // Dinamik Maskot Bölümü
                   Center(
-                    child: Icon(
-                      Icons.monitor_heart,
-                      size: 80,
-                      color: statsData.type == QuitStatType.success
-                          ? Colors.pink.shade200
-                          : Colors.redAccent.withValues(alpha: 0.5),
+                    child: MascotAnimation(
+                      child: SvgPicture.asset(
+                        statsData.type == QuitStatType.success
+                            ? AssetConstants.cigeritoDefault
+                            : AssetConstants.cigeritoSad,
+                        height: AppMascotSizes.xLarge,
+                      ),
                     ),
                   ),
 

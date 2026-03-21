@@ -3,6 +3,9 @@ import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_radius.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:luno_quit_smoking_app/core/constants/asset_constants.dart';
 
 class RecoveryProgress extends StatelessWidget {
   final double progress;
@@ -39,10 +42,9 @@ class RecoveryProgress extends StatelessWidget {
                   color: colors.first.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.monitor_heart_rounded,
-                  size: 20,
-                  color: colors.last,
+                child: SvgPicture.asset(
+                  AssetConstants.cigeritoDefault,
+                  height: AppMascotSizes.micro,
                 ),
               ),
               const SizedBox(width: AppSpacing.p12),

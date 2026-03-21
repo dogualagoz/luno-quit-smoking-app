@@ -10,6 +10,7 @@ import 'package:luno_quit_smoking_app/features/history/presentation/widgets/aver
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
+import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
@@ -30,8 +31,14 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final historyLogsState = ref.watch(historyLogsProvider);
+    final userProfile = ref.watch(userProfileProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+
+    // Birim sigara fiyatı hesapla
+    final double pricePerCigarette = (userProfile != null && userProfile.cigarettesPerPack > 0)
+        ? userProfile.packPrice / userProfile.cigarettesPerPack
+        : 0;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -39,7 +46,39 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         child: historyLogsState.when(
           data: (logs) {
             if (logs.isEmpty) {
-              return const Center(child: Text("Henüz hiç kayıt girmedin."));
+              return Center(
+                child: Padding(
+                  padding: AppSpacing.pageHorizontal,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(AppSpacing.p24),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.history_edu,
+                          size: 64,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.p24),
+                      Text(
+                        'Henüz Kayıt Yok',
+                        style: AppTextStyles.pageHeader.copyWith(color: theme.colorScheme.onSurface),
+                      ),
+                      const SizedBox(height: AppSpacing.p8),
+                      Text(
+                        "Sürecini başlatmak ve nasıl ilerlediğini görmek için ilk dürüst kaydını gir.",
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.body.copyWith(color: theme.hintColor),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }
 
             // Grafik verisini hazırla (Son 7 gün için mock/hesaplama)
@@ -102,7 +141,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: logs.length,
                       itemBuilder: (ctx, index) {
-                        return DailyLogCard(log: logs[index]);
+                        return DailyLogCard(
+                          log: logs[index],
+                          pricePerCigarette: pricePerCigarette,
+                        );
                       },
                     ),
 
@@ -121,17 +163,26 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     );
   }
 
-  // Son 7 günün içim verilerini bul (basit mantık: 1=Pzt, 7=Paz)
+  // Son 7 günün içim verilerini bul (sadece 'slip' kayıtları)
   Map<int, int> _calculateWeeklyData(List<dynamic> logs) {
     Map<int, int> data = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
     final now = DateTime.now();
     for (var log in logs) {
-      if (now.difference(log.date).inDays <= 7) {
-        int weekday = log.date.weekday; // 1 = Pzt, 7 = Paz
+      final logType = _getLogType(log);
+      if (logType == 'slip' && now.difference(log.date).inDays <= 7) {
+        int weekday = log.date.weekday;
         data[weekday] = (data[weekday] ?? 0) + log.smokeCount as int;
       }
     }
     return data;
+  }
+
+  String _getLogType(dynamic log) {
+    try {
+      return log.type ?? 'craving';
+    } catch (_) {
+      return 'craving';
+    }
   }
 
   Widget _buildFilterButtons(bool isDark) {
