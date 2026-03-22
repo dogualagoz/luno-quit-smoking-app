@@ -13,6 +13,7 @@ final statsProvider = StreamProvider<QuitStats>((ref) {
   if (userProfile == null) {
     return Stream.value(
       QuitStats(
+        rawMoney: 0.0,
         moneyLabel: "Harcanan Para",
         moneyValue: "0",
         moneyDecimal: ",00",

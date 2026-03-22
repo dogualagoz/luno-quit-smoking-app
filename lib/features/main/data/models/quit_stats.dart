@@ -7,6 +7,7 @@ enum QuitStatType { success, loss }
 
 class QuitStats {
   // — Para Kartı —
+  final double rawMoney;
   final String moneyLabel; // "Harcanan Para"
   final String moneyValue; // "₺ 68.438"
   final String moneyDecimal; // ",21"
@@ -44,6 +45,7 @@ class QuitStats {
   final bool isEstimatedToday; // TRUE if no log entered for today
 
   QuitStats({
+    required this.rawMoney,
     required this.moneyLabel,
     required this.moneyValue,
     this.moneyDecimal = "",

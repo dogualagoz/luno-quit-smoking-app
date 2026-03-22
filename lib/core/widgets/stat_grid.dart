@@ -35,6 +35,7 @@ class StatGrid extends StatelessWidget {
           child: StatCard(
             label: stats.moneyLabel,
             value: stats.moneyValue,
+            rawValue: stats.rawMoney,
             moneyDecimal: stats.moneyDecimal,
             subtext: stats.moneySubtext,
             icon: Icons.savings_outlined,

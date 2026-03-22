@@ -29,8 +29,8 @@ Luno, sigara bırakma sürecinde sizi "tebrik etmek" yerine, devam ettiğiniz he
 
 ## 📱 Ekran Görüntüleri
 
-| **Dashboard (Koyu Tema)** | **Hasar Raporu** | **Kriz Modu** | **Geçmiş & Kayıt** |
-| :---: | :---: | :---: | :---: |
+|                **Dashboard (Koyu Tema)**                 |                    **Hasar Raporu**                     |                     **Kriz Modu**                     |                    **Geçmiş & Kayıt**                    |
+| :------------------------------------------------------: | :-----------------------------------------------------: | :---------------------------------------------------: | :------------------------------------------------------: |
 | <img src="screenshots/dashboard_dark.png" width="180" /> | <img src="screenshots/damage_report.png" width="180" /> | <img src="screenshots/crisis_mode.png" width="180" /> | <img src="screenshots/history_screen.png" width="180" /> |
 
 ---
@@ -38,25 +38,30 @@ Luno, sigara bırakma sürecinde sizi "tebrik etmek" yerine, devam ettiğiniz he
 ## ✨ Temel Özellikler
 
 ### 📊 Dinamik Dashboard
-*   **Gerçek Zamanlı Kayıp Takibi:** Harcanan para, içilen sigara ve kaybedilen zamanı canlı olarak izleyin.
-*   **Görsel Karşılaştırmalar:** İçtiğiniz sigaraların toplam uzunluğunu "Everest'e tırmanış" gibi çarpıcı metriklerle görün.
-*   **Kayıp Animasyonları:** Paranızın nasıl "yandığını" gösteren dinamik progress bar'lar.
+
+- **Gerçek Zamanlı Kayıp Takibi:** Harcanan para, içilen sigara ve kaybedilen zamanı canlı olarak izleyin.
+- **Görsel Karşılaştırmalar:** İçtiğiniz sigaraların toplam uzunluğunu "Everest'e tırmanış" gibi çarpıcı metriklerle görün.
+- **Kayıp Animasyonları:** Paranızın nasıl "yandığını" gösteren dinamik progress bar'lar.
 
 ### 🫁 Detaylı Hasar Raporu
-*   **Organ Bazlı Analiz:** Akciğer, Kalp, Beyin ve Cilt üzerindeki birikmiş hasarı yüzde bazlı takip edin.
-*   **Farkındalık Cümleleri:** Ciğerito'nun her organ hasarına özel, iğneleyici ama gerçekçi yorumlarıyla yüzleşin.
+
+- **Organ Bazlı Analiz:** Akciğer, Kalp, Beyin ve Cilt üzerindeki birikmiş hasarı yüzde bazlı takip edin.
+- **Farkındalık Cümleleri:** Ciğerito'nun her organ hasarına özel, iğneleyici ama gerçekçi yorumlarıyla yüzleşin.
 
 ### ⚡ Kriz Modu
-*   **Acil Destek:** Sigara içme isteği geldiğinde sizi durduracak özel bir "Kriz Bölgesi".
-*   **İstatistikler:** Kaç krizi atlattığınızı ve başarı oranınızı takip ederek özgüveninizi artırın.
+
+- **Acil Destek:** Sigara içme isteği geldiğinde sizi durduracak özel bir "Kriz Bölgesi".
+- **İstatistikler:** Kaç krizi atlattığınızı ve başarı oranınızı takip ederek özgüveninizi artırın.
 
 ### 📅 Geçmiş ve Kayıt Yönetimi
-*   **Günlük Check-in:** Her gün kaç sigara içtiğinizi veya kaç krize direndiğinizi kolayca kaydedin.
-*   **Haftalık Analiz:** Verilerinizin haftalık değişimini kontrol ederek gidişatınızı görün.
+
+- **Günlük Check-in:** Her gün kaç sigara içtiğinizi veya kaç krize direndiğinizi kolayca kaydedin.
+- **Haftalık Analiz:** Verilerinizin haftalık değişimini kontrol ederek gidişatınızı görün.
 
 ### 🎨 Kişiselleştirme ve Tema
-*   **Koyu/Açık Mod:** Göz yormayan şık karanlık tema desteği (Hive ile kalıcı tercih).
-*   **Profil Yönetimi:** Sigara fiyatı ve günlük tüketim gibi verileri güncelleyerek hesaplamaları kişiselleştirin.
+
+- **Koyu/Açık Mod:** Göz yormayan şık karanlık tema desteği (Hive ile kalıcı tercih).
+- **Profil Yönetimi:** Sigara fiyatı ve günlük tüketim gibi verileri güncelleyerek hesaplamaları kişiselleştirin.
 
 ---
 
@@ -64,11 +69,11 @@ Luno, sigara bırakma sürecinde sizi "tebrik etmek" yerine, devam ettiğiniz he
 
 Luno, modern Flutter standartlarına uygun olarak **Feature-First** mimarisiyle geliştirilmiştir.
 
-*   **State Management:** Veri akışı ve uygulama durumu **Riverpod** ile yönetilir.
-*   **Veri Katmanı:**
-    *   **Uzak Veri:** Firebase Firestore (Profil ve Log senkronizasyonu).
-    *   **Yerel Veri:** Hive (Hızlı erişim, tema ve cache yönetimi).
-*   **Tasarım:** Tamamen özelleştirilmiş `LunoCard`, `SettingsSlider` ve animasyonlu bileşenler.
+- **State Management:** Veri akışı ve uygulama durumu **Riverpod** ile yönetilir.
+- **Veri Katmanı:**
+  - **Uzak Veri:** Firebase Firestore (Profil ve Log senkronizasyonu).
+  - **Yerel Veri:** Hive (Hızlı erişim, tema ve cache yönetimi).
+- **Tasarım:** Tamamen özelleştirilmiş `LunoCard`, `SettingsSlider` ve animasyonlu bileşenler.
 
 ```text
 lib/

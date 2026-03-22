@@ -35,11 +35,15 @@ class StatCard extends StatelessWidget {
   /// true ise ateş ikonu gösterilir (para kartları için)
   final bool showBurnIndicator;
 
+  /// Gerçek animasyonlu değer (opsiyonel)
+  final double? rawValue;
+
   const StatCard({
     super.key,
     required this.label,
     required this.value,
     required this.icon,
+    this.rawValue,
     this.moneyDecimal,
     this.digits,
     this.subtext,
@@ -125,6 +129,62 @@ class StatCard extends StatelessWidget {
       return _DigitCounter(digits: digits!);
     }
 
+    if (rawValue != null && isMoney) {
+      return TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: rawValue, end: rawValue!),
+        duration: const Duration(milliseconds: 1500),
+        curve: Curves.easeOutCubic,
+        builder: (context, val, child) {
+          final intVal = val.floor();
+          final decVal = ((val - intVal) * 100).toInt().toString().padLeft(2, '0');
+          final formattedInt = intVal.toString().replaceAllMapped(
+                RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                (Match m) => '${m[1]}.',
+              );
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 2.0),
+                child: Text(
+                  "₺",
+                  style: textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: _currencyOpacity),
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    formattedInt,
+                    style: textTheme.headlineSmall?.copyWith(
+                      color: colorScheme.onSurface,
+                      fontWeight: FontWeight.w900,
+                      fontSize: _valueFontSize,
+                      letterSpacing: -0.6,
+                    ),
+                  ),
+                ),
+              ),
+              Text(
+                ",$decVal",
+                style: textTheme.labelLarge?.copyWith(
+                  color: Colors.pink.shade300.withValues(alpha: _decimalOpacity),
+                  fontWeight: FontWeight.w700,
+                  fontSize: _decimalFontSize,
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
@@ -151,27 +211,25 @@ class StatCard extends StatelessWidget {
               transitionBuilder: (Widget child, Animation<double> animation) {
                 final isIncoming = child.key == ValueKey(value);
 
-                final inAnimation =
-                    Tween<Offset>(
-                      begin: const Offset(0.0, -1.0),
-                      end: Offset.zero,
-                    ).animate(
-                      CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeOutCubic,
-                      ),
-                    );
+                final inAnimation = Tween<Offset>(
+                  begin: const Offset(0.0, -1.0),
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  ),
+                );
 
-                final outAnimation =
-                    Tween<Offset>(
-                      begin: const Offset(0.0, 1.0),
-                      end: Offset.zero,
-                    ).animate(
-                      CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeInCubic,
-                      ),
-                    );
+                final outAnimation = Tween<Offset>(
+                  begin: const Offset(0.0, 1.0),
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeInCubic,
+                  ),
+                );
 
                 return ClipRect(
                   child: SlideTransition(
@@ -193,50 +251,13 @@ class StatCard extends StatelessWidget {
             ),
           ),
         ),
-        if (moneyDecimal != null)
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              final isIncoming = child.key == ValueKey(moneyDecimal);
-
-              // Slot machine akışı: Yeni yukardan girer, eski aşağıdan çıkar
-              final inAnimation =
-                  Tween<Offset>(
-                    begin: const Offset(0.0, -1.0),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeOutCubic,
-                    ),
-                  );
-
-              final outAnimation =
-                  Tween<Offset>(
-                    begin: const Offset(0.0, 1.0),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeInCubic,
-                    ),
-                  );
-
-              return ClipRect(
-                child: SlideTransition(
-                  position: isIncoming ? inAnimation : outAnimation,
-                  child: FadeTransition(opacity: animation, child: child),
-                ),
-              );
-            },
-            child: Text(
-              moneyDecimal!,
-              key: ValueKey(moneyDecimal),
-              style: textTheme.labelLarge?.copyWith(
-                color: Colors.pink.shade300.withValues(alpha: _decimalOpacity),
-                fontWeight: FontWeight.w700,
-                fontSize: _decimalFontSize,
-              ),
+        if (moneyDecimal != null && !isMoney)
+          Text(
+            moneyDecimal!,
+            style: textTheme.labelLarge?.copyWith(
+              color: Colors.pink.shade300.withValues(alpha: _decimalOpacity),
+              fontWeight: FontWeight.w700,
+              fontSize: _decimalFontSize,
             ),
           ),
       ],

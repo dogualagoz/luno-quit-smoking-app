@@ -36,6 +36,7 @@ class QuitCalculator {
     final recoveryDays = remainingAfterYears % AppBusinessRules.daysPerMonth;
 
     return QuitStats(
+      rawMoney: damage.rawMoney,
       moneyLabel: "Harcanan Para",
       moneyValue: damage.formattedMoney,
       moneyDecimal: ",${damage.moneyDecimalPart}",
@@ -193,11 +194,19 @@ class QuitCalculator {
     
     // Geçmiş logları tarihlere göre grupla
     final Map<DateTime, int> loggedSmokesByDate = {};
+    DateTime? lastLogTodayTime;
+
     for (var log in logs) {
       if (log.type == 'slip' && log.hasSmoked) {
         final d = DateTime(log.date.year, log.date.month, log.date.day);
         if (!d.isBefore(createdDate)) {
           loggedSmokesByDate[d] = (loggedSmokesByDate[d] ?? 0) + log.smokeCount;
+          
+          if (d.year == todayStr.year && d.month == todayStr.month && d.day == todayStr.day) {
+            if (lastLogTodayTime == null || log.date.isAfter(lastLogTodayTime!)) {
+              lastLogTodayTime = log.date;
+            }
+          }
         }
       }
     }
@@ -206,12 +215,18 @@ class QuitCalculator {
     bool isEstimatedToday = true;
 
     // Kayıt oluşturulan günden bugüne kadar döngü
-    for (DateTime d = createdDate; !d.isAfter(todayStr); d = d.add(const Duration(days: 1))) {
+    for (DateTime d = createdDate; !d.isAfter(todayStr); d = DateTime(d.year, d.month, d.day + 1)) {
       final bool hasLog = loggedSmokesByDate.containsKey(d);
       
-      if (d.isAtSameMomentAs(todayStr)) {
+      if (d.year == todayStr.year && d.month == todayStr.month && d.day == todayStr.day) {
         if (hasLog) {
           liveSmoked += loggedSmokesByDate[d]!;
+          if (lastLogTodayTime != null) {
+            final msSinceLastLog = now.difference(lastLogTodayTime!).inMilliseconds;
+            if (msSinceLastLog > 0) {
+              liveSmoked += (rates.cigarettesPerSecond / 1000) * msSinceLastLog;
+            }
+          }
           isEstimatedToday = false;
         } else {
           final msToday = now.difference(todayStr).inMilliseconds;
@@ -265,6 +280,7 @@ class QuitCalculator {
 
     return _DamageMetrics(
       totalSmoked: totalSmoked,
+      rawMoney: totalSpent,
       formattedMoney: _formatWithThousandSeparator(moneyValue.toString()),
       moneyDecimalPart: moneyDecimalPart,
       daysLost: daysLost,
@@ -293,6 +309,7 @@ class QuitCalculator {
 /// Hasar hesaplama sonuçlarını taşıyan veri sınıfı.
 class _DamageMetrics {
   final double totalSmoked;
+  final double rawMoney;
   final String formattedMoney;
   final String moneyDecimalPart;
   final int daysLost;
@@ -302,6 +319,7 @@ class _DamageMetrics {
 
   const _DamageMetrics({
     required this.totalSmoked,
+    required this.rawMoney,
     required this.formattedMoney,
     required this.moneyDecimalPart,
     required this.daysLost,
