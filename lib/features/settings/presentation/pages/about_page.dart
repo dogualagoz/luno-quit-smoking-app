@@ -4,6 +4,8 @@ import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
+import 'package:luno_quit_smoking_app/features/settings/presentation/pages/terms_of_service_page.dart';
+import 'package:luno_quit_smoking_app/features/settings/presentation/pages/privacy_policy_page.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:luno_quit_smoking_app/core/constants/asset_constants.dart';
@@ -200,6 +202,57 @@ class AboutPage extends StatelessWidget {
                             ],
                           ),
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: AppSpacing.p24),
+
+                // Yasal Belgeler (Legal)
+                LunoCard(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (_) => const TermsOfServicePage()),
+                          );
+                        },
+                        leading: Icon(
+                          Icons.gavel_rounded,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          size: 20,
+                        ),
+                        title: Text(
+                          "Kullanım Koşulları (TOS)",
+                          style: AppTextStyles.bodySemibold,
+                        ),
+                        trailing: const Icon(Icons.chevron_right, size: 20),
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                      ),
+                      const Divider(height: 1),
+                      ListTile(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (_) => const PrivacyPolicyPage()),
+                          );
+                        },
+                        leading: Icon(
+                          Icons.privacy_tip_outlined,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          size: 20,
+                        ),
+                        title: Text(
+                          "Gizlilik Politikası",
+                          style: AppTextStyles.bodySemibold,
+                        ),
+                        trailing: const Icon(Icons.chevron_right, size: 20),
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
                       ),
                     ],
                   ),

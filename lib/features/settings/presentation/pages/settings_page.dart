@@ -9,82 +9,120 @@ import '../widgets/settings_header.dart';
 import '../widgets/profile_card.dart';
 import '../widgets/settings_slider.dart';
 import '../widgets/settings_toggle_tile.dart';
+import '../widgets/settings_menu_tile.dart';
+import '../controllers/settings_controller.dart';
 import 'about_page.dart';
+import 'cigerito_customization_page.dart';
+import '../../../onboarding/data/onboarding_repository.dart';
+import '../../../../core/theme/theme_provider.dart';
+import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: AppSpacing.pageHorizontal,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: AppSpacing.p24),
+    // Profil kartı için orijinal veriyi kullanıyoruz (yukarıda login olunca güncellenmesi için)
+    final originalProfile = ref.watch(userProfileProvider);
+    
+    // Sliders için geçici durumu takip eden controller
+    final settingsState = ref.watch(settingsControllerProvider);
+    final userProfile = settingsState.profile;
 
-                // 1. Başlık
-                const SettingsHeader(),
+    final themeMode = ref.watch(themeModeProvider);
+    final isDarkMode = themeMode == ThemeMode.dark ||
+        (themeMode == ThemeMode.system &&
+            MediaQuery.of(context).platformBrightness == Brightness.dark);
 
-                const SizedBox(height: AppSpacing.p24),
+    final String userName = originalProfile?.nickname ?? "Misafir";
+    final String registerDate = originalProfile != null
+        ? DateFormat('dd.MM.yyyy').format(originalProfile.createdAt)
+        : "-";
 
-                // 2. Profil Kartı
-                const ProfileCard(
-                  userName: "Duman",
-                  registerDate: "2024-06-23",
-                ),
-
-                const SizedBox(height: AppSpacing.p24),
-
-                // 3. Sigara Bilgilerin
-                LunoCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Sigara Bilgilerin',
-                        style: AppTextStyles.cardHeader,
-                      ),
-                      const SizedBox(height: AppSpacing.p24),
-                      const SettingsSlider(
-                        label: "Günlük ortalama",
-                        value: "14",
-                        unit: " adet",
-                        progress: 0.4,
-                        activeColor: AppColors.lightPrimary,
-                        icon: Icons.smoke_free_rounded,
-                        subtext: "Orta seviye. Ama hedef sıfır, unutma.",
-                      ),
-                      const SizedBox(height: AppSpacing.p24),
-                      const SettingsSlider(
-                        label: "Paket fiyatı",
-                        value: "₺75",
-                        unit: "",
-                        progress: 0.6,
-                        activeColor: AppColors.lightChartWarning,
-                        icon: Icons.currency_lira_rounded,
-                      ),
-                      const SizedBox(height: AppSpacing.p24),
-                      const SettingsSlider(
-                        label: "Günlük hedef",
-                        value: "max 10",
-                        valueColor: AppColors.lightChartSuccess,
-                        unit: " adet",
-                        progress: 0.5,
-                        activeColor: AppColors.lightChartSuccess,
-                        icon: Icons.track_changes_rounded,
-                        subtext:
-                            "Hedef koymuşsun, güzel. Ama daha az olsa da olur.",
-                      ),
-                    ],
+    // Sliders değerleri (Controller'dan geliyor)
+    final int dailyCig = userProfile?.dailyCigarettes ?? 0;
+    final double price = userProfile?.packPrice ?? 0.0;
+    
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) {
+          // Sayfadan çıkarken (Geri tuşu veya Swipe) otomatik kaydet
+          await ref.read(settingsControllerProvider.notifier).saveSettings();
+          // Dashboard'un güncellenmesi için orijinal provider'ı da tetikle
+          ref.invalidate(userProfileProvider);
+        }
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: AppSpacing.pageHorizontal,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: AppSpacing.p24),
+  
+                  // 1. Başlık
+                  const SettingsHeader(),
+  
+                  const SizedBox(height: AppSpacing.p24),
+  
+                  // 2. Profil Kartı
+                  ProfileCard(
+                    userName: userName,
+                    registerDate: registerDate,
                   ),
-                ),
-
-                const SizedBox(height: AppSpacing.p24),
+  
+                  const SizedBox(height: AppSpacing.p24),
+  
+                  // 3. Sigara Bilgilerin
+                  if (userProfile != null)
+                    LunoCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Sigara Bilgilerin',
+                            style: AppTextStyles.cardHeader,
+                          ),
+                          const SizedBox(height: AppSpacing.p24),
+                          SettingsSlider(
+                            label: "Günlük ortalama",
+                            value: dailyCig.toString(),
+                            unit: " adet",
+                            progress: (dailyCig / 40.0).clamp(0.0, 1.0),
+                            activeColor: AppColors.lightPrimary,
+                            icon: Icons.smoke_free_rounded,
+                            subtext: "Hedef sıfır, unutma.",
+                            onChanged: (val) {
+                              final newVal = (val * 40).round();
+                              ref.read(settingsControllerProvider.notifier)
+                                 .updateDailyCigarettes(newVal);
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.p24),
+                          SettingsSlider(
+                            label: "Paket fiyatı",
+                            value: "₺${price.toStringAsFixed(0)}",
+                            unit: "",
+                            progress: (price / 150.0).clamp(0.0, 1.0),
+                            activeColor: AppColors.lightChartWarning,
+                            icon: Icons.currency_lira_rounded,
+                            onChanged: (val) {
+                               final newPrice = (val * 150).round().toDouble();
+                               ref.read(settingsControllerProvider.notifier)
+                                  .updatePackPrice(newPrice);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+  
+                  if (userProfile != null) const SizedBox(height: AppSpacing.p24),
 
                 // 4. Görünüm & Bildirimler
                 LunoCard(
@@ -92,27 +130,76 @@ class SettingsPage extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Görünüm & Bildirimler',
+                        'Araçlar & Görünüm',
                         style: AppTextStyles.cardHeader,
                       ),
                       const SizedBox(height: AppSpacing.p16),
                       SettingsToggleTile(
-                        title: "Açık Tema",
-                        icon: Icons.light_mode_outlined,
-                        value: true,
-                        onChanged: (val) {},
+                        title: "Koyu Tema",
+                        icon: Icons.dark_mode_outlined,
+                        value: isDarkMode,
+                        onChanged: (val) {
+                          ref.read(themeModeProvider.notifier).toggleTheme();
+                        },
                       ),
                       const Divider(height: 1),
                       SettingsToggleTile(
                         title: "Hatırlatıcılar",
                         icon: Icons.notifications_none_rounded,
                         value: true,
-                        onChanged: (val) {},
+                        onChanged: (val) {
+                          // TODO: Push Notifications On/Off
+                        },
+                      ),
+                      const Divider(height: 1),
+                      SettingsMenuTile(
+                        title: "Ciğerito Özelleştirme",
+                        icon: Icons.face_retouching_natural_rounded,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (_) => const CigeritoCustomizationPage()),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
 
+                const SizedBox(height: AppSpacing.p24),
+                
+                // 5. Ekstra Araçlar
+                LunoCard(
+                  child: Column(
+                    children: [
+                      SettingsMenuTile(
+                        title: "Uygulamayı Paylaş",
+                        icon: Icons.share_rounded,
+                        onTap: () {
+                          // ignore: deprecated_member_use
+                          Share.share(
+                              "Luno ile sigarayı bırakma serüvenime başladım! Sen de bana katıl: https://luno-app.com");
+                        },
+                      ),
+                      const Divider(height: 1),
+                      SettingsMenuTile(
+                        title: "Öneri Yap & Bildir",
+                        icon: Icons.lightbulb_outline_rounded,
+                        onTap: () async {
+                          final Uri emailLaunchUri = Uri(
+                            scheme: 'mailto',
+                            path: 'alagozdogu@gmail.com',
+                            query: 'subject=Luno Uygulaması Hakkında Öneri',
+                          );
+                          if (await canLaunchUrl(emailLaunchUri)) {
+                            await launchUrl(emailLaunchUri);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                
                 const SizedBox(height: AppSpacing.p24),
 
                 // 4.5 Hakkında
@@ -210,6 +297,7 @@ class SettingsPage extends ConsumerWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

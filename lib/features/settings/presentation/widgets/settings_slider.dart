@@ -6,11 +6,13 @@ class SettingsSlider extends StatelessWidget {
   final String label;
   final String value;
   final String unit;
-  final double progress; //0.0 - 1.0
+  final double progress; // 0.0 - 1.0
   final Color activeColor;
   final Color? valueColor;
   final String? subtext;
   final IconData icon;
+  final ValueChanged<double>? onChanged; // ✅ Yeni eklendi
+
   const SettingsSlider({
     super.key,
     required this.label,
@@ -21,6 +23,7 @@ class SettingsSlider extends StatelessWidget {
     this.valueColor,
     this.subtext,
     required this.icon,
+    this.onChanged, // ✅ Yeni eklendi
   });
 
   @override
@@ -46,7 +49,6 @@ class SettingsSlider extends StatelessWidget {
             ),
             RichText(
               text: TextSpan(
-                // ✅ Ana stile rengi ekledik, böylece çocukları bu rengi miras alacak
                 style: TextStyle(
                   color: valueColor ?? theme.colorScheme.onSurface,
                 ),
@@ -54,7 +56,6 @@ class SettingsSlider extends StatelessWidget {
                   TextSpan(
                     text: value,
                     style: AppTextStyles.bodySemibold.copyWith(
-                      // color: ... siliyoruz veya miras almasını sağlıyoruz
                       fontWeight: FontWeight.w800,
                       fontSize: 20,
                     ),
@@ -62,7 +63,6 @@ class SettingsSlider extends StatelessWidget {
                   TextSpan(
                     text: unit,
                     style: AppTextStyles.caption.copyWith(
-                      // color: ... siliyoruz, böylece yukarıdaki yeşili alır
                       fontSize: 18,
                     ),
                   ),
@@ -72,61 +72,76 @@ class SettingsSlider extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.p12),
-        Stack(
-          alignment: Alignment.centerLeft,
-          children: [
-            // Arka Plan (Muted Line)
-            Container(
-              height: 6,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.secondary.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            // Aktif Dolgu
-            FractionallySizedBox(
-              widthFactor: progress,
-              child: Container(
-                height: 6,
-                decoration: BoxDecoration(
-                  color: activeColor.withValues(alpha: 1),
-                  borderRadius: BorderRadius.circular(10),
+
+        // ✅ İnteraktif Kaydırıcı Alanı
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final double totalWidth = constraints.maxWidth;
+            
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onPanUpdate: (details) {
+                _handleInteraction(totalWidth, details.localPosition.dx);
+              },
+              onTapDown: (details) {
+                _handleInteraction(totalWidth, details.localPosition.dx);
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Stack(
+                  alignment: Alignment.centerLeft,
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Arka Plan (Muted Line)
+                    Container(
+                      height: 6,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.secondary.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    // Aktif Dolgu
+                    FractionallySizedBox(
+                      widthFactor: progress.clamp(0.0, 1.0),
+                      child: Container(
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: activeColor.withValues(alpha: 1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    // Tasarımdaki Thumb (Yuvarlak)
+                    Positioned(
+                      left: (totalWidth * progress.clamp(0.0, 1.0)) - 10,
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: activeColor.withValues(alpha: 1),
+                            width: 4,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            // Tasarımdaki Thumb (Yuvarlak)
-            // progress değerine göre yatayda konumlama
-            LayoutBuilder(
-              builder: (context, constraints) {
-                return Padding(
-                  padding: EdgeInsets.only(
-                    left: (constraints.maxWidth - 20) * progress,
-                  ),
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: activeColor.withValues(alpha: 1),
-                        width: 4,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
+            );
+          },
         ),
+
         // 3. Alt Bilgi Metni (Opsiyonel)
         if (subtext != null) ...[
           const SizedBox(height: AppSpacing.p8),
@@ -139,5 +154,12 @@ class SettingsSlider extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  void _handleInteraction(double totalWidth, double localDx) {
+    if (onChanged == null || totalWidth <= 0) return;
+    
+    double newProgress = (localDx / totalWidth).clamp(0.0, 1.0);
+    onChanged!(newProgress);
   }
 }

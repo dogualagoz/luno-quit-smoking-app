@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/theme/theme_provider.dart';
 
-class MainHeader extends StatelessWidget {
+class MainHeader extends ConsumerWidget {
   final String userName;
   final String subText;
 
   const MainHeader({super.key, required this.userName, required this.subText});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final themeMode = ref.watch(themeModeProvider);
+    
+    final isDarkMode = themeMode == ThemeMode.dark ||
+        (themeMode == ThemeMode.system &&
+            MediaQuery.of(context).platformBrightness == Brightness.dark);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -40,14 +47,21 @@ class MainHeader extends StatelessWidget {
         ),
 
         //Ay ikonu (tema değiştirici)
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: theme.colorScheme.secondary.withValues(alpha: 0.4),
-            shape: BoxShape.circle,
+        GestureDetector(
+          onTap: () => ref.read(themeModeProvider.notifier).toggleTheme(),
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.secondary.withValues(alpha: 0.4),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isDarkMode ? Icons.light_mode_outlined : Icons.nightlight_outlined,
+              size: 20,
+              color: theme.colorScheme.primary,
+            ),
           ),
-          child: const Icon(Icons.nightlight_outlined, size: 20),
         ),
       ],
     );

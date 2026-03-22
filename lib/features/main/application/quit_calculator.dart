@@ -214,8 +214,8 @@ class QuitCalculator {
           liveSmoked += loggedSmokesByDate[d]!;
           isEstimatedToday = false;
         } else {
-          final secondsToday = now.difference(todayStr).inSeconds;
-          liveSmoked += rates.cigarettesPerSecond * secondsToday;
+          final msToday = now.difference(todayStr).inMilliseconds;
+          liveSmoked += (rates.cigarettesPerSecond / 1000) * msToday;
         }
       } else {
         if (hasLog) {

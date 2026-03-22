@@ -474,12 +474,22 @@ class _DigitCounter extends StatelessWidget {
     bool isSmall = false,
     required String key,
   }) {
+    final isDark = theme.brightness == Brightness.dark;
+    
+    // Tema uyumlu renkler
+    final boxColor = isDark 
+        ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
+        : const Color(0xFFF5F0F2);
+    
+    final textColor = isDark 
+        ? theme.colorScheme.onSurface 
+        : theme.colorScheme.onSurface.withValues(alpha: 0.9);
+
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 600),
       transitionBuilder: (child, animation) {
         final isIncoming = (child.key as ValueKey).value == key;
 
-        // 3D Flip / Takvim Yaprağı Efekti
         final rotateAnim = Tween<double>(
           begin: isIncoming ? pi / 2 : 0,
           end: isIncoming ? 0 : -pi / 2,
@@ -500,34 +510,37 @@ class _DigitCounter extends StatelessWidget {
       },
       child: Container(
         key: ValueKey(key),
-        margin: const EdgeInsets.only(right: 2.5),
+        margin: const EdgeInsets.only(right: 3),
         padding: EdgeInsets.symmetric(
-          horizontal: isSmall ? 4 : 6,
-          vertical: isSmall ? 2 : 3,
+          horizontal: isSmall ? 5 : 7,
+          vertical: isSmall ? 3 : 4,
         ),
         decoration: BoxDecoration(
-          color: const Color(0xFFF5F0F2),
-          borderRadius: BorderRadius.circular(8),
+          color: boxColor,
+          borderRadius: BorderRadius.circular(6),
+          border: isDark ? Border.all(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+            width: 0.5,
+          ) : null,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 1,
-              offset: const Offset(0, 1.5),
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+              blurRadius: 2,
+              offset: const Offset(0, 1),
             ),
           ],
         ),
         child: Text(
           char,
-          style:
-              (isSmall
-                      ? theme.textTheme.bodyMedium
-                      : theme.textTheme.titleMedium)
-                  ?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: theme.colorScheme.onSurface,
-                    fontSize: isSmall ? 19 : 26, // Rakamlar büyütüldü
-                    fontFamily: 'Courier',
-                  ),
+          style: (isSmall
+                  ? theme.textTheme.bodyMedium
+                  : theme.textTheme.titleMedium)
+              ?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: textColor,
+                fontSize: isSmall ? 18 : 24, // Sığması için hafif küçültüldü
+                height: 1,
+              ),
         ),
       ),
     );
