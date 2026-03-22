@@ -38,15 +38,18 @@ class HistoryRepository {
     // 1. Hive'a yaz (Hızlı sonuç)
     await _dailyLogsBox.put(log.id, log);
 
-    // 2. Firestore'a yaz (Yedekleme)
+    // 2. Firestore'a yaz (Yedekleme - arka planda, beklemeden)
     final user = _auth.currentUser;
     if (user != null) {
-      await _firestore
+      _firestore
           .collection('users')
           .doc(user.uid)
           .collection('dailyLogs')
           .doc(log.id)
-          .set(log.toMap());
+          .set(log.toMap())
+          .catchError((e) {
+        print('Firestore yedekleme hatası: $e');
+      });
     }
   }
 

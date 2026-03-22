@@ -41,6 +41,8 @@ class QuitStats {
   final double progress; // 0.0 - 1.0
   final QuitStatType type; // success or loss
 
+  final bool isEstimatedToday; // TRUE if no log entered for today
+
   QuitStats({
     required this.moneyLabel,
     required this.moneyValue,
@@ -64,5 +66,6 @@ class QuitStats {
     this.totalDamageScore = 0.0,
     required this.progress,
     required this.type,
+    this.isEstimatedToday = true,
   });
 }

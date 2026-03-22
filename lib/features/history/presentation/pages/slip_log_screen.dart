@@ -146,8 +146,9 @@ class _SlipLogScreenState extends ConsumerState<SlipLogScreen> {
       note: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
     );
 
+    // Önce ekranı kapat, kayıt arkada devam etsin
+    context.pop();
     ref.read(historyLogsProvider.notifier).addLog(log);
-    if (mounted) context.pop();
   }
 
   @override

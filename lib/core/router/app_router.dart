@@ -13,8 +13,11 @@ import '../../features/onboarding/data/onboarding_repository.dart';
 import '../../features/history/presentation/pages/craving_screen.dart';
 import '../../features/history/presentation/pages/slip_log_screen.dart';
 import '../../features/history/presentation/pages/history_screen.dart';
-import '../../features/recovery/presentation/pages/recovery_screen.dart';
 import '../../features/crisis/presentation/crisis_screen.dart';
+import '../../features/main/presentation/pages/details/money_details_screen.dart';
+import '../../features/main/presentation/pages/details/cigarettes_details_screen.dart';
+import '../../features/main/presentation/pages/details/time_details_screen.dart';
+import '../../features/main/presentation/pages/details/recovery_details_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -73,6 +76,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRouter.slipLog,
         builder: (context, state) => const SlipLogScreen(),
       ),
+      GoRoute(
+        path: AppRouter.moneyDetails,
+        builder: (context, state) => const MoneyDetailsScreen(),
+      ),
+      GoRoute(
+        path: AppRouter.cigarettesDetails,
+        builder: (context, state) => const CigarettesDetailsScreen(),
+      ),
+      GoRoute(
+        path: AppRouter.timeDetails,
+        builder: (context, state) => const TimeDetailsScreen(),
+      ),
+      GoRoute(
+        path: AppRouter.recoveryDetails,
+        builder: (context, state) => const RecoveryDetailsScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainShell(navigationShell: navigationShell);
@@ -91,14 +110,6 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: AppRouter.damage,
                 builder: (context, state) => const DamageScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRouter.recovery,
-                builder: (context, state) => const RecoveryScreen(),
               ),
             ],
           ),
@@ -142,10 +153,13 @@ class AppRouter {
   static const String emailLogin = '/email-login';
   static const String register = '/register';
   static const String damage = '/damage';
-  static const String recovery = '/recovery';
   static const String crisis = '/crisis';
   static const String history = '/history';
   static const String settings = '/settings';
   static const String craving = '/craving';
   static const String slipLog = '/slip-log';
+  static const String moneyDetails = '/money-details';
+  static const String cigarettesDetails = '/cigarettes-details';
+  static const String timeDetails = '/time-details';
+  static const String recoveryDetails = '/recovery-details';
 }

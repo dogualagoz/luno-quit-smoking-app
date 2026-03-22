@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_radius.dart';
-import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/widgets/speech_bubble.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_radius.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
+import 'package:luno_quit_smoking_app/core/widgets/speech_bubble.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../core/constants/asset_constants.dart';
+import 'package:luno_quit_smoking_app/core/constants/asset_constants.dart';
 
 class TryingCountStep extends StatefulWidget {
   final String? initialValue;

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:luno_quit_smoking_app/core/constants/app_constants.dart';
 import 'package:luno_quit_smoking_app/core/constants/damage_model.dart';
+import 'package:luno_quit_smoking_app/features/history/data/models/daily_log.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/models/user_profile.dart';
 import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart';
 
@@ -16,13 +17,10 @@ class QuitCalculator {
 
   /// Kullanıcının bugüne kadar sigaraya verdiği toplam bedeli hesaplar.
   /// [atTime] parametresi verilirse, o anki saate göre canlı hesaplama yapar.
-  static QuitStats calculate(UserProfile profile, {DateTime? atTime}) {
+  static QuitStats calculate(UserProfile profile, {DateTime? atTime, List<DailyLog> logs = const []}) {
     final now = atTime ?? DateTime.now();
 
-    // Profil oluşturulduğundan beri geçen süre (canlı artış için)
-    final liveDuration = now.difference(profile.createdAt);
-
-    final damage = _calculateDamageMetrics(profile, liveDuration);
+    final damage = _calculateDamageMetrics(profile, logs, now);
     final burnRate = _calculateBurnRate(profile);
     final organs = _calculateOrganDamages(profile);
     final totalDamageScore = _calculateTotalDamageScore(organs);
@@ -64,6 +62,7 @@ class QuitCalculator {
       totalDamageScore: totalDamageScore,
       progress: totalDamageScore,
       type: QuitStatType.loss,
+      isEstimatedToday: damage.isEstimatedToday,
     );
   }
 
@@ -177,7 +176,8 @@ class QuitCalculator {
   /// Finansal hasar, zaman kaybı ve mesafe metriklerini hesaplar.
   static _DamageMetrics _calculateDamageMetrics(
     UserProfile profile,
-    Duration liveDuration,
+    List<DailyLog> logs,
+    DateTime now,
   ) {
     // 1. Geçmiş Yılların Zararı (SmokingYears bazlı)
     final historicalSmoked =
@@ -185,9 +185,46 @@ class QuitCalculator {
         AppBusinessRules.daysPerYear *
         profile.dailyCigarettes;
 
-    // 2. Uygulama Kullanıldığından Beri Canlı Zarar
+    // 2. Uygulama Kullanıldığından Beri Canlı Zarar (Hybrid)
     final rates = calculateRates(profile);
-    final liveSmoked = rates.cigarettesPerSecond * liveDuration.inSeconds;
+
+    final createdDate = DateTime(profile.createdAt.year, profile.createdAt.month, profile.createdAt.day);
+    final todayStr = DateTime(now.year, now.month, now.day);
+    
+    // Geçmiş logları tarihlere göre grupla
+    final Map<DateTime, int> loggedSmokesByDate = {};
+    for (var log in logs) {
+      if (log.type == 'slip' && log.hasSmoked) {
+        final d = DateTime(log.date.year, log.date.month, log.date.day);
+        if (!d.isBefore(createdDate)) {
+          loggedSmokesByDate[d] = (loggedSmokesByDate[d] ?? 0) + log.smokeCount;
+        }
+      }
+    }
+    
+    double liveSmoked = 0.0;
+    bool isEstimatedToday = true;
+
+    // Kayıt oluşturulan günden bugüne kadar döngü
+    for (DateTime d = createdDate; !d.isAfter(todayStr); d = d.add(const Duration(days: 1))) {
+      final bool hasLog = loggedSmokesByDate.containsKey(d);
+      
+      if (d.isAtSameMomentAs(todayStr)) {
+        if (hasLog) {
+          liveSmoked += loggedSmokesByDate[d]!;
+          isEstimatedToday = false;
+        } else {
+          final secondsToday = now.difference(todayStr).inSeconds;
+          liveSmoked += rates.cigarettesPerSecond * secondsToday;
+        }
+      } else {
+        if (hasLog) {
+          liveSmoked += loggedSmokesByDate[d]!;
+        } else {
+          liveSmoked += profile.dailyCigarettes;
+        }
+      }
+    }
 
     final totalSmoked = historicalSmoked + liveSmoked;
 
@@ -233,6 +270,7 @@ class QuitCalculator {
       daysLost: daysLost,
       timeDigits: timeDigits,
       distanceKm: distanceKm,
+      isEstimatedToday: isEstimatedToday,
     );
   }
 
@@ -260,6 +298,7 @@ class _DamageMetrics {
   final int daysLost;
   final List<String> timeDigits;
   final double distanceKm;
+  final bool isEstimatedToday;
 
   const _DamageMetrics({
     required this.totalSmoked,
@@ -268,6 +307,7 @@ class _DamageMetrics {
     required this.daysLost,
     required this.timeDigits,
     required this.distanceKm,
+    required this.isEstimatedToday,
   });
 }
 

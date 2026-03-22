@@ -1,11 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
+import 'package:luno_quit_smoking_app/features/history/application/history_provider.dart';
 import 'package:luno_quit_smoking_app/features/main/application/quit_calculator.dart';
 import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart';
 
 // Dashboard istatistiklerini sağlayan canlı akış (Stream) provider
 final statsProvider = StreamProvider<QuitStats>((ref) {
   final userProfile = ref.watch(userProfileProvider);
+  final logsAsync = ref.watch(historyLogsProvider);
+  final logs = logsAsync.value ?? [];
 
   if (userProfile == null) {
     return Stream.value(
@@ -36,6 +39,6 @@ final statsProvider = StreamProvider<QuitStats>((ref) {
 
   // Her 100 milisaniyede bir tetiklenen akış
   return Stream.periodic(const Duration(milliseconds: 100), (_) {
-    return QuitCalculator.calculate(userProfile);
+    return QuitCalculator.calculate(userProfile, logs: logs);
   });
 });

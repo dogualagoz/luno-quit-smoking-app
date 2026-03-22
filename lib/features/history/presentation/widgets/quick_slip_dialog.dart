@@ -33,8 +33,9 @@ class _QuickSlipDialogState extends ConsumerState<QuickSlipDialog> {
       note: 'Hızlı Kayıt',
     );
 
-    ref.read(historyLogsProvider.notifier).addLog(log);
+    // Önce dialog'u kapat, kayıt arkada devam etsin
     Navigator.of(context).pop();
+    ref.read(historyLogsProvider.notifier).addLog(log);
   }
 
   @override

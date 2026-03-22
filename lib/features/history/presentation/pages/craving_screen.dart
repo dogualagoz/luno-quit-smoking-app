@@ -10,9 +10,10 @@ import 'package:luno_quit_smoking_app/features/history/data/models/daily_log.dar
 import 'package:uuid/uuid.dart';
 
 // Steps
-import '../widgets/craving_steps/date_time_step.dart';
+import '../widgets/craving_steps/smoked_check_step.dart';
+import '../widgets/craving_steps/congratulations_step.dart';
+import '../widgets/craving_steps/smoke_count_step.dart';
 import '../widgets/craving_steps/intensity_step.dart';
-// Removed SmokedStatusStep and SmokeCountStep imports
 import '../widgets/craving_steps/mood_step.dart';
 import '../widgets/craving_steps/activity_step.dart';
 import '../widgets/craving_steps/companion_step.dart';
@@ -31,9 +32,9 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
   int _currentPage = 0;
   
   // Form State
-  DateTime _selectedDate = DateTime.now();
+  bool? _hasSmoked;
+  int _smokeCount = 1;
   double _intensity = 5;
-  // removed smoked status variables
   String? _location;
   final List<String> _selectedMoods = [];
   final List<String> _selectedContext = [];
@@ -42,64 +43,92 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
   final TextEditingController _otherMoodController = TextEditingController();
   final TextEditingController _otherActivityController = TextEditingController();
 
-  // Step Configuration
+  // Adımları dinamik olarak oluşturuyoruz
   List<Widget> get _steps {
-    final steps = [
-      DateTimeStep(
-        selectedDate: _selectedDate,
-        onPickDate: _showDateTimePicker,
-      ),
-      IntensityStep(
-        value: _intensity,
-        onValueChanged: (val) => setState(() => _intensity = val),
-      ),
-      // Removed SmokedStatusStep and SmokeCountStep
-    ];
+    final List<Widget> steps = [];
 
-    steps.addAll([
-      MoodStep(
-        selectedMoods: _selectedMoods,
-        otherController: _otherMoodController,
-        onMoodSelected: (val) {
-          setState(() {
-            if (_selectedMoods.contains(val)) {
-              _selectedMoods.remove(val);
-            } else {
-              _selectedMoods.add(val);
-            }
-          });
-        },
-      ),
-      ActivityStep(
-        selectedActivities: _selectedContext,
-        otherController: _otherActivityController,
-        onActivitySelected: (val) {
-          setState(() {
-            if (_selectedContext.contains(val)) {
-              _selectedContext.remove(val);
-            } else {
-              _selectedContext.add(val);
-            }
-          });
-        },
-      ),
-      CompanionStep(
-        selectedCompanions: _selectedCompanions,
-        onCompanionSelected: (val) {
-          setState(() {
-            _selectedCompanions.clear();
-            _selectedCompanions.add(val);
-          });
-        },
-      ),
-      LocationStep(
-        location: _location,
-        onLocationChanged: (val) => setState(() => _location = val),
-      ),
-      NotesStep(controller: _notesController),
-    ]);
+    // STEP 0: Sigara İçtin mi? (Ana Sorun)
+    steps.add(SmokedCheckStep(
+      hasSmoked: _hasSmoked,
+      onStatusChanged: (val) {
+        setState(() => _hasSmoked = val);
+        _nextPage(); // Seçim yapınca otomatik bir sonrakine geç
+      },
+    ));
+
+    if (_hasSmoked == null) return steps;
+
+    if (_hasSmoked == false) {
+      // --- İÇMEDİ (Kriz Akışı) ---
+      steps.addAll([
+        IntensityStep(
+          value: _intensity,
+          onValueChanged: (val) => setState(() => _intensity = val),
+        ),
+        MoodStep(
+          selectedMoods: _selectedMoods,
+          otherController: _otherMoodController,
+          onMoodSelected: _toggleMood,
+        ),
+        ActivityStep(
+          selectedActivities: _selectedContext,
+          otherController: _otherActivityController,
+          onActivitySelected: _toggleActivity,
+        ),
+        NotesStep(controller: _notesController),
+        const CongratulationsStep(),
+      ]);
+    } else {
+      // --- İÇTİ (Slip Akışı) ---
+      steps.addAll([
+        SmokeCountStep(
+          count: _smokeCount,
+          onValueChanged: (val) => setState(() => _smokeCount = val),
+        ),
+        LocationStep(
+          location: _location,
+          onLocationChanged: (val) => setState(() => _location = val),
+        ),
+        MoodStep(
+          selectedMoods: _selectedMoods,
+          otherController: _otherMoodController,
+          onMoodSelected: _toggleMood,
+        ),
+        ActivityStep(
+          selectedActivities: _selectedContext,
+          otherController: _otherActivityController,
+          onActivitySelected: _toggleActivity,
+        ),
+        CompanionStep(
+          selectedCompanions: _selectedCompanions,
+          onCompanionSelected: _toggleCompanion,
+        ),
+        NotesStep(controller: _notesController),
+      ]);
+    }
 
     return steps;
+  }
+
+  void _toggleMood(String val) {
+    setState(() {
+      if (_selectedMoods.contains(val)) _selectedMoods.remove(val);
+      else _selectedMoods.add(val);
+    });
+  }
+
+  void _toggleActivity(String val) {
+    setState(() {
+      if (_selectedContext.contains(val)) _selectedContext.remove(val);
+      else _selectedContext.add(val);
+    });
+  }
+
+  void _toggleCompanion(String val) {
+    setState(() {
+      _selectedCompanions.clear();
+      _selectedCompanions.add(val);
+    });
   }
 
   int get _totalSteps => _steps.length;
@@ -135,36 +164,7 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
     }
   }
 
-  Future<void> _showDateTimePicker() async {
-    final date = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now(),
-    );
-
-    if (date != null && mounted) {
-      final time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(_selectedDate),
-      );
-
-      if (time != null) {
-        setState(() {
-          _selectedDate = DateTime(
-            date.year,
-            date.month,
-            date.day,
-            time.hour,
-            time.minute,
-          );
-        });
-      }
-    }
-  }
-
   void _submit() {
-    // Collect moods and activities, handling "Diğer" custom values
     final finalMoods = List<String>.from(_selectedMoods);
     if (_selectedMoods.contains('Diğer') && _otherMoodController.text.isNotEmpty) {
       finalMoods.add(_otherMoodController.text.trim());
@@ -177,11 +177,11 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
 
     final log = DailyLog(
       id: const Uuid().v4(),
-      date: _selectedDate,
-      cravingIntensity: _intensity.toInt(),
-      hasSmoked: false, // Artık bu sayfa sadece kriz kaydı
-      smokeCount: 0,
-      type: 'craving', // Sadece kriz
+      date: DateTime.now(),
+      cravingIntensity: _hasSmoked == false ? _intensity.toInt() : 0,
+      hasSmoked: _hasSmoked ?? false,
+      smokeCount: _hasSmoked == true ? _smokeCount : 0,
+      type: _hasSmoked == true ? 'slip' : 'craving',
       location: _location,
       moods: finalMoods,
       context: finalActivities,
@@ -189,8 +189,9 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
       note: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
     );
 
-    ref.read(historyLogsProvider.notifier).addLog(log);
+    // Önce ekranı kapat, kayıt arkada devam etsin
     context.pop();
+    ref.read(historyLogsProvider.notifier).addLog(log);
   }
 
   @override
@@ -238,10 +239,7 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
           const SizedBox(width: 16),
           Text(
             "${_currentPage + 1}/$_totalSteps",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -249,13 +247,11 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
   }
 
   Widget _buildFooter() {
+    // İlk sayfada seçim yapana kadar butonu gizle (UX açısından daha temiz)
+    if (_currentPage == 0 && _hasSmoked == null) return const SizedBox.shrink();
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.p24,
-        0,
-        AppSpacing.p24,
-        AppSpacing.p24,
-      ),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.p24, 0, AppSpacing.p24, AppSpacing.p24),
       child: LunoButton(
         text: _currentPage == _totalSteps - 1 ? "Kaydet" : "Devam Et",
         icon: _currentPage == _totalSteps - 1 ? Icons.check : Icons.arrow_forward,

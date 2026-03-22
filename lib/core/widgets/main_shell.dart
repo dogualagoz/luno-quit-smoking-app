@@ -18,7 +18,7 @@ class MainShell extends StatelessWidget {
     // Yanlardan 16'şar (toplam 32) padding veriyoruz
     const double horizontalPadding = 16.0;
     final navWidth = screenWidth - (horizontalPadding * 2);
-    final itemWidth = navWidth / 6;
+    final itemWidth = navWidth / 5;
 
     return Scaffold(
       body: navigationShell,
@@ -76,11 +76,6 @@ class MainShell extends StatelessWidget {
                           Icons.warning_amber_rounded,
                           Icons.warning_rounded,
                           "Zararlar",
-                        ),
-                        _buildNavItem(
-                          Icons.show_chart_rounded,
-                          Icons.show_chart_outlined,
-                          "İyileşme",
                         ),
                         _buildNavItem(
                           Icons.flash_on,

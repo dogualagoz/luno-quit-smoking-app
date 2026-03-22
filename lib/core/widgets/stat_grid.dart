@@ -4,6 +4,8 @@ import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/widgets/stat_card.dart';
 import 'package:luno_quit_smoking_app/core/widgets/recovery_stat_card.dart';
 import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart';
+import 'package:go_router/go_router.dart';
+import 'package:luno_quit_smoking_app/core/router/app_router.dart';
 
 /// Dashboard'taki 4 istatistik kartını 2x2 grid olarak düzenler.
 ///
@@ -27,35 +29,51 @@ class StatGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       children: [
         // 1. Harcanan Para
-        StatCard(
-          label: stats.moneyLabel,
-          value: stats.moneyValue,
-          moneyDecimal: stats.moneyDecimal,
-          subtext: stats.moneySubtext,
-          icon: Icons.savings_outlined,
-          iconColor: AppColors.lightChartPrimary,
-          isMoney: true,
-          showBurnIndicator: true,
+        InkWell(
+          onTap: () => context.push(AppRouter.moneyDetails),
+          borderRadius: BorderRadius.circular(16),
+          child: StatCard(
+            label: stats.moneyLabel,
+            value: stats.moneyValue,
+            moneyDecimal: stats.moneyDecimal,
+            subtext: stats.moneySubtext,
+            icon: Icons.savings_outlined,
+            iconColor: AppColors.lightChartPrimary,
+            isMoney: true,
+            showBurnIndicator: true,
+          ),
         ),
         // 2. İçilen Sigara
-        StatCard(
-          label: stats.countLabel,
-          value: stats.countValue,
-          subtext: stats.countSubtext,
-          icon: Icons.smoking_rooms_outlined,
-          iconColor: AppColors.lightChartWarning,
+        InkWell(
+          onTap: () => context.push(AppRouter.cigarettesDetails),
+          borderRadius: BorderRadius.circular(16),
+          child: StatCard(
+            label: stats.countLabel,
+            value: stats.countValue,
+            subtext: stats.countSubtext,
+            icon: Icons.smoking_rooms_outlined,
+            iconColor: AppColors.lightChartWarning,
+          ),
         ),
         // 3. Kaybedilen Zaman
-        StatCard(
-          label: stats.timeLabel,
-          value: stats.timeValue,
-          digits: stats.timeDigits,
-          subtext: stats.timeSubtext,
-          icon: Icons.timer_outlined,
-          iconColor: Colors.blueGrey,
+        InkWell(
+          onTap: () => context.push(AppRouter.timeDetails),
+          borderRadius: BorderRadius.circular(16),
+          child: StatCard(
+            label: stats.timeLabel,
+            value: stats.timeValue,
+            digits: stats.timeDigits,
+            subtext: stats.timeSubtext,
+            icon: Icons.timer_outlined,
+            iconColor: Colors.blueGrey,
+          ),
         ),
         // 4. İyileşme Süresi
-        RecoveryStatCard(stats: stats),
+        InkWell(
+          onTap: () => context.push(AppRouter.recoveryDetails),
+          borderRadius: BorderRadius.circular(16),
+          child: RecoveryStatCard(stats: stats),
+        ),
       ],
     );
   }

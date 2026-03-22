@@ -5,12 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:luno_quit_smoking_app/core/constants/asset_constants.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
-import 'package:luno_quit_smoking_app/core/widgets/recovery_progress.dart';
 import 'package:luno_quit_smoking_app/core/widgets/quote_card.dart';
 import 'package:luno_quit_smoking_app/core/widgets/stat_grid.dart';
 import 'package:luno_quit_smoking_app/core/widgets/speech_bubble.dart';
 import 'package:luno_quit_smoking_app/features/main/presentation/widgets/main_header.dart';
 import 'package:luno_quit_smoking_app/core/widgets/swipeable_damage_cards.dart';
+import 'package:luno_quit_smoking_app/features/history/presentation/widgets/today_summary_card.dart';
 import 'package:luno_quit_smoking_app/features/main/application/stats_provider.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
 import 'package:luno_quit_smoking_app/features/history/application/history_provider.dart';
@@ -108,12 +108,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   StatGrid(stats: statsData),
                   AppSpacing.sectionGap,
 
-                  // Dinamik Toparlanma İlerlemesi
-                  RecoveryProgress(
-                    progress: statsData.progress,
-                    progressText: "%${(statsData.progress * 100).toInt()}",
-                    statusText: statsData.recoverySubtext,
-                  ),
+                  // Günlük Özet & Kayıt Teşviği
+                  TodaySummaryCard(logs: ref.watch(historyLogsProvider).value ?? []),
 
                   AppSpacing.sectionGap,
 
