@@ -1,142 +1,105 @@
 <p align="center">
-  <img src="screenshots/cigerito_mascot.png" width="180" alt="Ciğerito — Luno Maskot" />
+  <img src="assets/images/mascot/default_cigerito.svg" width="160" alt="Luno Logo" />
 </p>
 
 <h1 align="center">Luno 🫁</h1>
 
 <p align="center">
-  <strong>Sigara bırakma farkındalık uygulaması</strong><br/>
-  <em>Tatlı ama acı gerçeklerle yüzleştiren, hafif alaycı bir sigara bırakma deneyimi.</em>
+  <strong>"Acı Gerçeklerle Yüzleştiren" Sigara Bırakma Farkındalık Uygulaması</strong><br/>
+  <em>Klasik motivasyon yöntemlerini bir kenara bırakın. Ciğerito ile gerçek hasarı görmeye hazır mısın?</em>
 </p>
 
 <p align="center">
-  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter" alt="Flutter" /></a>
-  <a href="https://firebase.google.com"><img src="https://img.shields.io/badge/Firebase-Backend-FFCA28?logo=firebase" alt="Firebase" /></a>
-  <a href="https://riverpod.dev"><img src="https://img.shields.io/badge/Riverpod-State_Management-0553B1" alt="Riverpod" /></a>
-  <img src="https://img.shields.io/badge/Platform-iOS_•_Android-lightgrey" alt="Platform" />
-  <img src="https://img.shields.io/badge/License-MIT-green" alt="License" />
+  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter&style=for-the-badge" alt="Flutter" /></a>
+  <a href="https://firebase.google.com"><img src="https://img.shields.io/badge/Firebase-Backend-FFCA28?logo=firebase&style=for-the-badge" alt="Firebase" /></a>
+  <a href="https://riverpod.dev"><img src="https://img.shields.io/badge/Riverpod-State-0553B1?style=for-the-badge" alt="Riverpod" /></a>
+  <img src="https://img.shields.io/badge/Hive-Persistence-orange?style=for-the-badge" alt="Hive" />
 </p>
 
 ---
 
-## 🤔 Luno Nedir?
+## 🌬️ Luno Nedir?
 
-Luno, hâlâ sigara içen ama bırakmak isteyen kullanıcılar için tasarlanmış bir **farkındalık ve davranış yönlendirme** uygulamasıdır.
-
-Klasik sigara bırakma uygulamalarından farklı olarak:
-
-- ❌ Rozet, ödül, pozitif motivasyon **yok**
-- ✅ Harcanan para, verilen zarar, kaybedilen zaman gibi **acı gerçeklerle yüzleştirme** var
-- 🫁 **Ciğerito** — tatlı ama yaralı akciğer maskotu, sevimli ve hafif alaycı tavırlarıyla eşlik eder
+Luno, sigara bırakma sürecinde sizi "tebrik etmek" yerine, devam ettiğiniz her anın size ve bütçenize verdiği **net zararı** yüzünüze vuran bir farkındalık platformudur. Uygulamanın kalbinde, tatlı ama yaralı, bazen alaycı bazen de bilge maskotumuz **Ciğerito** yer alır.
 
 > _"Her sigara hayatından 11 dakika çalar. Ama sen zaten zamanı dumanla harcamayı seviyorsun, değil mi?"_
-> — Ciğerito, senin akciğer dostun
+> — **Ciğerito**
 
 ---
 
 ## 📱 Ekran Görüntüleri
 
-|                   Ana Sayfa                   |                  Hasar Raporu                   |                     İyileşme                      |                    Kriz Modu                    |                      Geçmiş                      |
-| :-------------------------------------------: | :---------------------------------------------: | :-----------------------------------------------: | :---------------------------------------------: | :----------------------------------------------: |
-| <img src="screenshots/home.png" width="160"/> | <img src="screenshots/damage.png" width="160"/> | <img src="screenshots/recovery.png" width="160"/> | <img src="screenshots/crisis.png" width="160"/> | <img src="screenshots/history.png" width="160"/> |
+| **Dashboard (Koyu Tema)** | **Hasar Raporu** | **Kriz Modu** | **Geçmiş & Kayıt** |
+| :---: | :---: | :---: | :---: |
+| <img src="screenshots/dashboard_dark.png" width="180" /> | <img src="screenshots/damage_report.png" width="180" /> | <img src="screenshots/crisis_mode.png" width="180" /> | <img src="screenshots/history_screen.png" width="180" /> |
 
 ---
 
-## ✨ Özellikler
+## ✨ Temel Özellikler
 
-### 🎯 MVP (v1.0)
+### 📊 Dinamik Dashboard
+*   **Gerçek Zamanlı Kayıp Takibi:** Harcanan para, içilen sigara ve kaybedilen zamanı canlı olarak izleyin.
+*   **Görsel Karşılaştırmalar:** İçtiğiniz sigaraların toplam uzunluğunu "Everest'e tırmanış" gibi çarpıcı metriklerle görün.
+*   **Kayıp Animasyonları:** Paranızın nasıl "yandığını" gösteren dinamik progress bar'lar.
 
-- **Dashboard** — Toplam sigara, harcanan para, kaybedilen zaman, zarar seviyesi
-- **Hasar Raporu** — Organ bazlı hasar skoru (akciğer, kalp, beyin, cilt...)
-- **Ayarlar** — Profil düzenleme, light/dark tema
-- **Onboarding** — Kişiselleştirilmiş başlangıç akışı
-- **Ciğerito Maskot** — Tatlı ve alaycı yorumlar, 6 farklı ruh hali
+### 🫁 Detaylı Hasar Raporu
+*   **Organ Bazlı Analiz:** Akciğer, Kalp, Beyin ve Cilt üzerindeki birikmiş hasarı yüzde bazlı takip edin.
+*   **Farkındalık Cümleleri:** Ciğerito'nun her organ hasarına özel, iğneleyici ama gerçekçi yorumlarıyla yüzleşin.
 
-### 🔮 Sonraki Fazlar
+### ⚡ Kriz Modu
+*   **Acil Destek:** Sigara içme isteği geldiğinde sizi durduracak özel bir "Kriz Bölgesi".
+*   **İstatistikler:** Kaç krizi atlattığınızı ve başarı oranınızı takip ederek özgüveninizi artırın.
 
-- İyileşme Yolculuğu — Bıraktıktan sonra vücut toparlanma timeline'ı
-- Kriz Modu — Sigara isteği gelince acil destek
-- Geçmiş & Kayıt — Günlük sigara takibi + haftalık istatistikler
-- Push Notifications — Hatırlatma ve motivasyon
-- AI Özellikleri — Kişiselleştirilmiş mesajlar
+### 📅 Geçmiş ve Kayıt Yönetimi
+*   **Günlük Check-in:** Her gün kaç sigara içtiğinizi veya kaç krize direndiğinizi kolayca kaydedin.
+*   **Haftalık Analiz:** Verilerinizin haftalık değişimini kontrol ederek gidişatınızı görün.
+
+### 🎨 Kişiselleştirme ve Tema
+*   **Koyu/Açık Mod:** Göz yormayan şık karanlık tema desteği (Hive ile kalıcı tercih).
+*   **Profil Yönetimi:** Sigara fiyatı ve günlük tüketim gibi verileri güncelleyerek hesaplamaları kişiselleştirin.
 
 ---
 
-## 🏗️ Teknik Yapı
+## 🏗️ Mimari ve Teknik Yapı
 
-| Katman           | Teknoloji                                      |
-| ---------------- | ---------------------------------------------- |
-| Framework        | Flutter (cross-platform)                       |
-| State Management | Riverpod                                       |
-| Routing          | GoRouter                                       |
-| Backend          | Firebase (Firestore, Auth, Analytics)          |
-| Mimari           | Feature-first + Lightweight Clean Architecture |
-| Veri Katmanı     | Repository Pattern                             |
-| Font             | Nunito (Google Fonts)                          |
+Luno, modern Flutter standartlarına uygun olarak **Feature-First** mimarisiyle geliştirilmiştir.
 
-### Klasör Yapısı
+*   **State Management:** Veri akışı ve uygulama durumu **Riverpod** ile yönetilir.
+*   **Veri Katmanı:**
+    *   **Uzak Veri:** Firebase Firestore (Profil ve Log senkronizasyonu).
+    *   **Yerel Veri:** Hive (Hızlı erişim, tema ve cache yönetimi).
+*   **Tasarım:** Tamamen özelleştirilmiş `LunoCard`, `SettingsSlider` ve animasyonlu bileşenler.
 
-```
+```text
 lib/
-├── app.dart                  # MaterialApp + GoRouter
-├── main.dart                 # Entry point + Firebase init
-├── core/                     # Tema, router, paylaşılan widget'lar
-│   ├── theme/
-│   ├── router/
-│   ├── constants/
-│   ├── providers/
-│   └── widgets/
-├── features/                 # Feature-first modüller
-│   ├── onboarding/
-│   ├── dashboard/
-│   ├── damage/
-│   └── settings/
-└── services/                 # Firebase, local storage
+├── core/                # Tema, sabitler, ortak bileşenler
+├── features/            # Modüler özellikler
+│   ├── auth/            # Firebase Auth & Profil
+│   ├── dashboard/       # Ana sayfa ve hesaplamalar
+│   ├── damage/          # Hasar analizi ekranları
+│   ├── history/         # Kayıt ve istatistik
+│   └── settings/        # Uygulama ayarları & Tema
+└── app.dart             # Ana uygulama yapılandırması
 ```
 
 ---
 
-## 🎨 Tasarım Dili
+## 🚀 Hızlı Başlangıç
 
-| Özellik     | Değer                                |
-| ----------- | ------------------------------------ |
-| Ton         | Tatlı, hafif kara mizahi, iğneleyici |
-| Renk Paleti | Pastel pembe + yeşil                 |
-| Primary     | `#E8A0BF`                            |
-| Success     | `#A8D8B9`                            |
-| Background  | `#FAF8F5`                            |
-| Tema        | Light + Dark                         |
-| UI Stili    | Kart bazlı, sade, akıcı              |
-
-> Detaylı tema referansı için → [tema.md](tema.md)
-
----
-
-## 🚀 Kurulum
-
-```bash
-# Repository'yi klonla
-git clone https://github.com/dogualagoz/cigeretto-quit-smoking-app.git
-cd cigeretto-quit-smoking-app
-
-# Bağımlılıkları yükle
-flutter pub get
-
-# Uygulamayı çalıştır
-flutter run
-```
-
-### Gereksinimler
-
-- Flutter 3.x+
-- Dart 3.x+
-- Firebase CLI (Firebase projesi kurulumu için)
-
----
-
-## 📄 Lisans
-
-Bu proje MIT lisansı ile lisanslanmıştır.
+1.  **Depoyu Klonlayın:**
+    ```bash
+    git clone https://github.com/dogualagoz/luno_quit_smoking_app.git
+    ```
+2.  **Bağımlılıkları Yükleyin:**
+    ```bash
+    flutter pub get
+    ```
+3.  **Firebase Kurulumu:**
+    Projenin Firebase entegrasyonu için `firebase_options.dart` dosyasını kendi projenize göre yapılandırmayı unutmayın.
+4.  **Uygulamayı Çalıştırın:**
+    ```bash
+    flutter run
+    ```
 
 ---
 
