@@ -4,9 +4,14 @@ import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 
 class HistoryBarChart extends StatefulWidget {
-  final Map<int, int> weeklyData;
+  final Map<int, int> data;
+  final String filter;
 
-  const HistoryBarChart({super.key, required this.weeklyData});
+  const HistoryBarChart({
+    super.key,
+    required this.data,
+    required this.filter,
+  });
 
   @override
   State<HistoryBarChart> createState() => _HistoryBarChartState();
@@ -18,20 +23,45 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
   @override
   void initState() {
     super.initState();
-    int todayIndex = DateTime.now().weekday - 1;
-    touchedIndex = todayIndex;
+    _setInitialSelection();
+  }
+
+  void _setInitialSelection() {
+    final now = DateTime.now();
+    if (widget.filter == 'H') {
+      touchedIndex = now.weekday - 1;
+    } else if (widget.filter == 'A') {
+      touchedIndex = now.day - 1;
+    } else {
+      touchedIndex = now.month - 1;
+    }
+  }
+
+  @override
+  void didUpdateWidget(HistoryBarChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.filter != widget.filter) {
+      _setInitialSelection();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+    final primaryGradient = LinearGradient(
+      colors: [
+        isDark ? const Color(0xFFD4789E) : const Color(0xFFE8A0BF),
+        isDark ? const Color(0xFFB85E82) : const Color(0xFFD4789E),
+      ],
+      begin: Alignment.bottomCenter,
+      end: Alignment.topCenter,
+    );
 
     return AspectRatio(
       aspectRatio: 1.8,
       child: BarChart(
         BarChartData(
-          alignment: BarChartAlignment.spaceAround,
+          alignment: BarChartAlignment.spaceEvenly,
           maxY: _getMaxY(),
           minY: 0,
           barTouchData: BarTouchData(
@@ -46,20 +76,23 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
               });
             },
             touchTooltipData: BarTouchTooltipData(
-              getTooltipColor: (_) => isDark ? AppColors.darkForeground : AppColors.lightForeground,
+              getTooltipColor: (_) => isDark ? const Color(0xFF2D2640) : const Color(0xFFF0E6EF),
+              tooltipPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               tooltipMargin: 8,
               getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                final value = widget.weeklyData[group.x + 1] ?? 0;
+                final value = widget.data[group.x + 1] ?? 0;
                 return BarTooltipItem(
-                  '$value \n',
+                  '$value',
                   AppTextStyles.bodySemibold.copyWith(
-                    color: Theme.of(context).scaffoldBackgroundColor,
+                    color: isDark ? AppColors.darkPrimary : AppColors.lightPrimary,
+                    fontSize: 16,
                   ),
                   children: [
                     TextSpan(
-                      text: value == 1 ? 'sigara' : 'adet',
+                      text: ' \n${value == 1 ? 'sigara' : 'adet'}',
                       style: AppTextStyles.micro.copyWith(
-                        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
+                        color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+                        fontWeight: FontWeight.normal,
                       ),
                     ),
                   ],
@@ -74,86 +107,92 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
                 showTitles: true,
                 getTitlesWidget: getTitles,
                 reservedSize: 32,
+                interval: widget.filter == 'A' ? 5 : 1, // Ay gösteriminde her günü yazmasın
               ),
             ),
-            leftTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
+            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
           borderData: FlBorderData(show: false),
           gridData: FlGridData(
             show: true,
             drawVerticalLine: false,
-            horizontalInterval: _getMaxY() / 4,
+            horizontalInterval: _getMaxY() / 3,
             getDrawingHorizontalLine: (value) {
               return FlLine(
-                color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
+                color: (isDark ? AppColors.darkBorder : AppColors.lightBorder).withValues(alpha: 0.2),
                 strokeWidth: 1,
-                dashArray: [4, 4],
+                dashArray: [8, 4],
               );
             },
           ),
-          barGroups: [
-            for (int i = 1; i <= 7; i++)
-              makeGroupData(
-                i - 1,
-                (widget.weeklyData[i] ?? 0).toDouble(),
-                primaryColor,
-                i - 1 == touchedIndex,
-              ),
-          ],
+          barGroups: _buildBarGroups(primaryGradient, isDark),
         ),
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOutQuart,
       ),
     );
   }
 
-  double _getMaxY() {
-    if (widget.weeklyData.isEmpty) return 10;
-    final maxVal = widget.weeklyData.values.reduce(
-      (curr, next) => curr > next ? curr : next,
-    );
-    return maxVal < 10 ? 10 : (maxVal * 1.5); // Add some padding on top for tooltip
+  List<BarChartGroupData> _buildBarGroups(LinearGradient gradient, bool isDark) {
+    final List<BarChartGroupData> groups = [];
+    final int count = widget.data.length;
+
+    for (int i = 0; i < count; i++) {
+      final double yValue = (widget.data[i + 1] ?? 0).toDouble();
+      groups.add(
+        _makeGroupData(
+          i,
+          yValue,
+          gradient,
+          i == touchedIndex,
+          isDark,
+          count,
+        ),
+      );
+    }
+    return groups;
   }
 
-  BarChartGroupData makeGroupData(
+  double _getMaxY() {
+    if (widget.data.isEmpty) return 10;
+    final maxVal = widget.data.values.fold<int>(0, (p, e) => e > p ? e : p);
+    return maxVal < 10 ? 12 : (maxVal * 1.3);
+  }
+
+  BarChartGroupData _makeGroupData(
     int x,
     double y,
-    Color primaryColor,
+    LinearGradient gradient,
     bool isTouched,
+    bool isDark,
+    int totalCount,
   ) {
-    // Fotoğraftaki gibi: aktifse tam renk, inaktifse çok hafif pembe arka planı
-    final barColor = isTouched ? primaryColor : primaryColor.withValues(alpha: 0.12);
+    // Çubuk genişliği toplam çubuk sayısına göre dinamik (Ay'da daha ince, Hafta'da daha geniş)
+    double width = 24.0;
+    if (widget.filter == 'A') width = 8.0;
+    if (widget.filter == 'Y') width = 16.0;
 
-    // Çubukların hap şeklinde kalması için minimum bir değere sahip olmaları gerek.
-    // Çünkü değer 0 olunca hiç bir şey çizilmiyor veya kutu gibi oluyor.
-    double drawY = y;
     final maxY = _getMaxY();
-    // 0 ise bile en dibinde ufak bir yuvarlak olsun (MaxY değerinin %5'i kadar)
-    if (drawY == 0) {
-      drawY = maxY * 0.05; 
-    } else if (drawY < maxY * 0.05) {
-      // Y değeri çok küçükse mininum yüksekliğe sabitle
-      drawY = maxY * 0.05;
-    }
+    
+    // Görsel derinlik için minimum yükseklik
+    double drawY = y;
+    if (drawY < maxY * 0.03) drawY = maxY * 0.03;
 
     return BarChartGroupData(
       x: x,
       barRods: [
         BarChartRodData(
           toY: drawY,
-          color: barColor,
-          width: 26, // Fotoğraftaki gibi dolgun çubuklar
-          borderRadius: BorderRadius.circular(100), // Tam yuvarlak kapama (hap şeklinde)
+          gradient: isTouched ? gradient : null,
+          color: isTouched ? null : (isDark ? AppColors.darkPrimary : AppColors.lightPrimary).withValues(alpha: 0.15),
+          width: width,
+          borderRadius: BorderRadius.circular(width / 2),
           backDrawRodData: BackgroundBarChartRodData(
-            show: isTouched, // Yalnızca seçiliyken arkasında puslu bir şerit çıksın (opsiyonel vurgu)
+            show: true,
             toY: maxY,
-            color: primaryColor.withValues(alpha: 0.05),
+            color: (isDark ? AppColors.darkBorder : AppColors.lightBorder).withValues(alpha: 0.05),
           ),
         ),
       ],
@@ -161,20 +200,31 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
   }
 
   Widget getTitles(double value, TitleMeta meta) {
-    final isTouched = value.toInt() == touchedIndex;
-    final style = isTouched
-        ? AppTextStyles.label.copyWith(
-            color: Theme.of(context).colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-          )
-        : AppTextStyles.label.copyWith(
-            color: Theme.of(context).hintColor.withValues(alpha: 0.6),
-            fontWeight: FontWeight.normal,
-          );
-
-    final days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
-    final text = (value.toInt() >= 0 && value.toInt() < 7) ? days[value.toInt()] : '';
+    final index = value.toInt();
+    final isTouched = index == touchedIndex;
     
+    final style = TextStyle(
+      color: isTouched 
+          ? (Theme.of(context).brightness == Brightness.dark ? AppColors.darkForeground : AppColors.lightForeground)
+          : Theme.of(context).hintColor.withValues(alpha: 0.5),
+      fontWeight: isTouched ? FontWeight.bold : FontWeight.normal,
+      fontSize: 11,
+    );
+
+    String text = '';
+    if (widget.filter == 'H') {
+      final days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+      if (index >= 0 && index < 7) text = days[index];
+    } else if (widget.filter == 'A') {
+      // Aylıkta sadece 1, 5, 10, 15... gibi değerleri yaz
+      if ((index + 1) % 5 == 0 || index == 0) {
+        text = '${index + 1}';
+      }
+    } else {
+      final months = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+      if (index >= 0 && index < 12) text = months[index];
+    }
+
     return SideTitleWidget(
       meta: meta,
       space: 12,

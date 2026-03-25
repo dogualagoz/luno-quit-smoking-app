@@ -81,8 +81,6 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               );
             }
 
-            // Grafik verisini hazırla (Son 7 gün için mock/hesaplama)
-            final Map<int, int> chartData = _calculateWeeklyData(logs);
 
             return SingleChildScrollView(
               child: Padding(
@@ -117,7 +115,11 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Bu Hafta",
+                                _selectedFilter == 'H'
+                                    ? "Bu Hafta"
+                                    : _selectedFilter == 'A'
+                                        ? "Bu Ay"
+                                        : "Bu Yıl",
                                 style: AppTextStyles.cardHeader.copyWith(
                                   color: theme.colorScheme.onSurface,
                                 ),
@@ -126,7 +128,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                             ],
                           ),
                           const SizedBox(height: AppSpacing.p24),
-                          HistoryBarChart(weeklyData: chartData),
+                          HistoryBarChart(
+                            data: _calculateChartData(logs),
+                            filter: _selectedFilter,
+                          ),
                         ],
                       ),
                     ),
@@ -163,15 +168,54 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     );
   }
 
-  // Son 7 günün içim verilerini bul (sadece 'slip' kayıtları)
-  Map<int, int> _calculateWeeklyData(List<dynamic> logs) {
-    Map<int, int> data = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
+  // Hafta, Ay veya Yıl verilerini filtreye göre hesapla
+  Map<int, int> _calculateChartData(List<dynamic> logs) {
     final now = DateTime.now();
-    for (var log in logs) {
-      final logType = _getLogType(log);
-      if (logType == 'slip' && now.difference(log.date).inDays <= 7) {
-        int weekday = log.date.weekday;
-        data[weekday] = (data[weekday] ?? 0) + log.smokeCount as int;
+    Map<int, int> data = {};
+
+    if (_selectedFilter == 'H') {
+      // HAFTALIK: Pazartesiden pazara kadar
+      for (int i = 1; i <= 7; i++) {
+        data[i] = 0;
+      }
+      
+      final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+      final startOfDay = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
+
+      for (var log in logs) {
+        if (_getLogType(log) == 'slip' && !log.date.isBefore(startOfDay)) {
+          int weekday = log.date.weekday;
+          data[weekday] = (data[weekday] ?? 0) + (log.smokeCount as int);
+        }
+      }
+    } else if (_selectedFilter == 'A') {
+      // AYLIK: Ayın günleri (1-31)
+      final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
+      for (int i = 1; i <= daysInMonth; i++) {
+        data[i] = 0;
+      }
+
+      final startOfMonth = DateTime(now.year, now.month, 1);
+
+      for (var log in logs) {
+        if (_getLogType(log) == 'slip' && !log.date.isBefore(startOfMonth)) {
+          int day = log.date.day;
+          data[day] = (data[day] ?? 0) + (log.smokeCount as int);
+        }
+      }
+    } else {
+      // YILLIK: Yılın ayları (1-12)
+      for (int i = 1; i <= 12; i++) {
+        data[i] = 0;
+      }
+
+      final startOfYear = DateTime(now.year, 1, 1);
+
+      for (var log in logs) {
+        if (_getLogType(log) == 'slip' && !log.date.isBefore(startOfYear)) {
+          int month = log.date.month;
+          data[month] = (data[month] ?? 0) + (log.smokeCount as int);
+        }
       }
     }
     return data;
