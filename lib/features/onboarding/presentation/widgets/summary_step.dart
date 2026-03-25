@@ -75,7 +75,7 @@ class _SummaryStepState extends State<SummaryStep> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             crossAxisCount: 2,
-            childAspectRatio: 1.45,
+            childAspectRatio: 1.3,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
             children: [

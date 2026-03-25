@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/images/mascot/default_cigerito.svg" width="160" alt="Luno Logo" />
+  <img src="assets/images/mascot/default_cigerito.svg" width="160" alt="Cigerito Logo" />
 </p>
 
-<h1 align="center">Luno 🫁</h1>
+<h1 align="center">Cigerito 🫁</h1>
 
 <p align="center">
   <strong>"Acı Gerçeklerle Yüzleştiren" Sigara Bırakma Farkındalık Uygulaması</strong><br/>
@@ -18,9 +18,9 @@
 
 ---
 
-## 🌬️ Luno Nedir?
+## 🌬️ Cigerito Nedir?
 
-Luno, sigara bırakma sürecinde sizi "tebrik etmek" yerine, devam ettiğiniz her anın size ve bütçenize verdiği **net zararı** yüzünüze vuran bir farkındalık platformudur. Uygulamanın kalbinde, tatlı ama yaralı, bazen alaycı bazen de bilge maskotumuz **Ciğerito** yer alır.
+Cigerito, sigara bırakma sürecinde sizi "tebrik etmek" yerine, devam ettiğiniz her anın size ve bütçenize verdiği **net zararı** yüzünüze vuran bir farkındalık platformudur. Uygulamanın kalbinde, tatlı ama yaralı, bazen alaycı bazen de bilge maskotumuz **Ciğerito** yer alır.
 
 > _"Her sigara hayatından 11 dakika çalar. Ama sen zaten zamanı dumanla harcamayı seviyorsun, değil mi?"_
 > — **Ciğerito**
@@ -67,7 +67,7 @@ Luno, sigara bırakma sürecinde sizi "tebrik etmek" yerine, devam ettiğiniz he
 
 ## 🏗️ Mimari ve Teknik Yapı
 
-Luno, modern Flutter standartlarına uygun olarak **Feature-First** mimarisiyle geliştirilmiştir.
+Cigerito, modern Flutter standartlarına uygun olarak **Feature-First** mimarisiyle geliştirilmiştir.
 
 - **State Management:** Veri akışı ve uygulama durumu **Riverpod** ile yönetilir.
 - **Veri Katmanı:**

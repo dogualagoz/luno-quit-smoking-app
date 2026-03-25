@@ -50,4 +50,11 @@ class AuthController extends AsyncNotifier<User?> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() => service.signOut().then((_) => null));
   }
+
+  // Hesabı kalıcı olarak siler ve UI durumunu günceller
+  Future<void> deleteAccount() async {
+    final service = ref.read(authServiceProvider);
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() => service.deleteAccount().then((_) => null));
+  }
 }

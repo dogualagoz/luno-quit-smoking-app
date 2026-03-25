@@ -95,4 +95,17 @@ class AuthRepository {
       rethrow;
     }
   }
+
+  /// Kullanıcının hesabını tamamen siler (App Store zorunluluğu).
+  Future<void> deleteAccount() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        await user.delete();
+        await _googleSignIn.signOut();
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

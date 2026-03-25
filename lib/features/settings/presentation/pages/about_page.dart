@@ -83,7 +83,7 @@ class AboutPage extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.p8),
                       Text(
-                        "Luno",
+                        "Cigerito",
                         style: textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),

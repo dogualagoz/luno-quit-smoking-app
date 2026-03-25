@@ -21,29 +21,35 @@ class MainHeader extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Merhaba, x
-            Text(
-              "Merhaba, $userName 💨",
-              style: textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                fontSize: 22.4,
-                height: 1.2,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Merhaba, x
+              Text(
+                "Merhaba, $userName 💨",
+                style: textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 22.4,
+                  height: 1.2,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            const SizedBox(height: 4),
+              const SizedBox(height: 4),
 
-            // altındaki yazı
-            Text(
-              subText,
-              style: textTheme.bodySmall?.copyWith(
-                fontSize: 12.5,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              // altındaki yazı
+              Text(
+                subText,
+                style: textTheme.bodySmall?.copyWith(
+                  fontSize: 12.5,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
 
         //Ay ikonu (tema değiştirici)

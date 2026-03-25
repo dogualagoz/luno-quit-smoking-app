@@ -66,7 +66,7 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
       child: Column(
         children: [
           Container(
-            height: 220, // Slider içeriği için yükseklik
+            height: 240, // Slider içeriği için biraz daha fazla alan tanıdık
             padding: const EdgeInsets.fromLTRB(AppSpacing.p20, AppSpacing.p20, AppSpacing.p20, 0),
             child: PageView(
               controller: _pageController,

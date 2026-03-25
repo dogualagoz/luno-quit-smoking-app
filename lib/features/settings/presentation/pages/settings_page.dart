@@ -178,7 +178,7 @@ class SettingsPage extends ConsumerWidget {
                         onTap: () {
                           // ignore: deprecated_member_use
                           Share.share(
-                              "Luno ile sigarayı bırakma serüvenime başladım! Sen de bana katıl: https://luno-app.com");
+                              "Cigerito ile sigarayı bırakma serüvenime başladım! Sen de bana katıl: https://luno-app.com");
                         },
                       ),
                       const Divider(height: 1),
@@ -279,6 +279,69 @@ class SettingsPage extends ConsumerWidget {
                         ),
                         title: Text(
                           'Çıkış Yap',
+                          style: AppTextStyles.body.copyWith(
+                            color: AppColors.lightDestructive,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        trailing: const Icon(Icons.chevron_right, size: 20),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      ListTile(
+                        onTap: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Hesabı Kalıcı Olarak Sil?'),
+                              content: const Text(
+                                'Tüm verilerin ve hesabın kalıcı olarak silinecektir. Bu işlem geri alınamaz. Onaylıyor musun?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: const Text('Vazgeç'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: const Text(
+                                    'Hesabı Sil',
+                                    style: TextStyle(
+                                      color: AppColors.lightDestructive,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirm == true) {
+                            await ref
+                                .read(authControllerProvider.notifier)
+                                .deleteAccount();
+                                
+                            // Eğer hata olursa kullanıcıyı bilgilendir
+                            final authState = ref.read(authControllerProvider);
+                            if (authState.hasError) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text('Güvenlik için lütfen çıkış yapıp tekrar giriş yaptıktan sonra hesabı silmeyi deneyin.'),
+                                    backgroundColor: AppColors.lightDestructive,
+                                  ),
+                                );
+                              }
+                            }
+                          }
+                        },
+                        leading: Icon(
+                          Icons.delete_forever_rounded,
+                          color: AppColors.lightDestructive.withValues(
+                            alpha: 0.8,
+                          ),
+                        ),
+                        title: Text(
+                          'Hesabı Sil',
                           style: AppTextStyles.body.copyWith(
                             color: AppColors.lightDestructive,
                             fontWeight: FontWeight.bold,

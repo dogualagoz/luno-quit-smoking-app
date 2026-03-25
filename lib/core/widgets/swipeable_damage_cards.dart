@@ -132,7 +132,7 @@ class _SwipeableDamageCardsState extends ConsumerState<SwipeableDamageCards>
 
         // Kart Yığını
         SizedBox(
-          height: 132,
+          height: 145,
           child: Stack(
             clipBehavior: Clip.none,
             children: _buildCardStack(screenWidth, theme, textTheme, organs),

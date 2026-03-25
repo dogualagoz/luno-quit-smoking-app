@@ -102,4 +102,19 @@ class AuthService {
     // Bu sayede yeni bir hesapla girince eski veriler karışmaz.
     await _onboardingRepository.deleteProfile();
   }
+
+  /// Hesabı tamamen siler, yerel ve (gerekirse) bulut verileri dahil temizler.
+  Future<void> deleteAccount() async {
+    final user = _authRepository.currentUser;
+    if (user != null) {
+      // 1. İsteğe bağlı: kullanıcının buluttaki verisini (users collection) silebiliriz.
+      // await _firestoreRepository.deleteProfile(user.uid); 
+      
+      // 2. Firebase ve Google Auth id'sini (hesabı) tamamen sil
+      await _authRepository.deleteAccount();
+
+      // 3. Yerel verileri (Hive) temizle
+      await _onboardingRepository.deleteProfile();
+    }
+  }
 }
