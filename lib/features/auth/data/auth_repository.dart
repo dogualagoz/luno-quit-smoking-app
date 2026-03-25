@@ -38,11 +38,8 @@ class AuthRepository {
   Future<UserCredential?> signInWithGoogle() async {
     try {
       // 1. Kullanıcıdan Google hesabı seçmesini ve kimliğini doğrulamayı ister
-      final GoogleSignInAccount? googleUser = await _googleSignIn
+      final googleUser = await _googleSignIn
           .authenticate();
-
-      // Kullanıcı pencereyi kapatırsa null döner
-      if (googleUser == null) return null;
 
       // 2. Google'dan gelen kimlik doğruluğu (idToken) bilgilerini alır
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;

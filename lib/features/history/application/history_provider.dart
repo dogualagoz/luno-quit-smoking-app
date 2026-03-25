@@ -39,7 +39,6 @@ class HistoryLogsNotifier extends StateNotifier<AsyncValue<List<DailyLog>>> {
       state = AsyncValue.data(syncedLogs);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
-      print('Log yükleme hatası: $e'); // Console error for testing
     }
   }
 
@@ -56,7 +55,6 @@ class HistoryLogsNotifier extends StateNotifier<AsyncValue<List<DailyLog>>> {
       // Bir hata olursa eski haline geri döndür
       state = previousState;
       state = AsyncValue.error(e, stack);
-      print('Log ekleme hatası: $e');
     }
   }
 }

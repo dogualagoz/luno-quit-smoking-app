@@ -46,10 +46,7 @@ class HistoryRepository {
           .doc(user.uid)
           .collection('dailyLogs')
           .doc(log.id)
-          .set(log.toMap())
-          .catchError((e) {
-        print('Firestore yedekleme hatası: $e');
-      });
+          .set(log.toMap());
     }
   }
 
@@ -76,7 +73,7 @@ class HistoryRepository {
         await _dailyLogsBox.putAll(logsMap);
       }
     } catch (e) {
-      print('Senkronizasyon hatası: $e'); // Error message check requirement
+      // Hata sessizce geçiliyor, Hive verileri korunuyor
     }
   }
 }

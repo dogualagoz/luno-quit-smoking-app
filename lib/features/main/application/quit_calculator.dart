@@ -52,7 +52,7 @@ class QuitCalculator {
         damage.totalSmoked.toInt().toString(),
       ),
       countSubtext:
-          "${damage.distanceKm.toStringAsFixed(1)} km — Everest'e tırmanabilirdin",
+      "${damage.distanceKm.toStringAsFixed(1)} km — Everest'e tırmanabilirdin",
       recoveryLabel: "İyileşme Süresi",
       recoveryYears: recoveryYears,
       recoveryMonths: recoveryMonths,
@@ -68,13 +68,13 @@ class QuitCalculator {
   }
 
   /// Saniye başına kayıp hızlarını hesaplar (Para, Zaman, Sigara)
-  static _LossRates calculateRates(UserProfile profile) {
+  static LossRates calculateRates(UserProfile profile) {
     final pricePerCigarette = profile.packPrice / profile.cigarettesPerPack;
     final dailyCost = profile.dailyCigarettes * pricePerCigarette;
     final dailyTimeLost =
         profile.dailyCigarettes * AppBusinessRules.minutesLostPerCigarette;
 
-    return _LossRates(
+    return LossRates(
       moneyPerSecond: dailyCost / 86400,
       minutesPerSecond: dailyTimeLost / 86400,
       cigarettesPerSecond: profile.dailyCigarettes / 86400,
@@ -175,7 +175,7 @@ class QuitCalculator {
   // ─── Finansal Hesaplamalar ────────────────────────────────────────────────
 
   /// Finansal hasar, zaman kaybı ve mesafe metriklerini hesaplar.
-  static _DamageMetrics _calculateDamageMetrics(
+  static DamageMetrics _calculateDamageMetrics(
     UserProfile profile,
     List<DailyLog> logs,
     DateTime now,
@@ -203,7 +203,7 @@ class QuitCalculator {
           loggedSmokesByDate[d] = (loggedSmokesByDate[d] ?? 0) + log.smokeCount;
           
           if (d.year == todayStr.year && d.month == todayStr.month && d.day == todayStr.day) {
-            if (lastLogTodayTime == null || log.date.isAfter(lastLogTodayTime!)) {
+            if (lastLogTodayTime == null || log.date.isAfter(lastLogTodayTime)) {
               lastLogTodayTime = log.date;
             }
           }
@@ -222,7 +222,7 @@ class QuitCalculator {
         if (hasLog) {
           liveSmoked += loggedSmokesByDate[d]!;
           if (lastLogTodayTime != null) {
-            final msSinceLastLog = now.difference(lastLogTodayTime!).inMilliseconds;
+            final msSinceLastLog = now.difference(lastLogTodayTime).inMilliseconds;
             if (msSinceLastLog > 0) {
               liveSmoked += (rates.cigarettesPerSecond / 1000) * msSinceLastLog;
             }
@@ -278,7 +278,7 @@ class QuitCalculator {
         (totalSmoked * AppBusinessRules.cigaretteLengthMeters) /
         AppBusinessRules.metersPerKilometer;
 
-    return _DamageMetrics(
+    return DamageMetrics(
       totalSmoked: totalSmoked,
       rawMoney: totalSpent,
       formattedMoney: _formatWithThousandSeparator(moneyValue.toString()),
@@ -307,7 +307,7 @@ class QuitCalculator {
 }
 
 /// Hasar hesaplama sonuçlarını taşıyan veri sınıfı.
-class _DamageMetrics {
+class DamageMetrics {
   final double totalSmoked;
   final double rawMoney;
   final String formattedMoney;
@@ -317,7 +317,7 @@ class _DamageMetrics {
   final double distanceKm;
   final bool isEstimatedToday;
 
-  const _DamageMetrics({
+  const DamageMetrics({
     required this.totalSmoked,
     required this.rawMoney,
     required this.formattedMoney,
@@ -330,12 +330,12 @@ class _DamageMetrics {
 }
 
 /// Saniye başına kayıp hızlarını taşıyan sınıf
-class _LossRates {
+class LossRates {
   final double moneyPerSecond;
   final double minutesPerSecond;
   final double cigarettesPerSecond;
 
-  const _LossRates({
+  const LossRates({
     required this.moneyPerSecond,
     required this.minutesPerSecond,
     required this.cigarettesPerSecond,

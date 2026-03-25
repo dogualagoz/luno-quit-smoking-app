@@ -112,15 +112,21 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
 
   void _toggleMood(String val) {
     setState(() {
-      if (_selectedMoods.contains(val)) _selectedMoods.remove(val);
-      else _selectedMoods.add(val);
+      if (_selectedMoods.contains(val)) {
+        _selectedMoods.remove(val);
+      } else {
+        _selectedMoods.add(val);
+      }
     });
   }
 
   void _toggleActivity(String val) {
     setState(() {
-      if (_selectedContext.contains(val)) _selectedContext.remove(val);
-      else _selectedContext.add(val);
+      if (_selectedContext.contains(val)) {
+        _selectedContext.remove(val);
+      } else {
+        _selectedContext.add(val);
+      }
     });
   }
 
