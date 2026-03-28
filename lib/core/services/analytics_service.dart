@@ -42,7 +42,7 @@ class AnalyticsService {
     );
   }
 
-  // --- Kullanıcı Özellikleri ---
+  // --- Kullanıcı Özellikleri 
   Future<void> setUserProfile({
     required int dailyCigarettes,
     required double packPrice,
