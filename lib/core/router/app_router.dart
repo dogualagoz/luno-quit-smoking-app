@@ -18,13 +18,17 @@ import '../../features/main/presentation/pages/details/money_details_screen.dart
 import '../../features/main/presentation/pages/details/cigarettes_details_screen.dart';
 import '../../features/main/presentation/pages/details/time_details_screen.dart';
 import '../../features/main/presentation/pages/details/recovery_details_screen.dart';
+import '../services/analytics_service.dart';
+import '../providers/firebase_providers.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
   final onboardingRepo = ref.watch(onboardingRepositoryProvider);
+  final AnalyticsService analytics = ref.watch(analyticsServiceProvider);
 
   return GoRouter(
     initialLocation: AppRouter.onboarding,
+    observers: [analytics.getObserver()],
     redirect: (context, state) {
       final isLoggedIn = authState.value != null;
       final isBoardingFinished = onboardingRepo.isProfileCreated();

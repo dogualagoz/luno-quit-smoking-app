@@ -58,7 +58,7 @@ class _ReasonsStepState extends State<ReasonsStep> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: AppSpacing.pageHorizontal,
       child: Column(
         children: [
@@ -79,64 +79,60 @@ class _ReasonsStepState extends State<ReasonsStep> {
             ],
           ),
           const SizedBox(height: AppSpacing.p24),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 2.2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-              ),
-              itemCount: _reasons.length,
-              itemBuilder: (context, index) {
-                final reason = _reasons[index];
-                final isSelected = _selectedReasons.contains(reason['title']);
-                return InkWell(
-                  onTap: () => _toggleReason(reason['title']!),
-                  borderRadius: AppRadius.mainCard,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: _reasons.map((reason) {
+              final isSelected = _selectedReasons.contains(reason['title']);
+              final width = (MediaQuery.of(context).size.width - (AppSpacing.p20 * 2) - 12) / 2;
+              return InkWell(
+                onTap: () => _toggleReason(reason['title']!),
+                borderRadius: AppRadius.mainCard,
+                child: Container(
+                  width: width,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.lightChartSuccess.withValues(alpha: 0.1)
+                        : AppColors.lightCard,
+                    borderRadius: AppRadius.mainCard,
+                    border: Border.all(
                       color: isSelected
-                          ? AppColors.lightChartSuccess.withValues(alpha: 0.1)
-                          : AppColors.lightCard,
-                      borderRadius: AppRadius.mainCard,
-                      border: Border.all(
-                        color: isSelected
-                            ? AppColors.lightChartSuccess
-                            : AppColors.lightBorder,
-                        width: isSelected ? 1.5 : 1,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          reason['icon']!,
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            reason['title']!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.w500,
-                              color: isSelected
-                                  ? AppColors.lightChartSuccess
-                                  : AppColors.lightForeground,
-                            ),
-                          ),
-                        ),
-                      ],
+                          ? AppColors.lightChartSuccess
+                          : AppColors.lightBorder,
+                      width: isSelected ? 1.5 : 1,
                     ),
                   ),
-                );
-              },
-            ),
+                  child: Row(
+                    children: [
+                      Text(
+                        reason['icon']!,
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          reason['title']!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.w500,
+                            color: isSelected
+                                ? AppColors.lightChartSuccess
+                                : AppColors.lightForeground,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
           ),
+          const SizedBox(height: AppSpacing.p40),
         ],
       ),
     );

@@ -52,7 +52,7 @@ class _TriggerMomentsStepState extends State<TriggerMomentsStep> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: AppSpacing.pageHorizontal,
       child: Column(
         children: [
@@ -73,66 +73,60 @@ class _TriggerMomentsStepState extends State<TriggerMomentsStep> {
             ],
           ),
           const SizedBox(height: AppSpacing.p24),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _moments.length,
-              itemBuilder: (context, index) {
-                final moment = _moments[index];
-                final isSelected = _selectedValue == moment['title'];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: InkWell(
-                    onTap: () => _onSelect(moment['title']!),
+          ..._moments.map((moment) {
+            final isSelected = _selectedValue == moment['title'];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: InkWell(
+                onTap: () => _onSelect(moment['title']!),
+                borderRadius: AppRadius.mainCard,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.lightPrimary.withValues(alpha: 0.05)
+                        : AppColors.lightCard,
                     borderRadius: AppRadius.mainCard,
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.lightPrimary.withValues(alpha: 0.05)
-                            : AppColors.lightCard,
-                        borderRadius: AppRadius.mainCard,
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColors.lightPrimary
-                              : AppColors.lightBorder,
-                          width: isSelected ? 1.5 : 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            moment['icon']!,
-                            style: const TextStyle(fontSize: 24),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              moment['title']!,
-                              style: TextStyle(
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.w600,
-                                color: isSelected
-                                    ? AppColors.lightPrimary
-                                    : AppColors.lightForeground,
-                              ),
-                            ),
-                          ),
-                          if (isSelected)
-                            const Icon(
-                              Icons.check_circle_outline,
-                              color: AppColors.lightPrimary,
-                              size: 20,
-                            ),
-                        ],
-                      ),
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.lightPrimary
+                          : AppColors.lightBorder,
+                      width: isSelected ? 1.5 : 1,
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
+                  child: Row(
+                    children: [
+                      Text(
+                        moment['icon']!,
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          moment['title']!,
+                          style: TextStyle(
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.w600,
+                            color: isSelected
+                                ? AppColors.lightPrimary
+                                : AppColors.lightForeground,
+                          ),
+                        ),
+                      ),
+                      if (isSelected)
+                        const Icon(
+                          Icons.check_circle_outline,
+                          color: AppColors.lightPrimary,
+                          size: 20,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+          const SizedBox(height: AppSpacing.p40),
         ],
       ),
     );

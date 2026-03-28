@@ -25,15 +25,35 @@ class QuitCalculator {
     final organs = _calculateOrganDamages(profile);
     final totalDamageScore = _calculateTotalDamageScore(organs);
 
-    // İyileşme: en uzun iyileşme süresine sahip organı baz al
-    final maxRecoveryDays = organs.fold<int>(
-      0,
-      (prev, organ) => max(prev, organ.recoveryDays),
-    );
-    final recoveryYears = maxRecoveryDays ~/ AppBusinessRules.daysPerYear;
-    final remainingAfterYears = maxRecoveryDays % AppBusinessRules.daysPerYear;
-    final recoveryMonths = remainingAfterYears ~/ AppBusinessRules.daysPerMonth;
-    final recoveryDays = remainingAfterYears % AppBusinessRules.daysPerMonth;
+    // --- Hazırlık Seviyesi (Preparation Level) Hesaplaması ---
+    // Mantık:
+    // 1. Baz: %10 (Uygulamayı kullanıyor olması)
+    // 2. Azaltma: %40 (Baseline vs. Bugün içilen)
+    // 3. İstikrar: %30 (Son 7 gündeki log sayısı)
+    // 4. İrade: %20 (Kriz direnci)
+
+    double prepScore = 0.10; // Baz
+
+    // Azaltma Skoru (%40)
+    final dailyCigarettes = profile.dailyCigarettes;
+    final todaySmoked = damage.liveSmokedToday.clamp(0, dailyCigarettes * 2); 
+    final reductionFactor = (dailyCigarettes - todaySmoked) / dailyCigarettes;
+    prepScore += (reductionFactor.clamp(0, 1.0) * 0.40);
+
+    // İstikrar Skoru (%30) - Son 7 günün kaçında log var?
+    int loggedDaysCount = 0;
+    for (int i = 0; i < 7; i++) {
+        final dateToCheck = damage.todayStr.subtract(Duration(days: i));
+        if (damage.loggedSmokesByDate.containsKey(dateToCheck)) {
+            loggedDaysCount++;
+        }
+    }
+    prepScore += (loggedDaysCount / 7) * 0.30;
+
+    // İrade Skoru (%20) - Kaç kriz direnildi? (Maks 10 kriz = %20)
+    prepScore += (damage.resistedCravings / 10).clamp(0, 1.0) * 0.20;
+
+    final finalPrepPercentage = prepScore.clamp(0.01, 1.0);
 
     return QuitStats(
       rawMoney: damage.rawMoney,
@@ -41,7 +61,7 @@ class QuitCalculator {
       moneyValue: damage.formattedMoney,
       moneyDecimal: ",${damage.moneyDecimalPart}",
       moneySubtext:
-          "₺${(burnRate * 60).toStringAsFixed(1)}/dk yanıyor", // Dakika hızına çevir
+          "₺${(burnRate * 60).toStringAsFixed(1)}/dk yanıyor",
       moneyAction: "ne alabilirdin? — dokun",
       timeLabel: "Kaybedilen Zaman",
       timeValue: damage.daysLost.toString(),
@@ -53,12 +73,10 @@ class QuitCalculator {
       ),
       countSubtext:
       "${damage.distanceKm.toStringAsFixed(1)} km — Everest'e tırmanabilirdin",
-      recoveryLabel: "İyileşme Süresi",
-      recoveryYears: recoveryYears,
-      recoveryMonths: recoveryMonths,
-      recoveryDays: recoveryDays,
-      recoverySubtext: "içmeye devam ettikçe artıyor",
-      recoveryAction: "🌱 bırakırsan ne olur? — dokun",
+      prepLabel: "Hazırlık Seviyesi",
+      prepPercentage: finalPrepPercentage,
+      prepSubtext: "Bırakmaya %${(finalPrepPercentage * 100).toInt()} hazırsın",
+      prepAction: "Bırakmaya hazır mısın? — dokun",
       organDamages: organs,
       totalDamageScore: totalDamageScore,
       progress: totalDamageScore,
@@ -278,6 +296,9 @@ class QuitCalculator {
         (totalSmoked * AppBusinessRules.cigaretteLengthMeters) /
         AppBusinessRules.metersPerKilometer;
 
+    // İrade Skoru için kriz direnci sayısını hesapla
+    int resistedCravings = logs.where((l) => l.type == 'craving' && !l.hasSmoked).length;
+
     return DamageMetrics(
       totalSmoked: totalSmoked,
       rawMoney: totalSpent,
@@ -287,6 +308,10 @@ class QuitCalculator {
       timeDigits: timeDigits,
       distanceKm: distanceKm,
       isEstimatedToday: isEstimatedToday,
+      liveSmokedToday: liveSmoked, // Bugün içilen (tahmin dahil)
+      loggedSmokesByDate: loggedSmokesByDate,
+      resistedCravings: resistedCravings,
+      todayStr: todayStr,
     );
   }
 
@@ -316,6 +341,10 @@ class DamageMetrics {
   final List<String> timeDigits;
   final double distanceKm;
   final bool isEstimatedToday;
+  final double liveSmokedToday;
+  final Map<DateTime, int> loggedSmokesByDate;
+  final int resistedCravings;
+  final DateTime todayStr;
 
   const DamageMetrics({
     required this.totalSmoked,
@@ -326,6 +355,10 @@ class DamageMetrics {
     required this.timeDigits,
     required this.distanceKm,
     required this.isEstimatedToday,
+    required this.liveSmokedToday,
+    required this.loggedSmokesByDate,
+    required this.resistedCravings,
+    required this.todayStr,
   });
 }
 

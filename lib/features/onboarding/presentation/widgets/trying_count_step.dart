@@ -65,7 +65,7 @@ class _TryingCountStepState extends State<TryingCountStep> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: AppSpacing.pageHorizontal,
       child: Column(
         children: [
@@ -86,77 +86,72 @@ class _TryingCountStepState extends State<TryingCountStep> {
             ],
           ),
           const SizedBox(height: AppSpacing.p40),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _options.length,
-              itemBuilder: (context, index) {
-                final opt = _options[index];
-                final isSelected = _selectedValue == opt['title'];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: InkWell(
-                    onTap: () => _onSelect(opt['title']!),
+          ..._options.map((opt) {
+            final isSelected = _selectedValue == opt['title'];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: InkWell(
+                onTap: () => _onSelect(opt['title']!),
+                borderRadius: AppRadius.mainCard,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.lightPrimary.withValues(alpha: 0.05)
+                        : AppColors.lightCard,
                     borderRadius: AppRadius.mainCard,
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.lightPrimary.withValues(alpha: 0.05)
-                            : AppColors.lightCard,
-                        borderRadius: AppRadius.mainCard,
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColors.lightPrimary
-                              : AppColors.lightBorder,
-                          width: isSelected ? 1.5 : 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            opt['icon']!,
-                            style: const TextStyle(fontSize: 24),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  opt['title']!,
-                                  style: TextStyle(
-                                    fontWeight: isSelected
-                                        ? FontWeight.bold
-                                        : FontWeight.w600,
-                                    color: isSelected
-                                        ? AppColors.lightPrimary
-                                        : AppColors.lightForeground,
-                                  ),
-                                ),
-                                Text(
-                                  opt['desc']!,
-                                  style: AppTextStyles.micro.copyWith(
-                                    color: AppColors.lightForeground.withValues(
-                                      alpha: 0.4,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (isSelected)
-                            const Icon(
-                              Icons.check_circle,
-                              color: AppColors.lightPrimary,
-                            ),
-                        ],
-                      ),
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.lightPrimary
+                          : AppColors.lightBorder,
+                      width: isSelected ? 1.5 : 1,
                     ),
                   ),
-                );
-              },
-            ),
-          ),
+                  child: Row(
+                    children: [
+                      Text(
+                        opt['icon']!,
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              opt['title']!,
+                              style: TextStyle(
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w600,
+                                color: isSelected
+                                    ? AppColors.lightPrimary
+                                    : AppColors.lightForeground,
+                              ),
+                            ),
+                            Text(
+                              opt['desc']!,
+                              style: AppTextStyles.micro.copyWith(
+                                color: AppColors.lightForeground.withValues(
+                                  alpha: 0.4,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isSelected)
+                        const Icon(
+                          Icons.check_circle,
+                          color: AppColors.lightPrimary,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+          const SizedBox(height: AppSpacing.p40),
         ],
       ),
     );

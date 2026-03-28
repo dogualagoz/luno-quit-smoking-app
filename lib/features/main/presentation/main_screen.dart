@@ -18,6 +18,7 @@ import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart'
 import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
 import 'package:luno_quit_smoking_app/core/widgets/mascot_animation.dart';
 
+// --- Ana Dashboard Ekranı (Uygulamanın Merkezi) ---
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
 
@@ -26,6 +27,7 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
+  // Navigasyon sırasında kriz kontrolünün birden fazla yapılmasını önleyen bayrak
   bool _hasCheckedCraving = false;
 
   @override
@@ -57,7 +59,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       }
     });
 
-    // Gerçek istatistikleri ve kullanıcı profilini dinle
+    // --- Durum İzleme (İstatistikler ve Kullanıcı Verileri) ---
     final stats = ref.watch(statsProvider);
     final profile = ref.watch(userProfileProvider);
 
@@ -65,6 +67,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
     return Scaffold(
       body: SafeArea(
+        // --- İçerik Yükleme Durumu Yönetimi ---
         child: stats.when(
           data: (statsData) => SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
@@ -77,7 +80,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   // Dinamik Başlık
                   MainHeader(
                     userName: userName,
-                    subText: statsData.recoverySubtext,
+                    subText: statsData.prepSubtext,
                   ),
 
                   AppSpacing.sectionGapLarge,
@@ -97,23 +100,25 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   const SizedBox(height: 8),
 
                   // Konuşma Balonu
-                  SpeechBubble(text: statsData.recoverySubtext),
+                  SpeechBubble(text: statsData.prepSubtext),
                   AppSpacing.sectionGap,
 
                   // Organ Hasar Kartları
                   SwipeableDamageCards(organs: statsData.organDamages),
                   AppSpacing.sectionGap,
 
-                  // Dinamik İstatistik Grid'i
+                  // --- Kullanıcı Bilgileri ve Aktivite Kayıtları Bölümü ---
+                  
+                  // Sağlık göstergelerini gösteren özet grid (Akciğer, Kalp vb.)
                   StatGrid(stats: statsData),
                   AppSpacing.sectionGap,
 
-                  // Günlük Özet & Kayıt Teşviği
+                  // Günlük sigara, maliyet ve zaman özeti (Etkileşimli Slider Kartı)
                   TodaySummaryCard(logs: ref.watch(historyLogsProvider).value ?? []),
 
                   AppSpacing.sectionGap,
 
-                  // Motivasyon Kartı (Quote Card)
+                  // Motivasyon Kartı (Alıntı Kartı)
                   const QuoteCard(
                     quote:
                         "Her sigara hayatından 11 dakika çalar. Ama sen zaten zamanı dumanla harcamayı seviyorsun, değil mi?",
@@ -126,9 +131,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             ),
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => Center(child: Text('Error: $err')),
+          error: (err, stack) => Center(child: Text('Hata: $err')),
         ),
       ),
+      // --- Yüzen Aksiyon Butonu (Yeni Kriz/Kaçamak Kaydı) ---
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push(AppRouter.craving),
         backgroundColor: Colors.pink.shade200,

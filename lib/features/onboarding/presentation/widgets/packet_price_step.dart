@@ -49,7 +49,7 @@ class _PacketPriceStepState extends State<PacketPriceStep> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: AppSpacing.pageHorizontal,
       child: Column(
         children: [
@@ -215,7 +215,7 @@ class _PacketPriceStepState extends State<PacketPriceStep> {
               ],
             ),
           ),
-          const Spacer(),
+          const SizedBox(height: AppSpacing.p40),
         ],
       ),
     );

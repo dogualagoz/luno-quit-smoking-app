@@ -42,7 +42,7 @@ class _SmokingYearsStepState extends State<SmokingYearsStep> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: AppSpacing.pageHorizontal,
       child: Column(
         children: [
@@ -140,6 +140,7 @@ class _SmokingYearsStepState extends State<SmokingYearsStep> {
           const SizedBox(height: AppSpacing.p24),
           Wrap(
             spacing: 8,
+            runSpacing: 8,
             children: [1, 3, 5, 10].map((year) {
               final isSelected = _currentValue == year;
               return InkWell(
@@ -175,7 +176,7 @@ class _SmokingYearsStepState extends State<SmokingYearsStep> {
               );
             }).toList(),
           ),
-          const Spacer(),
+          const SizedBox(height: AppSpacing.p40),
         ],
       ),
     );

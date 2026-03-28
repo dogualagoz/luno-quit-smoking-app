@@ -8,6 +8,7 @@ import 'package:luno_quit_smoking_app/core/widgets/luno_button.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_progress_bar.dart';
 import 'package:luno_quit_smoking_app/features/history/application/history_provider.dart';
 import 'package:luno_quit_smoking_app/features/history/data/models/daily_log.dart';
+import 'package:luno_quit_smoking_app/core/providers/firebase_providers.dart';
 import 'package:uuid/uuid.dart';
 
 // Steps (reuse)
@@ -149,6 +150,12 @@ class _SlipLogScreenState extends ConsumerState<SlipLogScreen> {
     // Önce ekranı kapat, kayıt arkada devam etsin
     context.pop();
     ref.read(historyLogsProvider.notifier).addLog(log);
+
+    // Analytics: Sigara içme olayını logla
+    ref.read(analyticsServiceProvider).logSmokeLogged(
+          count: log.smokeCount,
+          reason: log.note,
+        );
   }
 
   @override

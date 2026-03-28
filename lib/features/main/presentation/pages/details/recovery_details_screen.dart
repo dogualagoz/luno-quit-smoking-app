@@ -16,26 +16,22 @@ class RecoveryDetailsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("İyileşme Haritası"),
+        title: const Text("Bırakmaya Hazırlık"), // İyileşme Haritası -> Bırakmaya Hazırlık
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
       body: statsAsync.when(
         data: (stats) {
-          // stats.totalDamageScore gives us an idea of severity.
-          // In a real medical app, timeline is rigid based on quit time.
-          // Since they haven't quit yet ideally, we show them what HAPPENS if they quit NOW.
-          
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.p20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildHeroStat(context, stats.recoveryYears, stats.recoveryMonths, isDark, successColor),
+                _buildHeroStat(context, stats.prepPercentage, isDark, successColor),
                 AppSpacing.sectionGapLarge,
-                Text("Şimdi Bırakırsan Ne Olur?", style: AppTextStyles.cardHeader),
+                Text("Hazırlık Seviyeni Ne Artırır?", style: AppTextStyles.cardHeader),
                 AppSpacing.sectionGap,
-                _buildTimelineList(context, isDark, successColor),
+                _buildFactorsList(context, isDark, successColor),
               ],
             ),
           );
@@ -46,7 +42,7 @@ class RecoveryDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeroStat(BuildContext context, int years, int months, bool isDark, Color color) {
+  Widget _buildHeroStat(BuildContext context, double percentage, bool isDark, Color color) {
     return Container(
       padding: AppSpacing.cardPaddingLarge,
       decoration: BoxDecoration(
@@ -63,92 +59,65 @@ class RecoveryDetailsScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          Icon(Icons.monitor_heart_outlined, size: 48, color: color),
+          Icon(Icons.rocket_launch_outlined, size: 48, color: color),
           const SizedBox(height: 16),
-          Text("Tam İyileşme İçin Toplam Süre", style: AppTextStyles.body.copyWith(color: Theme.of(context).hintColor)),
+          Text("Bırakmaya Hazırlık Skorun", style: AppTextStyles.body.copyWith(color: Theme.of(context).hintColor)),
           const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              if (years > 0) ...[
-                Text("$years", style: AppTextStyles.largeNumber.copyWith(color: color)),
-                Text("yıl ", style: AppTextStyles.statValue.copyWith(color: Theme.of(context).hintColor)),
-              ],
-              Text("$months", style: AppTextStyles.largeNumber.copyWith(color: color)),
-              Text("ay", style: AppTextStyles.statValue.copyWith(color: Theme.of(context).hintColor)),
-            ],
+          Text(
+            "%${(percentage * 100).toInt()}",
+            style: AppTextStyles.largeNumber.copyWith(color: color),
+          ),
+          const SizedBox(height: 16),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: percentage,
+              minHeight: 12,
+              backgroundColor: color.withValues(alpha: 0.1),
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTimelineList(BuildContext context, bool isDark, Color color) {
-    final timeline = [
-      {'time': '20 Dakika', 'desc': 'Kalp atış hızı normale döner.'},
-      {'time': '12 Saat', 'desc': 'Kandaki karbonmonoksit seviyesi normale döner.'},
-      {'time': '2 Hafta', 'desc': 'Kalp kriz riski düşmeye başlar, akciğerler güçlenir.'},
-      {'time': '1-9 Ay', 'desc': 'Öksürük ve nefes darlığı azalır.'},
-      {'time': '1 Yıl', 'desc': 'Koroner kalp hastalığı riski yarıya iner.'},
-      {'time': '5 Yıl', 'desc': 'Ağız, gırtlak ve mesane kanseri riski yarı yarıya düşer.'},
-      {'time': '10 Yıl', 'desc': 'Akciğer kanserinden ölüm riski yarıya düşer.'},
-      {'time': '15 Yıl', 'desc': 'Kalp krizi riski hiç içmeyen biriyle aynı olur.'},
+  Widget _buildFactorsList(BuildContext context, bool isDark, Color color) {
+    final factors = [
+      {'title': 'Günlük Limit Uyumu', 'desc': 'Belirlediğin günlük sigara limitinin altında kaldığın her an skorun artar.', 'icon': Icons.check_circle_outline},
+      {'title': 'Kriz Yönetimi', 'desc': 'Canın sigara istediğinde içmek yerine "Kriz" butonunu kullanman iradeni güçlendirir.', 'icon': Icons.psychology_outlined},
+      {'title': 'Düzenli Takip', 'desc': 'Uygulamayı her gün kullanman ve verilerini girmen kararlılığını gösterir.', 'icon': Icons.calendar_today_outlined},
+      {'title': 'Zaman Kazanımı', 'desc': 'Sigara içmeyerek kazandığın her dakika seni özgürlüğe yaklaştırır.', 'icon': Icons.timer_outlined},
     ];
 
     return Column(
-      children: List.generate(timeline.length, (index) {
-        final item = timeline[index];
-        return IntrinsicHeight(
+      children: factors.map((f) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkCard : AppColors.lightCard,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
+          ),
           child: Row(
             children: [
-              SizedBox(
-                width: 40,
-                child: Column(
-                  children: [
-                    Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 3),
-                      ),
-                    ),
-                    if (index != timeline.length - 1)
-                      Expanded(
-                        child: Container(
-                          width: 2,
-                          color: color.withValues(alpha: 0.3),
-                        ),
-                      )
-                  ],
-                ),
-              ),
+              Icon(f['icon'] as IconData, color: color, size: 24),
+              const SizedBox(width: 16),
               Expanded(
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 24),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                     color: isDark ? AppColors.darkCard : AppColors.lightCard,
-                     borderRadius: BorderRadius.circular(16),
-                     border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(item['time']!, style: AppTextStyles.cardHeader.copyWith(color: color)),
-                      const SizedBox(height: 4),
-                      Text(item['desc']!, style: AppTextStyles.caption.copyWith(color: Theme.of(context).hintColor)),
-                    ],
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(f['title'] as String, style: AppTextStyles.bodySemibold),
+                    const SizedBox(height: 4),
+                    Text(f['desc'] as String, style: AppTextStyles.caption.copyWith(color: Theme.of(context).hintColor)),
+                  ],
                 ),
               ),
             ],
           ),
         );
-      }),
+      }).toList(),
     );
   }
 }

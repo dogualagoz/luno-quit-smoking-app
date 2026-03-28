@@ -25,10 +25,11 @@ class _IntroStepState extends State<IntroStep> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: AppSpacing.pageHorizontal,
       child: Column(
         children: [
+          const SizedBox(height: AppSpacing.p20),
           Center(
               child: SvgPicture.asset(
                 AssetConstants.cigeritoDefault,
@@ -54,7 +55,7 @@ class _IntroStepState extends State<IntroStep> {
               color: AppColors.lightForeground.withValues(alpha: 0.6),
             ),
           ),
-          const Spacer(),
+          const SizedBox(height: AppSpacing.p40),
           Text(
             "Tamamen ücretsiz · Reklamsız · Veriler cihazında",
             style: AppTextStyles.micro.copyWith(

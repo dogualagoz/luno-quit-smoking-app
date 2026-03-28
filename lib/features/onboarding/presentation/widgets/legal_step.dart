@@ -26,7 +26,7 @@ class _LegalStepState extends State<LegalStep> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: AppSpacing.pageHorizontal,
       child: Column(
         children: [
@@ -74,7 +74,7 @@ class _LegalStepState extends State<LegalStep> {
               ],
             ),
           ),
-          const Spacer(),
+          const SizedBox(height: AppSpacing.p40),
         ],
       ),
     );

@@ -18,6 +18,7 @@ import 'widgets/summary_step.dart';
 import '../application/onboarding_provider.dart';
 import '../../../core/constants/app_constants.dart';
 
+// --- Ana Ekran Tanımı ---
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -26,11 +27,12 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 }
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
+  // --- Animasyon ve Akış Kontrolü ---
   final PageController _pageController = PageController();
   int _currentPage = 0;
   final int _totalSteps = 10;
 
-  // Form Verileri
+  // --- Geçici Form Verileri (Adımlardan toplanan) ---
   int _dailyCigarettes = 20;
   int _smokingYears = 5;
   double _packetPrice = 75.0;
@@ -53,6 +55,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       }
     });
   }
+
+  // --- Navigasyon Mantığı ---
 
   void _nextPage() {
     if (_currentPage < _totalSteps - 1) {
@@ -93,13 +97,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // --- Düzen Yapısı ---
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
+            _buildHeader(), // İlerleme Çubuğu ve Geri Butonu
             Expanded(
+              // --- Sayfa Geçiş İçeriği ---
               child: PageView(
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
@@ -183,13 +189,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ],
               ),
             ),
-            _buildFixedFooter(),
+            _buildFixedFooter(), // Sabit Devam/Bitir butonu
           ],
         ),
       ),
     );
   }
 
+  // --- Header UI (Step Counter and Progress Bar) ---
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
@@ -218,6 +225,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
+  // --- Footer UI (Floating Action Button) ---
   Widget _buildFixedFooter() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(

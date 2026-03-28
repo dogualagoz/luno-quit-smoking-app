@@ -42,7 +42,7 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: AppSpacing.pageHorizontal,
       child: Column(
         children: [
@@ -169,7 +169,7 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
               ),
             ),
           ),
-          const Spacer(),
+          const SizedBox(height: AppSpacing.p40),
         ],
       ),
     );

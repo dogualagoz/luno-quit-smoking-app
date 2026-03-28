@@ -12,6 +12,7 @@ import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
 
+// --- Ekran Tanımı ve Durumu ---
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
 
@@ -20,7 +21,8 @@ class HistoryScreen extends ConsumerStatefulWidget {
 }
 
 class _HistoryScreenState extends ConsumerState<HistoryScreen> {
-  String _selectedFilter = 'A'; // 'H' (Haftalık), 'A' (Aylık), 'Y' (Yıllık)
+  // Filtreler: 'H' (Haftalık), 'A' (Aylık), 'Y' (Yıllık)
+  String _selectedFilter = 'A';
 
   @override
   void initState() {
@@ -35,7 +37,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // Birim sigara fiyatı hesapla
+    // --- Geçmiş kartları için birim sigara fiyatı hesaplama ---
     final double pricePerCigarette = (userProfile != null && userProfile.cigarettesPerPack > 0)
         ? userProfile.packPrice / userProfile.cigarettesPerPack
         : 0;
@@ -55,7 +57,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.p24),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                          color: theme.colorScheme.primary.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -81,7 +83,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               );
             }
 
-
+            // --- Geçmiş Sayfası Düzeni Oluşturma ---
             return SingleChildScrollView(
               child: Padding(
                 padding: AppSpacing.pageHorizontal,
@@ -97,15 +99,15 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                     ),
                     const SizedBox(height: AppSpacing.p24),
 
-                    // Bugün Kartı (Tekrar İçtim butonu ile)
+                    // --- Bugünün Özeti ve Hızlı Aksiyon Kartı ---
                     TodaySummaryCard(logs: logs),
                     const SizedBox(height: AppSpacing.p24),
 
-                    // Ortalama Kartı (Haftalık)
+                    // --- Ortalama İstatistik Masası ---
                     AverageSummaryCard(logs: logs),
                     const SizedBox(height: AppSpacing.p24),
 
-                    // Sütun Grafiği Kartı
+                    // --- Analitik Grafiği (Haftalık/Aylık/Yıllık) ---
                     LunoCard(
                       padding: AppSpacing.cardPaddingLarge,
                       child: Column(
@@ -140,7 +142,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                     Text("Günlük Kayıtlar", style: AppTextStyles.cardHeader),
                     const SizedBox(height: AppSpacing.p12),
 
-                    // Liste Kartları
+                    // --- Detaylı Aktivite Akışı (Günlük Kayıt Kartları) ---
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -168,7 +170,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     );
   }
 
-  // Hafta, Ay veya Yıl verilerini filtreye göre hesapla
+  // --- Mantık ve Veri İşleme ---
+
+  // Seçilen filtreye (Haftalık, Aylık, Yıllık) göre grafik verilerini filtreler ve hazırlar
   Map<int, int> _calculateChartData(List<dynamic> logs) {
     final now = DateTime.now();
     Map<int, int> data = {};
@@ -229,6 +233,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     }
   }
 
+  // --- UI Bileşen Oluşturucuları ---
+
+  // Grafiğin üstündeki H/A/Y filtre seçim butonlarını oluşturur
   Widget _buildFilterButtons(bool isDark) {
     return Row(
       children: ['H', 'A', 'Y'].map((filter) {
@@ -247,7 +254,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               borderRadius: BorderRadius.circular(12),
               border: isSelected
                   ? null
-                  : Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                  : Border.all(color: Colors.grey.withOpacity(0.3)),
             ),
             child: Text(
               filter,

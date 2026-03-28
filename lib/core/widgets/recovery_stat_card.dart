@@ -36,8 +36,8 @@ class RecoveryStatCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(colorScheme, textTheme),
-            const SizedBox(height: 4),
-            _buildDuration(textTheme),
+            const SizedBox(height: 12),
+            _buildProgress(context, colorScheme, textTheme),
             const Spacer(),
             _buildSubtext(colorScheme, textTheme),
             const SizedBox(height: 2),
@@ -55,19 +55,19 @@ class RecoveryStatCard extends StatelessWidget {
         Container(
           padding: _iconPadding,
           decoration: BoxDecoration(
-            color: AppColors.lightChartPrimary.withValues(alpha: 0.1),
+            color: AppColors.lightChartSuccess.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: const Icon(
-            Icons.healing_outlined,
+            Icons.rocket_launch_outlined, // Healing yerine daha hazırlık odaklı bir ikon
             size: _iconSize,
-            color: AppColors.lightChartPrimary,
+            color: AppColors.lightChartSuccess,
           ),
         ),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
-            stats.recoveryLabel,
+            stats.prepLabel,
             style: textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
               color: colorScheme.onSurface.withValues(alpha: _labelOpacity),
@@ -79,24 +79,50 @@ class RecoveryStatCard extends StatelessWidget {
     );
   }
 
-  /// Süre gösterimi: "3 yıl 8 ay 30 gün"
-  Widget _buildDuration(TextTheme textTheme) {
-    return Wrap(
-      spacing: 2,
-      runSpacing: 2,
-      crossAxisAlignment: WrapCrossAlignment.center,
+  /// Hazırlık ilerlemesi ve yüzde gösterimi
+  Widget _buildProgress(BuildContext context, ColorScheme colorScheme, TextTheme textTheme) {
+    final percentage = (stats.prepPercentage * 100).toInt();
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _durationValue(textTheme, stats.recoveryYears.toString()),
-        _durationUnit(textTheme, "yıl"),
-        _durationValue(textTheme, stats.recoveryMonths.toString()),
-        _durationUnit(textTheme, "ay"),
-        _durationValue(textTheme, stats.recoveryDays.toString()),
-        _durationUnit(textTheme, "gün"),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              "%$percentage",
+              style: textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w900,
+                fontSize: _valueFontSize,
+                color: AppColors.lightChartSuccess,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              "hazır",
+              style: textTheme.labelSmall?.copyWith(
+                fontSize: _unitFontSize,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(999),
+          child: LinearProgressIndicator(
+            value: stats.prepPercentage,
+            backgroundColor: AppColors.lightChartSuccess.withValues(alpha: 0.1),
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.lightChartSuccess),
+            minHeight: 6,
+          ),
+        ),
       ],
     );
   }
 
-  /// Alt açıklama: turuncu nokta + açıklama metni
+  /// Alt açıklama: yeşil nokta + açıklama metni
   Widget _buildSubtext(ColorScheme colorScheme, TextTheme textTheme) {
     return Row(
       children: [
@@ -104,14 +130,14 @@ class RecoveryStatCard extends StatelessWidget {
           width: _indicatorDotSize,
           height: _indicatorDotSize,
           decoration: const BoxDecoration(
-            color: AppColors.lightChartWarning,
+            color: AppColors.lightChartSuccess,
             shape: BoxShape.circle,
           ),
         ),
         const SizedBox(width: 4),
         Expanded(
           child: Text(
-            stats.recoverySubtext,
+            stats.prepSubtext,
             style: textTheme.labelSmall?.copyWith(
               color: colorScheme.onSurface.withValues(alpha: _subtextOpacity),
               fontSize: _subtextFontSize,
@@ -124,41 +150,16 @@ class RecoveryStatCard extends StatelessWidget {
     );
   }
 
-  /// Aksiyon metni: "🌱 bırakırsan ne olur? — dokun"
+  /// Aksiyon metni: "Bırakmaya hazır mısın? — dokun"
   Widget _buildAction(ColorScheme colorScheme, TextTheme textTheme) {
     return Text(
-      stats.recoveryAction,
+      stats.prepAction,
       style: textTheme.labelSmall?.copyWith(
         color: colorScheme.onSurface.withValues(alpha: _actionOpacity),
         fontSize: _subtextFontSize,
       ),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-    );
-  }
-
-  // — Yardımcı Widget'lar —
-
-  Widget _durationValue(TextTheme textTheme, String val) {
-    return Text(
-      val,
-      style: textTheme.headlineSmall?.copyWith(
-        fontWeight: FontWeight.w900,
-        fontSize: _valueFontSize,
-      ),
-    );
-  }
-
-  Widget _durationUnit(TextTheme textTheme, String unit) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 4.0),
-      child: Text(
-        unit,
-        style: textTheme.labelSmall?.copyWith(
-          fontSize: _unitFontSize,
-          color: Colors.grey,
-        ),
-      ),
     );
   }
 }

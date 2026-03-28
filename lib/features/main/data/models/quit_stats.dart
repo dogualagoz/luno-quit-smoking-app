@@ -25,13 +25,11 @@ class QuitStats {
   final String countValue; // "18.250"
   final String countSubtext; // "1.5 km — Everest'e tırmanabilirdin"
 
-  // — İyileşme Süresi Kartı —
-  final String recoveryLabel; // "İyileşme Süresi"
-  final int recoveryYears; // 3
-  final int recoveryMonths; // 8
-  final int recoveryDays; // 30
-  final String recoverySubtext; // "içmeye devam ettikçe artıyor"
-  final String recoveryAction; // "🌱 bırakırsan ne olur? — dokun"
+  // — Hazırlık Seviyesi Kartı (Eski İyileşme Süresi) —
+  final String prepLabel; // "Hazırlık Seviyesi"
+  final double prepPercentage; // 0.0 - 1.0 (örn: 0.45)
+  final String prepSubtext; // "Bırakmaya %45 hazırsın"
+  final String prepAction; // "Bırakmaya hazır mısın? — dokun"
 
   // — Organ Hasar Verileri —
   final List<OrganDamageModel> organDamages;
@@ -58,12 +56,10 @@ class QuitStats {
     required this.countLabel,
     required this.countValue,
     required this.countSubtext,
-    required this.recoveryLabel,
-    required this.recoveryYears,
-    required this.recoveryMonths,
-    required this.recoveryDays,
-    required this.recoverySubtext,
-    required this.recoveryAction,
+    required this.prepLabel,
+    required this.prepPercentage,
+    required this.prepSubtext,
+    required this.prepAction,
     this.organDamages = const [],
     this.totalDamageScore = 0.0,
     required this.progress,

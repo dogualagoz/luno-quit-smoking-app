@@ -8,6 +8,7 @@ import 'package:luno_quit_smoking_app/features/damage/widgets/total_damage_card.
 import 'package:luno_quit_smoking_app/features/damage/widgets/damage_header.dart';
 import 'package:luno_quit_smoking_app/core/widgets/speech_bubble.dart';
 import 'package:luno_quit_smoking_app/features/main/application/stats_provider.dart';
+import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
 
 class DamageScreen extends ConsumerWidget {
@@ -16,13 +17,12 @@ class DamageScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final stats = ref.watch(statsProvider);
+    final profile = ref.watch(userProfileProvider); // Profile'dan yılların bilgisini al
+
     return stats.when(
       data: (statsData) {
         final organs = statsData.organDamages;
-        final totalDays =
-            statsData.recoveryYears * 365 +
-            statsData.recoveryMonths * 30 +
-            statsData.recoveryDays;
+        final totalYears = profile?.smokingYears ?? 0;
 
         return Scaffold(
           body: SafeArea(
@@ -61,7 +61,7 @@ class DamageScreen extends ConsumerWidget {
                     // 4. Genel Hasar Skoru (Dinamik)
                     TotalDamageCard(
                       damageScore: statsData.totalDamageScore,
-                      subtext: "$totalDays günde birikmiş toplam hasar",
+                      subtext: "$totalYears yıla yayılmış toplam hasar",
                     ),
 
                     const SizedBox(height: AppSpacing.p24),
