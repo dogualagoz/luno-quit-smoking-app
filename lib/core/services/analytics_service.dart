@@ -22,7 +22,7 @@ class AnalyticsService {
     await _analytics.logEvent(name: 'onboarding_completed');
   }
 
-  // --- Temel Kullanım Olayları ---
+  // --- Temel Kullanım Olayları 
   Future<void> logSmokeLogged({int? count, String? reason}) async {
     await _analytics.logEvent(
       name: 'smoke_logged',
