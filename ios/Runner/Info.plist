@@ -9,7 +9,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.763643886491-cr8214f4enrgugdn4cu6ur70hrlbumoj</string>
+				<string>com.googleusercontent.apps.763643886491-pm3uklp9iurr95s9mh5lgh8ku009jf6c</string>
 			</array>
 		</dict>
 	</array>
@@ -28,7 +28,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>luno_quit_smoking_app</string>
+	<string>cigerito</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

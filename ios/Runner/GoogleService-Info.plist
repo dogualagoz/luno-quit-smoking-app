@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>763643886491-cr8214f4enrgugdn4cu6ur70hrlbumoj.apps.googleusercontent.com</string>
+	<string>763643886491-pm3uklp9iurr95s9mh5lgh8ku009jf6c.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.763643886491-cr8214f4enrgugdn4cu6ur70hrlbumoj</string>
+	<string>com.googleusercontent.apps.763643886491-pm3uklp9iurr95s9mh5lgh8ku009jf6c</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>763643886491-an75feffflt5vmi6i511tg6rkp544s0k.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.lunoQuitSmokingApp</string>
+	<string>com.dogualagoz.cigerito</string>
 	<key>PROJECT_ID</key>
 	<string>luno-quit-smoking-app</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:763643886491:ios:79f6d2e9395e6b077bff3e</string>
+	<string>1:763643886491:ios:6206ef385c189ead7bff3e</string>
 </dict>
 </plist>

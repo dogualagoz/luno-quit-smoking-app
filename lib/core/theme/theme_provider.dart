@@ -8,7 +8,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   static const String _themeKey = 'app_theme_mode';
   late final Box _box;
 
-  ThemeModeNotifier() : super(ThemeMode.system) {
+  ThemeModeNotifier() : super(ThemeMode.light) {
     _init();
   }
 
@@ -21,7 +21,8 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
       } else if (savedTheme == ThemeMode.dark.index) {
         state = ThemeMode.dark;
       } else {
-        state = ThemeMode.system;
+        // If there wasn't a choice or it was system, now we default to light as per user request
+        state = ThemeMode.light;
       }
     }
   }

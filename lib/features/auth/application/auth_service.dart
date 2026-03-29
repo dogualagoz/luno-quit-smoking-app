@@ -36,6 +36,16 @@ class AuthService {
     return null;
   }
 
+  /// Apple ile giriş yapar ve verileri senkronize eder.
+  Future<User?> signInWithApple() async {
+    final credential = await _authRepository.signInWithApple();
+    if (credential != null && credential.user != null) {
+      await _handleUserSync(credential.user!);
+      return credential.user;
+    }
+    return null;
+  }
+
   Future<User?> signInWithEmailAndPassword(
     String email,
     String password,

@@ -1,5 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
+import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// [authRepositoryProvider], uygulamanın herhangi bir yerinden (UI, Logic)
@@ -57,6 +61,48 @@ class AuthRepository {
       // Hata oluşursa hatayı bir üst katmana (Controller'a) fırlatır
       rethrow;
     }
+  }
+
+  /// Apple ile güvenli giriş yapma metodur.
+  Future<UserCredential?> signInWithApple() async {
+    try {
+      final rawNonce = _generateNonce();
+      final nonce = _sha256ofString(rawNonce);
+
+      // 1. Apple kimlik doğrulama isteği gönderilir
+      final appleIdCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+
+      // 2. Apple'dan gelen bilgileri Firebase'in anlayacağı bir "Credential" haline getirilir
+      final OAuthCredential credential = OAuthProvider('apple.com').credential(
+        idToken: appleIdCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+
+      // 3. Firebase'e bu belgeyle giriş yapmasını söyler
+      return await _auth.signInWithCredential(credential);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Güvenli giriş için rastgele nonce üretir (Replay attack koruması)
+  String _generateNonce([int length = 32]) {
+    const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(length, (_) => charset[random.nextInt(charset.length)]).join();
+  }
+
+  /// String'i SHA-256 ile hashler
+  String _sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
   }
 
   /// Klasik E-posta ve Şifre ile giriş yapma metodur.

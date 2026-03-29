@@ -73,7 +73,9 @@ class AuthSelectionScreen extends ConsumerWidget {
                     text: 'Apple ile devam et',
                     backgroundColor: const Color(0xFF2D2A3E),
                     textColor: Colors.white,
-                    onPressed: () => context.go('/'),
+                    onPressed: () => ref
+                        .read(authControllerProvider.notifier)
+                        .signInWithApple(),
                   ),
                   const SizedBox(height: AppSpacing.p16),
                   _AuthButton(

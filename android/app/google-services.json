@@ -7,6 +7,42 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:763643886491:android:20b274f1d92e06de7bff3e",
+        "android_client_info": {
+          "package_name": "com.dogualagoz.cigerito"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "763643886491-jfgsib89pj00qrcl69532t5q9u7kuumd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFd9Vf0n2-oOQAI3pf_yBeBd1i_ySClzI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "763643886491-jfgsib89pj00qrcl69532t5q9u7kuumd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "763643886491-cr8214f4enrgugdn4cu6ur70hrlbumoj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.lunoQuitSmokingApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:763643886491:android:e275f82b8db451d67bff3e",
         "android_client_info": {
           "package_name": "com.example.luno_quit_smoking_app"

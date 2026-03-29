@@ -67,6 +67,6 @@ class DefaultFirebaseOptions {
         '763643886491-an75feffflt5vmi6i511tg6rkp544s0k.apps.googleusercontent.com',
     iosClientId:
         '763643886491-cr8214f4enrgugdn4cu6ur70hrlbumoj.apps.googleusercontent.com',
-    iosBundleId: 'com.example.lunoQuitSmokingApp',
+    iosBundleId: 'com.dogualagoz.cigerito',
   );
 }

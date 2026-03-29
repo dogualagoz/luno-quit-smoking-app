@@ -1,4 +1,4 @@
-package com.example.luno_quit_smoking_app
+package com.dogualagoz.cigerito
 
 import io.flutter.embedding.android.FlutterActivity
 
