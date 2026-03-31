@@ -204,6 +204,7 @@
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				31ABF1185981BB5CAFBCC95D /* [CP] Embed Pods Frameworks */,
 				62F8BFFF24C47F82C11F96DE /* [CP] Copy Pods Resources */,
+				DB1D19A12F7C18C7004FB7BA /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -362,6 +363,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
+		};
+		DB1D19A12F7C18C7004FB7BA /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 12;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/FirebaseCrashlytics/run\"\n";
 		};
 		E4475CF129334BE65E637621 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

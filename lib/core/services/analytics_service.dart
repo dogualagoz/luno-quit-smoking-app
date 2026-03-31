@@ -28,7 +28,7 @@ class AnalyticsService {
       name: 'smoke_logged',
       parameters: {
         'count': count ?? 1,
-        'has_reason': reason != null && reason.isNotEmpty,
+        'has_reason': (reason != null && reason.isNotEmpty) ? 1 : 0,
       },
     );
   }
