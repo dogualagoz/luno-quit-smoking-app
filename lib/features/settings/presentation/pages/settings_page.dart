@@ -13,6 +13,7 @@ import '../widgets/settings_menu_tile.dart';
 import '../controllers/settings_controller.dart';
 import 'about_page.dart';
 import 'cigerito_customization_page.dart';
+import 'error_preview_page.dart';
 import '../../../onboarding/data/onboarding_repository.dart';
 import '../../../../core/theme/theme_provider.dart';
 import 'package:intl/intl.dart';
@@ -153,12 +154,15 @@ class SettingsPage extends ConsumerWidget {
                       ),
                       const Divider(height: 1),
                       SettingsMenuTile(
-                        title: "Ciğerito Özelleştirme",
+                        title: "Ciğerito Özelleştirme (Yakında)",
                         icon: Icons.face_retouching_natural_rounded,
                         onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (_) => const CigeritoCustomizationPage()),
+                          // Bu özellik V1.1 sürümünde gelecek
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Bu özellik çok yakında sizlerle!"),
+                              duration: Duration(seconds: 2),
+                            ),
                           );
                         },
                       ),
@@ -194,6 +198,19 @@ class SettingsPage extends ConsumerWidget {
                           if (await canLaunchUrl(emailLaunchUri)) {
                             await launchUrl(emailLaunchUri);
                           }
+                        },
+                      ),
+                      const Divider(height: 1),
+                      // TEST: Hata Ekranı Önizleme
+                      SettingsMenuTile(
+                        title: "Hata Ekranı Testi (Geliştirici)",
+                        icon: Icons.bug_report_outlined,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const ErrorPreviewPage(),
+                            ),
+                          );
                         },
                       ),
                     ],

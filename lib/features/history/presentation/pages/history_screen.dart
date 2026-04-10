@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:luno_quit_smoking_app/core/widgets/luno_error_widget.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/features/history/application/history_provider.dart';
@@ -164,7 +165,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             );
           },
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => Center(child: Text("Hata oluştu: $err")),
+          error: (err, stack) => LunoErrorWidget(
+            onRetry: () => ref.invalidate(historyLogsProvider),
+          ),
         ),
       ),
     );

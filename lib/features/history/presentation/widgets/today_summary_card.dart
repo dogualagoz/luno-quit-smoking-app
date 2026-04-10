@@ -77,6 +77,9 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
           log.date.day == yesterdayDate.day;
     }).toList();
 
+    // Dün kayıt girilmiş mi? (Yanlış kıyaslama yapmamak için kritik)
+    final bool hasYesterdayLogs = yesterdayLogs.isNotEmpty;
+
     final int yesterdaySmoked = yesterdayLogs
         .where((log) => _getLogType(log) == 'slip')
         .fold(0, (sum, log) => sum + (log.smokeCount as int));
@@ -124,12 +127,14 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
                       : null,
                   hasSmoked: hasSmokedToday,
                   primaryColor: primary,
-                  comparisonData: _getComparisonData(
-                    current: todaySmoked.toDouble(),
-                    previous: yesterdaySmoked.toDouble(),
-                    unit: "sigara",
-                    isImprovementBetter: false,
-                  ),
+                  comparisonData: hasYesterdayLogs
+                      ? _getComparisonData(
+                          current: todaySmoked.toDouble(),
+                          previous: yesterdaySmoked.toDouble(),
+                          unit: "sigara",
+                          isImprovementBetter: false,
+                        )
+                      : null,
                 ),
                 // Slide 2: Günlük Maliyet (Finansal)
                 _buildSlide(
@@ -148,13 +153,15 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
                   ),
                   hasSmoked: hasSmokedToday,
                   primaryColor: AppColors.lightChartPrimary,
-                  comparisonData: _getComparisonData(
-                    current: todayCost,
-                    previous: yesterdayCost,
-                    unit: "TL",
-                    isImprovementBetter: false,
-                    isCurrency: true,
-                  ),
+                  comparisonData: hasYesterdayLogs
+                      ? _getComparisonData(
+                          current: todayCost,
+                          previous: yesterdayCost,
+                          unit: "TL",
+                          isImprovementBetter: false,
+                          isCurrency: true,
+                        )
+                      : null,
                 ),
                 // Slide 3: Zaman Kaybı
                 _buildSlide(
@@ -169,12 +176,14 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
                   ),
                   hasSmoked: hasSmokedToday,
                   primaryColor: Colors.blueGrey,
-                  comparisonData: _getComparisonData(
-                    current: todayTimeLostMinutes.toDouble(),
-                    previous: yesterdayTimeLostMinutes.toDouble(),
-                    unit: "dakika",
-                    isImprovementBetter: false,
-                  ),
+                  comparisonData: hasYesterdayLogs
+                      ? _getComparisonData(
+                          current: todayTimeLostMinutes.toDouble(),
+                          previous: yesterdayTimeLostMinutes.toDouble(),
+                          unit: "dakika",
+                          isImprovementBetter: false,
+                        )
+                      : null,
                 ),
               ],
             ),

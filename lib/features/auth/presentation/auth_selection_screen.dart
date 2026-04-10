@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../core/constants/asset_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/widgets/cigerito_mascot.dart';
 import '../../../core/widgets/speech_bubble.dart';
 import 'controllers/auth_controller.dart';
+import '../../../core/utils/error_translator.dart';
 
 class AuthSelectionScreen extends ConsumerWidget {
   final String userName;
@@ -17,21 +19,23 @@ class AuthSelectionScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authControllerProvider);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     // Hataları dinleyip kullanıcıya gösteriyoruz
     ref.listen<AsyncValue<void>>(authControllerProvider, (previous, next) {
       if (next is AsyncError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.error.toString()),
-            backgroundColor: AppColors.lightDestructive,
+            content: Text(ErrorTranslator.translate(next.error)),
+            backgroundColor: theme.colorScheme.error,
           ),
         );
       }
     });
 
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Stack(
           children: [
@@ -41,8 +45,11 @@ class AuthSelectionScreen extends ConsumerWidget {
                 children: [
                   const SizedBox(height: AppSpacing.p40),
                   // Maskot Bölümü
-                  const Center(
-                    child: CigeritoMascot(mode: MascotMode.proud, size: 140),
+                  Center(
+                    child: SvgPicture.asset(
+                      AssetConstants.cigeritoDefault,
+                      height: 140,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.p16),
                   Row(
@@ -52,7 +59,7 @@ class AuthSelectionScreen extends ConsumerWidget {
                       Text(
                         'Onboarding tamamlandı!',
                         style: AppTextStyles.label.copyWith(
-                          color: AppColors.lightMutedForeground,
+                          color: theme.hintColor,
                         ),
                       ),
                       const Text(' ✨', style: TextStyle(fontSize: 16)),
@@ -81,9 +88,9 @@ class AuthSelectionScreen extends ConsumerWidget {
                   _AuthButton(
                     iconPath: Icons.g_mobiledata, // Yerici Google ikonu
                     text: 'Google ile devam et',
-                    backgroundColor: Colors.white,
-                    textColor: AppColors.lightForeground,
-                    border: Border.all(color: AppColors.lightBorder),
+                    backgroundColor: colorScheme.surface,
+                    textColor: colorScheme.onSurface,
+                    border: Border.all(color: theme.dividerColor),
                     onPressed: () => ref
                         .read(authControllerProvider.notifier)
                         .signInWithGoogle(),
@@ -92,17 +99,17 @@ class AuthSelectionScreen extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.p24),
                   Row(
                     children: [
-                      Expanded(child: Divider(color: AppColors.lightBorder)),
+                      Expanded(child: Divider(color: theme.dividerColor)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
                           'veya',
                           style: AppTextStyles.caption.copyWith(
-                            color: AppColors.lightMutedForeground,
+                            color: theme.hintColor,
                           ),
                         ),
                       ),
-                      Expanded(child: Divider(color: AppColors.lightBorder)),
+                      Expanded(child: Divider(color: theme.dividerColor)),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.p24),
@@ -110,9 +117,9 @@ class AuthSelectionScreen extends ConsumerWidget {
                   _AuthButton(
                     iconPath: Icons.mail_outline,
                     text: 'E-posta ile giriş yap',
-                    backgroundColor: Colors.white,
-                    textColor: AppColors.lightForeground,
-                    border: Border.all(color: AppColors.lightBorder),
+                    backgroundColor: colorScheme.surface,
+                    textColor: colorScheme.onSurface,
+                    border: Border.all(color: theme.dividerColor),
                     onPressed: () => context.push('/email-login'),
                   ),
                   const SizedBox(height: AppSpacing.p16),
@@ -121,10 +128,10 @@ class AuthSelectionScreen extends ConsumerWidget {
                   _AuthButton(
                     iconPath: Icons.face_retouching_natural_outlined,
                     text: 'Anonim olarak devam et',
-                    backgroundColor: AppColors.lightMuted.withValues(
-                      alpha: 0.3,
-                    ),
-                    textColor: AppColors.lightMutedForeground,
+                    backgroundColor: theme.brightness == Brightness.light 
+                        ? AppColors.lightMuted.withValues(alpha: 0.3)
+                        : colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                    textColor: theme.hintColor,
                     isDotted: true,
                     onPressed: () => context.go('/'),
                   ),
@@ -142,7 +149,7 @@ class AuthSelectionScreen extends ConsumerWidget {
                       "Anonim girişte verilerin yalnızca bu cihazda saklanır. Hesap oluşturursan cihazlar arası senkron yapabilirsin.",
                       textAlign: TextAlign.center,
                       style: AppTextStyles.micro.copyWith(
-                        color: AppColors.lightForeground.withValues(alpha: 0.6),
+                        color: colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ),
@@ -156,7 +163,7 @@ class AuthSelectionScreen extends ConsumerWidget {
                       Text(
                         'Devam ederek ',
                         style: AppTextStyles.micro.copyWith(
-                          color: AppColors.lightMutedForeground,
+                          color: theme.hintColor,
                         ),
                       ),
                       InkWell(
@@ -164,7 +171,7 @@ class AuthSelectionScreen extends ConsumerWidget {
                         child: Text(
                           'Kullanım Koşulları',
                           style: AppTextStyles.micro.copyWith(
-                            color: AppColors.lightMutedForeground,
+                            color: theme.hintColor,
                             decoration: TextDecoration.underline,
                           ),
                         ),
@@ -172,7 +179,7 @@ class AuthSelectionScreen extends ConsumerWidget {
                       Text(
                         ' ve ',
                         style: AppTextStyles.micro.copyWith(
-                          color: AppColors.lightMutedForeground,
+                          color: theme.hintColor,
                         ),
                       ),
                       InkWell(
@@ -180,7 +187,7 @@ class AuthSelectionScreen extends ConsumerWidget {
                         child: Text(
                           'Gizlilik Politikası',
                           style: AppTextStyles.micro.copyWith(
-                            color: AppColors.lightMutedForeground,
+                            color: theme.hintColor,
                             decoration: TextDecoration.underline,
                           ),
                         ),
@@ -188,7 +195,7 @@ class AuthSelectionScreen extends ConsumerWidget {
                       Text(
                         '\'nı kabul edersin.',
                         style: AppTextStyles.micro.copyWith(
-                          color: AppColors.lightMutedForeground,
+                          color: theme.hintColor,
                         ),
                       ),
                     ],
@@ -252,7 +259,7 @@ class _AuthButton extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: AppRadius.button,
                     border: Border.all(
-                      color: AppColors.lightBorder,
+                      color: Theme.of(context).dividerColor,
                       style: BorderStyle.solid,
                     ),
                   ),

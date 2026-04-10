@@ -99,7 +99,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget build(BuildContext context) {
     // --- Düzen Yapısı ---
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -198,14 +198,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   // --- Header UI (Step Counter and Progress Bar) ---
   Widget _buildHeader() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back,
-              color: AppColors.lightForeground,
+              color: colorScheme.onSurface,
             ),
             onPressed: _currentPage > 0 ? _previousPage : null,
           ),
@@ -215,9 +218,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           const SizedBox(width: 16),
           Text(
             "${_currentPage + 1}/$_totalSteps",
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: AppColors.lightForeground,
+              color: colorScheme.onSurface,
             ),
           ),
         ],

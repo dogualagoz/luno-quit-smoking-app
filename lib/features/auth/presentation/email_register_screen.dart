@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../core/constants/asset_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/widgets/cigerito_mascot.dart';
 import '../../../core/widgets/speech_bubble.dart';
 import 'controllers/auth_controller.dart';
+import '../../../core/utils/error_translator.dart';
 
 class EmailRegisterScreen extends ConsumerStatefulWidget {
   const EmailRegisterScreen({super.key});
@@ -38,7 +40,7 @@ class _EmailRegisterScreenState extends ConsumerState<EmailRegisterScreen> {
       if (next is AsyncError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.error.toString()),
+            content: Text(ErrorTranslator.translate(next.error)),
             backgroundColor: AppColors.lightDestructive,
           ),
         );
@@ -60,8 +62,11 @@ class _EmailRegisterScreenState extends ConsumerState<EmailRegisterScreen> {
           child: Column(
             children: [
               // Maskot ve Konuşma Balonu
-              const Center(
-                child: CigeritoMascot(mode: MascotMode.happy, size: 100),
+              Center(
+                child: SvgPicture.asset(
+                  AssetConstants.cigeritoDefault,
+                  height: 100,
+                ),
               ),
               const SizedBox(height: AppSpacing.p12),
               const SpeechBubble(text: "Yeni hesap oluştur, ben seni unutmam!"),

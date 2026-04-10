@@ -1,4 +1,5 @@
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:luno_quit_smoking_app/core/widgets/luno_error_widget.dart';
 import 'package:luno_quit_smoking_app/core/constants/asset_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -130,7 +131,9 @@ class DamageScreen extends ConsumerWidget {
       },
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (err, stack) => Scaffold(body: Center(child: Text('Error: $err'))),
+      error: (err, stack) => LunoErrorWidget(
+        onRetry: () => ref.invalidate(statsProvider),
+      ),
     );
   }
 }

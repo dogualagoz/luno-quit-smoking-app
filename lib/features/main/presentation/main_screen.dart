@@ -17,6 +17,7 @@ import 'package:luno_quit_smoking_app/features/history/application/history_provi
 import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
 import 'package:luno_quit_smoking_app/core/widgets/mascot_animation.dart';
+import 'package:luno_quit_smoking_app/core/widgets/luno_error_widget.dart';
 
 // --- Ana Dashboard Ekranı (Uygulamanın Merkezi) ---
 class MainScreen extends ConsumerStatefulWidget {
@@ -131,7 +132,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             ),
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => Center(child: Text('Hata: $err')),
+          error: (err, stack) => LunoErrorWidget(
+            onRetry: () => ref.invalidate(statsProvider),
+          ),
         ),
       ),
       // --- Yüzen Aksiyon Butonu (Yeni Kriz/Kaçamak Kaydı) ---
