@@ -192,7 +192,7 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
                 decoration: BoxDecoration(
                   color: _currentPage == index
                       ? primary
-                      : primary.withOpacity(0.2),
+                      : primary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(3),
                 ),
               );
@@ -221,7 +221,7 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
                   style: AppTextStyles.caption.copyWith(
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.8),
+                    ).colorScheme.onSurface.withValues(alpha: 0.8),
                     fontStyle: FontStyle.italic,
                   ),
                   textAlign: TextAlign.center,
@@ -291,7 +291,7 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: comparisonColor?.withOpacity(0.1),
+                            color: comparisonColor?.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -313,7 +313,7 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
                   style: AppTextStyles.body.copyWith(
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.5),
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
                     fontSize: 12,
                   ),
                 ),
@@ -328,7 +328,7 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
                   fontSize: 14,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -391,7 +391,7 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -416,7 +416,7 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(isDark ? 0.2 : 0.1),
+        color: color.withValues(alpha: isDark ? 0.2 : 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

@@ -125,7 +125,7 @@ class _TriggerMomentsStepState extends State<TriggerMomentsStep> {
                 ),
               ),
             );
-          }).toList(),
+          }),
           const SizedBox(height: AppSpacing.p40),
         ],
       ),

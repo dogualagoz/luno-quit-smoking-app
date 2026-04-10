@@ -150,7 +150,7 @@ class _TryingCountStepState extends State<TryingCountStep> {
                 ),
               ),
             );
-          }).toList(),
+          }),
           const SizedBox(height: AppSpacing.p40),
         ],
       ),

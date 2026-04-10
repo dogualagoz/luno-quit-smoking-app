@@ -57,7 +57,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.p24),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withOpacity(0.1),
+                          color: theme.colorScheme.primary.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -254,7 +254,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               borderRadius: BorderRadius.circular(12),
               border: isSelected
                   ? null
-                  : Border.all(color: Colors.grey.withOpacity(0.3)),
+                  : Border.all(color: Colors.grey.withValues(alpha: 0.3)),
             ),
             child: Text(
               filter,
