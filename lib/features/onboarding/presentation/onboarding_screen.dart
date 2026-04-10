@@ -15,6 +15,9 @@ import 'widgets/reasons_step.dart';
 import 'widgets/trigger_moments_step.dart';
 import 'widgets/final_legal_step.dart';
 import 'widgets/summary_step.dart';
+import 'widgets/years_interstitial_step.dart';
+import 'widgets/cigarettes_interstitial_step.dart';
+import 'widgets/money_interstitial_step.dart';
 import '../application/onboarding_provider.dart';
 import '../../../core/constants/app_constants.dart';
 
@@ -30,7 +33,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   // --- Animasyon ve Akış Kontrolü ---
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  final int _totalSteps = 10;
+  final int _totalSteps = 13; // Interstitials (3) eklendi
 
   // --- Geçici Form Verileri (Adımlardan toplanan) ---
   int _dailyCigarettes = 20;
@@ -129,9 +132,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     onValidStateChanged: (isValid) =>
                         _updateButtonState(isEnabled: isValid),
                   ),
+                  YearsInterstitialStep(
+                    smokingYears: _smokingYears,
+                    onValidStateChanged: (isValid) =>
+                        _updateButtonState(isEnabled: isValid),
+                  ),
                   DailyCigarettesStep(
                     initialValue: _dailyCigarettes,
                     onValueChanged: (val) => _dailyCigarettes = val,
+                    onValidStateChanged: (isValid) =>
+                        _updateButtonState(isEnabled: isValid),
+                  ),
+                  CigarettesInterstitialStep(
+                    smokingYears: _smokingYears,
+                    dailyCigarettes: _dailyCigarettes,
                     onValidStateChanged: (isValid) =>
                         _updateButtonState(isEnabled: isValid),
                   ),
@@ -139,6 +153,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     initialValue: _packetPrice,
                     dailyCigarettes: _dailyCigarettes,
                     onValueChanged: (val) => _packetPrice = val,
+                  ),
+                  MoneyInterstitialStep(
+                    dailyCigarettes: _dailyCigarettes,
+                    packetPrice: _packetPrice,
+                    onValidStateChanged: (isValid) =>
+                        _updateButtonState(isEnabled: isValid),
                   ),
                   TryingCountStep(
                     initialValue: _tryingCount,

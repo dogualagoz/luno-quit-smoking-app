@@ -56,12 +56,7 @@ class _IntroStepState extends State<IntroStep> {
             ),
           ),
           const SizedBox(height: AppSpacing.p40),
-          Text(
-            "Tamamen ücretsiz · Reklamsız · Veriler cihazında",
-            style: AppTextStyles.micro.copyWith(
-              color: AppColors.lightMutedForeground,
-            ),
-          ),
+
           const SizedBox(height: 16),
         ],
       ),

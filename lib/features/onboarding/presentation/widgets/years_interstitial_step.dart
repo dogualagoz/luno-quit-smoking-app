@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
-import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
-import 'package:luno_quit_smoking_app/core/theme/app_radius.dart';
 import 'package:luno_quit_smoking_app/core/widgets/speech_bubble.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:luno_quit_smoking_app/core/constants/asset_constants.dart';
 
-class LegalStep extends StatefulWidget {
+class YearsInterstitialStep extends StatefulWidget {
+  final int smokingYears;
   final Function(bool) onValidStateChanged;
 
-  const LegalStep({super.key, required this.onValidStateChanged});
+  const YearsInterstitialStep({
+    super.key,
+    required this.smokingYears,
+    required this.onValidStateChanged,
+  });
 
   @override
-  State<LegalStep> createState() => _LegalStepState();
+  State<YearsInterstitialStep> createState() => _YearsInterstitialStepState();
 }
 
-class _LegalStepState extends State<LegalStep> {
+class _YearsInterstitialStepState extends State<YearsInterstitialStep> {
   @override
   void initState() {
     super.initState();
@@ -29,22 +32,20 @@ class _LegalStepState extends State<LegalStep> {
     return SingleChildScrollView(
       padding: AppSpacing.pageHorizontal,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(height: AppSpacing.p20),
-          const SizedBox(height: AppSpacing.p20),
+          const SizedBox(height: AppSpacing.p40),
           Center(
             child: SvgPicture.asset(
-              AssetConstants.cigeritoDefault,
+              AssetConstants.cigeritoDefault, // Veya 'default_cigerito.svg' yerine uyarsa
               height: AppMascotSizes.hero,
             ),
           ),
           const SizedBox(height: AppSpacing.p32),
-          const SpeechBubble(
+          SpeechBubble(
             text:
-                "Burada kimse seni yargılamaz.\n\nBu yolculuk senin iradenle ve doğru verilerle şekillenecek. Lütfen sorulara dürüst yanıt ver ki sana en iyi şekilde yardımcı olabileyim.",
+                "${widget.smokingYears} yıl içmişsin ha? Merak etme, birlikte bırakmamız ${widget.smokingYears} gün bile sürmeyecek!",
           ),
-          const SizedBox(height: AppSpacing.p40),
-
         ],
       ),
     );

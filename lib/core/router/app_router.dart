@@ -4,7 +4,7 @@ import '../../features/main/presentation/main_screen.dart';
 import '../../core/widgets/main_shell.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/damage/presentation/damage_screen.dart';
-import '../../features/onboarding/presentation/onboarding_screen.dart';
+import '../../features/onboarding/presentation/welcome_screen.dart';
 import '../../features/auth/presentation/auth_selection_screen.dart';
 import '../../features/auth/presentation/email_login_screen.dart';
 import '../../features/auth/presentation/email_register_screen.dart';
@@ -20,6 +20,7 @@ import '../../features/main/presentation/pages/details/time_details_screen.dart'
 import '../../features/main/presentation/pages/details/recovery_details_screen.dart';
 import '../services/analytics_service.dart';
 import '../providers/firebase_providers.dart';
+import '../../features/splash_screen/presentation/splash_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -27,7 +28,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final AnalyticsService analytics = ref.watch(analyticsServiceProvider);
 
   return GoRouter(
-    initialLocation: AppRouter.onboarding,
+    initialLocation: AppRouter.splash,
     observers: [analytics.getObserver()],
     redirect: (context, state) {
       final isLoggedIn = authState.value != null;
@@ -39,14 +40,15 @@ final routerProvider = Provider<GoRouter>((ref) {
           state.matchedLocation == AppRouter.emailLogin ||
           state.matchedLocation == AppRouter.register;
 
-      // 1. Giriş yapılmışsa ve auth sayfalarındaysa -> Ana Sayfa
+      // 1. Giriş yapılmışsa ve auth veya onboarding sayfalarındaysa -> Ana Sayfa
       if (isLoggedIn && (goingToAuth || goingToOnboarding)) {
         return AppRouter.root;
       }
 
-      // 2. Giriş yapılmamışsa ama onboarding bitmişse ve onboarding sayfasındaysa -> Auth Selection
-      if (!isLoggedIn && isBoardingFinished && goingToOnboarding) {
-        return AppRouter.authSelection;
+      // 2. Giriş yapılmamışsa ve auth sayfasında değilse (veya splash'ten geliyorsa) -> Onboarding (WelcomeScreen)
+      // Bu sayede kullanıcıyı her zaman WelcomeScreen karşılar.
+      if (!isLoggedIn && !goingToOnboarding && !goingToAuth && state.matchedLocation != AppRouter.splash) {
+        return AppRouter.onboarding;
       }
 
       // 3. Hiçbir durum uymuyorsa olduğu yerde kalsın
@@ -54,8 +56,12 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(
+        path: AppRouter.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
         path: AppRouter.onboarding,
-        builder: (context, state) => const OnboardingScreen(),
+        builder: (context, state) => const WelcomeScreen(),
       ),
       GoRoute(
         path: AppRouter.authSelection,
@@ -152,6 +158,7 @@ class AppRouter {
 
   // Ana sayfanın adresi
   static const String root = '/';
+  static const String splash = '/splash';
   static const String onboarding = '/onboarding';
   static const String authSelection = '/auth-selection';
   static const String emailLogin = '/email-login';

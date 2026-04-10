@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart'; // Yatay geçişler için gerekebilir
 import 'app_colors.dart';
 import 'app_text_styles.dart';
 import 'app_radius.dart';
@@ -44,12 +45,12 @@ abstract final class AppTheme {
       titleMedium: AppTextStyles.cardHeader,
       bodyLarge: AppTextStyles.body,
       bodyMedium: AppTextStyles.bodySemibold,
-      titleLarge: AppTextStyles.summaryValue, // 20.8px/w800
-      headlineSmall: AppTextStyles.statValue, // 24px/w700
-      bodySmall: AppTextStyles.caption, // 12.5px/w400
+      titleLarge: AppTextStyles.summaryValue,
+      headlineSmall: AppTextStyles.statValue,
+      bodySmall: AppTextStyles.caption,
       labelSmall: AppTextStyles.hint.copyWith(
         color: AppColors.lightMutedForeground,
-      ), // 11.5px/w400
+      ),
     ),
     // Kart Teması
     cardTheme: CardThemeData(
@@ -71,7 +72,15 @@ abstract final class AppTheme {
         elevation: 0,
       ),
     ),
+    // Sayfa Geçiş Teması 
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: <TargetPlatform, PageTransitionsBuilder>{
+        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      },
+    ),
   );
+
   // ─── KOYU TEMA (Dark) ───
   static ThemeData get dark => ThemeData(
     useMaterial3: true,
@@ -89,21 +98,21 @@ abstract final class AppTheme {
       onSurface: AppColors.darkForeground,
       outline: AppColors.darkBorder,
     ),
-    // Metin Teması (Aynı stiller, Flutter renkleri otomatik ayarlar)
+    // Metin Teması
     textTheme: TextTheme(
       displayLarge: AppTextStyles.header,
       headlineMedium: AppTextStyles.pageHeader,
       titleMedium: AppTextStyles.cardHeader,
       bodyLarge: AppTextStyles.body,
       bodyMedium: AppTextStyles.bodySemibold,
-      titleLarge: AppTextStyles.summaryValue, // 20.8px/w900
-      headlineSmall: AppTextStyles.statValue, // 24px/w700
+      titleLarge: AppTextStyles.summaryValue,
+      headlineSmall: AppTextStyles.statValue,
       bodySmall: AppTextStyles.caption.copyWith(
         color: AppColors.darkMutedForeground,
-      ), // 12.5px/w400
+      ),
       labelSmall: AppTextStyles.hint.copyWith(
         color: AppColors.darkMutedForeground,
-      ), // 11.5px/w400
+      ),
     ),
     // Kart Teması
     cardTheme: CardThemeData(
@@ -124,6 +133,13 @@ abstract final class AppTheme {
         textStyle: AppTextStyles.bodySemibold,
         elevation: 0,
       ),
+    ),
+    // Sayfa Geçiş Teması (Hatalar giderildi - Const düzenlendi)
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: <TargetPlatform, PageTransitionsBuilder>{
+        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      },
     ),
   );
 }

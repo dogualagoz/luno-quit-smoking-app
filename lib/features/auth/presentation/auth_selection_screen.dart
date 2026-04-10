@@ -10,6 +10,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/speech_bubble.dart';
 import 'controllers/auth_controller.dart';
 import '../../../core/utils/error_translator.dart';
+import '../../../core/router/app_router.dart';
 
 class AuthSelectionScreen extends ConsumerWidget {
   final String userName;
@@ -39,6 +40,7 @@ class AuthSelectionScreen extends ConsumerWidget {
       body: SafeArea(
         child: Stack(
           children: [
+            // Giriş Butonları ve İçerik
             SingleChildScrollView(
               padding: AppSpacing.pageHorizontal,
               child: Column(
@@ -58,7 +60,7 @@ class AuthSelectionScreen extends ConsumerWidget {
                       const Text('✨ ', style: TextStyle(fontSize: 16)),
                       Text(
                         'Onboarding tamamlandı!',
-                        style: AppTextStyles.label.copyWith(
+                        style: AppTextStyles.caption.copyWith(
                           color: theme.hintColor,
                         ),
                       ),
@@ -76,7 +78,7 @@ class AuthSelectionScreen extends ConsumerWidget {
 
                   // Giriş Butonları
                   _AuthButton(
-                    iconPath: Icons.apple,
+                    iconData: Icons.apple,
                     text: 'Apple ile devam et',
                     backgroundColor: const Color(0xFF2D2A3E),
                     textColor: Colors.white,
@@ -86,7 +88,7 @@ class AuthSelectionScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.p16),
                   _AuthButton(
-                    iconPath: Icons.g_mobiledata, // Yerici Google ikonu
+                    iconData: Icons.g_mobiledata,
                     text: 'Google ile devam et',
                     backgroundColor: colorScheme.surface,
                     textColor: colorScheme.onSurface,
@@ -115,41 +117,42 @@ class AuthSelectionScreen extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.p24),
 
                   _AuthButton(
-                    iconPath: Icons.mail_outline,
+                    iconData: Icons.mail_outline,
                     text: 'E-posta ile giriş yap',
                     backgroundColor: colorScheme.surface,
                     textColor: colorScheme.onSurface,
                     border: Border.all(color: theme.dividerColor),
-                    onPressed: () => context.push('/email-login'),
+                    onPressed: () => context.push(AppRouter.emailLogin),
                   ),
                   const SizedBox(height: AppSpacing.p16),
 
-                  // Anonim buton (Dotted efektini simüle ediyoruz)
                   _AuthButton(
-                    iconPath: Icons.face_retouching_natural_outlined,
+                    iconData: Icons.face_retouching_natural_outlined,
                     text: 'Anonim olarak devam et',
                     backgroundColor: theme.brightness == Brightness.light 
-                        ? AppColors.lightMuted.withValues(alpha: 0.3)
-                        : colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                        ? AppColors.lightMuted.withOpacity(0.3)
+                        : colorScheme.secondaryContainer.withOpacity(0.3),
                     textColor: theme.hintColor,
                     isDotted: true,
-                    onPressed: () => context.go('/'),
+                    onPressed: () => context.go(AppRouter.root),
                   ),
+
 
                   const SizedBox(height: AppSpacing.p24),
 
                   // Bilgi Kutusu
                   Container(
+                    width: double.infinity,
                     padding: AppSpacing.cardPadding,
                     decoration: BoxDecoration(
-                      color: AppColors.lightDestructive.withValues(alpha: 0.05),
+                      color: AppColors.lightDestructive.withOpacity(0.05),
                       borderRadius: AppRadius.mainCard,
                     ),
                     child: Text(
                       "Anonim girişte verilerin yalnızca bu cihazda saklanır. Hesap oluşturursan cihazlar arası senkron yapabilirsin.",
                       textAlign: TextAlign.center,
                       style: AppTextStyles.micro.copyWith(
-                        color: colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ),
@@ -204,10 +207,25 @@ class AuthSelectionScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            // Loading Overlay: İşlem sürerken ekranın üstüne biner
+            
+            // Geri Butonu (En üstte olması için sona ekledik)
+            Positioned(
+              top: 8,
+              left: 8,
+              child: IconButton(
+                onPressed: () => context.go(AppRouter.onboarding),
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: colorScheme.onSurface,
+                  size: 20,
+                ),
+              ),
+            ),
+
+            // Loading Overlay
             if (authState.isLoading)
               Container(
-                color: Colors.black.withValues(alpha: 0.3),
+                color: Colors.black.withOpacity(0.3),
                 child: const Center(child: CircularProgressIndicator()),
               ),
           ],
@@ -218,7 +236,7 @@ class AuthSelectionScreen extends ConsumerWidget {
 }
 
 class _AuthButton extends StatelessWidget {
-  final IconData iconPath;
+  final IconData iconData;
   final String text;
   final Color backgroundColor;
   final Color textColor;
@@ -227,7 +245,7 @@ class _AuthButton extends StatelessWidget {
   final bool isDotted;
 
   const _AuthButton({
-    required this.iconPath,
+    required this.iconData,
     required this.text,
     required this.backgroundColor,
     required this.textColor,
@@ -252,30 +270,16 @@ class _AuthButton extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            if (isDotted)
-              // Basit bir kesikli çizgi efekti (Container border'ı ile tam yapılamaz ama görsel benzer)
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: AppRadius.button,
-                    border: Border.all(
-                      color: Theme.of(context).dividerColor,
-                      style: BorderStyle.solid,
-                    ),
-                  ),
-                ),
-              ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(iconPath, color: textColor, size: 24),
+                Icon(iconData, color: textColor, size: 24),
                 const SizedBox(width: 12),
                 Text(
                   text,
-                  style: AppTextStyles.label.copyWith(
+                  style: AppTextStyles.bodySemibold.copyWith(
                     color: textColor,
                     fontSize: 16,
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],

@@ -47,21 +47,7 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
       child: Column(
         children: [
           const SizedBox(height: AppSpacing.p20),
-          Row(
-            children: [
-              SvgPicture.asset(
-                AssetConstants.cigeritoDefault,
-                height: AppMascotSizes.medium,
-              ),
-              const SizedBox(width: AppSpacing.p12),
-              const Expanded(
-                child: SpeechBubble(
-                  text: "Ortalama bir Türk sigara içicisi. Klasik.",
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.p40),
+          const SizedBox(height: AppSpacing.p20),
           Container(
             width: double.infinity,
             padding: AppSpacing.cardPadding,
@@ -79,33 +65,35 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.p20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildIncrementButton(
-                      Icons.remove,
-                      () => _updateValue(_currentValue - 1),
+                    Text(
+                      _currentValue.toString(),
+                      style: AppTextStyles.largeNumber.copyWith(fontSize: 48),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Text(
-                        _currentValue.toString(),
-                        style: AppTextStyles.largeNumber,
+                    const SizedBox(height: 4),
+                    Text(
+                      "adet / gün",
+                      style: AppTextStyles.body.copyWith(
+                        color: AppColors.lightForeground.withValues(alpha: 0.4),
                       ),
                     ),
-                    _buildIncrementButton(
-                      Icons.add,
-                      () => _updateValue(_currentValue + 1),
+                    const SizedBox(height: AppSpacing.p24),
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: AppColors.lightPrimary,
+                        inactiveTrackColor: AppColors.lightPrimary.withValues(alpha: 0.2),
+                        thumbColor: AppColors.lightPrimary,
+                        trackHeight: 8.0,
+                      ),
+                      child: Slider(
+                        value: _currentValue.toDouble(),
+                        min: 1,
+                        max: 60,
+                        divisions: 59,
+                        onChanged: (val) {
+                          _updateValue(val.toInt());
+                        },
+                      ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "adet / gün",
-                  style: AppTextStyles.body.copyWith(
-                    color: AppColors.lightForeground.withValues(alpha: 0.4),
-                  ),
-                ),
                 const SizedBox(height: AppSpacing.p24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -153,47 +141,10 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.p24),
-          Container(
-            width: double.infinity,
-            padding: AppSpacing.cardPadding,
-            decoration: BoxDecoration(
-              color: AppColors.lightPrimary.withValues(alpha: 0.05),
-              borderRadius: AppRadius.mainCard,
-            ),
-            child: Text(
-              _getDynamicMessage(),
-              textAlign: TextAlign.center,
-              style: AppTextStyles.caption.copyWith(
-                color: AppColors.lightForeground.withValues(alpha: 0.6),
-              ),
-            ),
-          ),
           const SizedBox(height: AppSpacing.p40),
         ],
       ),
     );
   }
 
-  String _getDynamicMessage() {
-    if (_currentValue >= 20) {
-      return "Günde $_currentValue sigara = Yılda ${(_currentValue * 365 / 20).round()} paket. Tütüncün en iyi müşterisi sensin.";
-    }
-    return "Günde $_currentValue sigara = Her ${(1440 / _currentValue).round()} dakikada bir nefes alıyorsun. Sigaradan.";
-  }
-
-  Widget _buildIncrementButton(IconData icon, VoidCallback onPressed) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF7F3F7),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: AppColors.lightForeground, size: 20),
-        onPressed: onPressed,
-      ),
-    );
-  }
 }

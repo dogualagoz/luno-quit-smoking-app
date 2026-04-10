@@ -1,9 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_radius.dart';
 
-class SpeechBubble extends StatelessWidget {
+class SpeechBubble extends StatefulWidget {
   final String text;
-  const SpeechBubble({super.key, required this.text});
+  final Duration typingSpeed;
+
+  const SpeechBubble({
+    super.key,
+    required this.text,
+    this.typingSpeed = const Duration(milliseconds: 30),
+  });
+
+  @override
+  State<SpeechBubble> createState() => _SpeechBubbleState();
+}
+
+class _SpeechBubbleState extends State<SpeechBubble> with TickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<int> _characterCount;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupAnimation();
+  }
+
+  @override
+  void didUpdateWidget(SpeechBubble oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.text != widget.text) {
+      _controller.dispose();
+      _setupAnimation();
+    }
+  }
+
+  void _setupAnimation() {
+    _controller = AnimationController(
+      vsync: this,
+      duration: widget.typingSpeed * widget.text.length,
+    );
+    _characterCount = StepTween(begin: 0, end: widget.text.length).animate(_controller);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +57,7 @@ class SpeechBubble extends StatelessWidget {
     return Center(
       child: Stack(
         alignment: Alignment.topCenter,
-        clipBehavior: Clip.none, // Okun dışarı taşmasına izin veriyoruz
+        clipBehavior: Clip.none,
         children: [
           // ANA BALON
           Container(
@@ -22,32 +66,55 @@ class SpeechBubble extends StatelessWidget {
               color: colorScheme.surface,
               borderRadius: AppRadius.mascotBubble,
               border: Border.all(
-                color: colorScheme.primary.withValues(alpha: 0.1),
+                color: colorScheme.primary.withOpacity(0.1),
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
+                  color: Colors.black.withOpacity(0.02),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: Text(
-              text,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface.withValues(alpha: 0.8),
-                fontWeight: FontWeight.w500,
-              ),
+            child: Stack(
+              children: [
+                // Görünmez Katman: Balonun en baştan tam boyuta ulaşmasını sağlar
+                Text(
+                  widget.text,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.transparent, // Tamamen şeffaf
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                // Görünür Katman: Daktilo efekti
+                AnimatedBuilder(
+                  animation: _characterCount,
+                  builder: (context, child) {
+                    final int count = _characterCount.value.clamp(0, widget.text.length);
+                    String visibleText = widget.text.substring(0, count);
+                    return Text(
+                      visibleText,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface.withOpacity(0.8),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    );
+                  },
+                ),
+
+              ],
             ),
+
           ),
 
           // BALONUN OKU (Arrow)
           Positioned(
-            top: -7, // Balonun üst kenarından dışarı taşacak
+            top: -7,
             child: Transform.rotate(
-              angle: 0.785, // 45 derece döndürerek üçgen efekti veriyoruz
+              angle: 0.785,
               child: Container(
                 width: 14,
                 height: 14,
@@ -55,11 +122,11 @@ class SpeechBubble extends StatelessWidget {
                   color: colorScheme.surface,
                   border: Border(
                     left: BorderSide(
-                      color: colorScheme.primary.withValues(alpha: 0.1),
+                      color: colorScheme.primary.withOpacity(0.1),
                       width: 2,
                     ),
                     top: BorderSide(
-                      color: colorScheme.primary.withValues(alpha: 0.1),
+                      color: colorScheme.primary.withOpacity(0.1),
                       width: 2,
                     ),
                   ),
