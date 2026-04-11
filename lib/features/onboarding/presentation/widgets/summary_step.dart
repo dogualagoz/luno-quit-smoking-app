@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_radius.dart';
-import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
-import 'package:luno_quit_smoking_app/core/widgets/speech_bubble.dart';
-import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:luno_quit_smoking_app/core/constants/asset_constants.dart';
 
 class SummaryStep extends StatefulWidget {
   final int dailyCigarettes;
@@ -57,113 +52,84 @@ class _SummaryStepState extends State<SummaryStep> {
     final minutesStolen = totalCigarettes * 11;
     final daysLost = (minutesStolen / (60 * 24)).round();
 
-    return SingleChildScrollView(
-      padding: AppSpacing.pageHorizontal,
-      child: Column(
-        children: [
-          const SizedBox(height: AppSpacing.p12),
-          SvgPicture.asset(
-            AssetConstants.cigeritoDefault,
-            height: AppMascotSizes.medium,
+    return Column(
+      children: [
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          childAspectRatio: 1.3,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          children: [
+            _buildStatCard(
+              "sigara içtin",
+              _numberFormat.format(totalCigarettes),
+              Icons.smoke_free,
+            ),
+            _buildStatCard(
+              "harcadın",
+              _currencyFormat.format(totalMoneySpent),
+              Icons.money_off,
+            ),
+            _buildStatCard(
+              "gün kaybettin",
+              daysLost.toString(),
+              Icons.access_time,
+            ),
+            _buildStatCard(
+              "dk ömür çalındı",
+              _numberFormat.format(minutesStolen),
+              Icons.person_remove_outlined,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.lightPrimary.withValues(alpha: 0.05),
+            borderRadius: AppRadius.mainCard,
           ),
-          const SizedBox(height: AppSpacing.p8),
-          const SpeechBubble(
-            text: "İşte gerçekler... Ama birlikte değiştireceğiz, söz.",
+          child: Text(
+            "${_currencyFormat.format(totalMoneySpent)} ile sıfırdan bir araba alabilirdin.",
+            textAlign: TextAlign.center,
+            style: AppTextStyles.micro.copyWith(
+              color: AppColors.lightForeground.withValues(alpha: 0.7),
+              fontWeight: FontWeight.bold,
+              fontSize: 11,
+            ),
           ),
-          const SizedBox(height: AppSpacing.p20),
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            childAspectRatio: 1.3,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            children: [
-              _buildStatCard(
-                "sigara içtin",
-                _numberFormat.format(totalCigarettes),
-                Icons.smoke_free,
-              ),
-              _buildStatCard(
-                "harcadın",
-                _currencyFormat.format(totalMoneySpent),
-                Icons.money_off,
-              ),
-              _buildStatCard(
-                "gün kaybettin",
-                daysLost.toString(),
-                Icons.access_time,
-              ),
-              _buildStatCard(
-                "dk ömür çalındı",
-                _numberFormat.format(minutesStolen),
-                Icons.person_remove_outlined,
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: AppColors.lightPrimary.withValues(alpha: 0.05),
+        ),
+        const SizedBox(height: 20),
+        TextField(
+          controller: _nameController,
+          onChanged: (val) {
+            widget.onNameChanged(val);
+            widget.onValidStateChanged(val.trim().isNotEmpty);
+          },
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+          decoration: InputDecoration(
+            hintText: "Adın veya takma adın...",
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
+            filled: true,
+            fillColor: AppColors.lightCard,
+            border: OutlineInputBorder(
               borderRadius: AppRadius.mainCard,
+              borderSide: const BorderSide(color: AppColors.lightBorder),
             ),
-            child: Text(
-              "${_currencyFormat.format(totalMoneySpent)} ile sıfırdan bir araba alabilirdin.",
-              textAlign: TextAlign.center,
-              style: AppTextStyles.micro.copyWith(
-                color: AppColors.lightForeground.withValues(alpha: 0.7),
-                fontWeight: FontWeight.bold,
-                fontSize: 11,
-              ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: AppRadius.mainCard,
+              borderSide: const BorderSide(color: AppColors.lightBorder),
             ),
           ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              SvgPicture.asset(
-                AssetConstants.cigeritoDefault,
-                height: AppMascotSizes.small,
-              ),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: SpeechBubble(
-                  text:
-                      "Son bir şey! Sana ne diyelim? Takma ad da olur, gerçek ad da.",
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _nameController,
-            onChanged: (val) {
-              widget.onNameChanged(val);
-              widget.onValidStateChanged(val.trim().isNotEmpty);
-            },
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-            decoration: InputDecoration(
-              hintText: "Adın veya takma adın...",
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
-              ),
-              filled: true,
-              fillColor: AppColors.lightCard,
-              border: OutlineInputBorder(
-                borderRadius: AppRadius.mainCard,
-                borderSide: const BorderSide(color: AppColors.lightBorder),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: AppRadius.mainCard,
-                borderSide: const BorderSide(color: AppColors.lightBorder),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
+        ),
+        const SizedBox(height: 20),
+      ],
     );
   }
 

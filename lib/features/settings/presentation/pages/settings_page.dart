@@ -12,7 +12,6 @@ import '../widgets/settings_toggle_tile.dart';
 import '../widgets/settings_menu_tile.dart';
 import '../controllers/settings_controller.dart';
 import 'about_page.dart';
-import 'cigerito_customization_page.dart';
 import 'error_preview_page.dart';
 import '../../../onboarding/data/onboarding_repository.dart';
 import '../../../../core/theme/theme_provider.dart';

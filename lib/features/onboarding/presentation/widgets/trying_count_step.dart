@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_radius.dart';
-import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
-import 'package:luno_quit_smoking_app/core/widgets/speech_bubble.dart';
-import 'package:luno_quit_smoking_app/core/theme/app_mascot_styles.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:luno_quit_smoking_app/core/constants/asset_constants.dart';
 
 class TryingCountStep extends StatefulWidget {
   final String? initialValue;
@@ -65,95 +60,72 @@ class _TryingCountStepState extends State<TryingCountStep> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: AppSpacing.pageHorizontal,
-      child: Column(
-        children: [
-          const SizedBox(height: AppSpacing.p20),
-          Row(
-            children: [
-              SvgPicture.asset(
-                AssetConstants.cigeritoDefault,
-                height: AppMascotSizes.medium,
-              ),
-              const SizedBox(width: AppSpacing.p12),
-              const Expanded(
-                child: SpeechBubble(
-                  text:
-                      "Hata yapmak insanidir, ama denememek Ciğerito'nun kalbini kırar.",
+    return Column(
+      children: _options.map((opt) {
+        final isSelected = _selectedValue == opt['title'];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: InkWell(
+            onTap: () => _onSelect(opt['title']!),
+            borderRadius: AppRadius.mainCard,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.lightPrimary.withValues(alpha: 0.05)
+                    : AppColors.lightCard,
+                borderRadius: AppRadius.mainCard,
+                border: Border.all(
+                  color: isSelected
+                      ? AppColors.lightPrimary
+                      : AppColors.lightBorder,
+                  width: isSelected ? 1.5 : 1,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.p40),
-          ..._options.map((opt) {
-            final isSelected = _selectedValue == opt['title'];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: InkWell(
-                onTap: () => _onSelect(opt['title']!),
-                borderRadius: AppRadius.mainCard,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.lightPrimary.withValues(alpha: 0.05)
-                        : AppColors.lightCard,
-                    borderRadius: AppRadius.mainCard,
-                    border: Border.all(
-                      color: isSelected
-                          ? AppColors.lightPrimary
-                          : AppColors.lightBorder,
-                      width: isSelected ? 1.5 : 1,
+              child: Row(
+                children: [
+                  Text(
+                    opt['icon']!,
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          opt['title']!,
+                          style: TextStyle(
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.w600,
+                            color: isSelected
+                                ? AppColors.lightPrimary
+                                : AppColors.lightForeground,
+                          ),
+                        ),
+                        Text(
+                          opt['desc']!,
+                          style: AppTextStyles.micro.copyWith(
+                            color: AppColors.lightForeground.withValues(
+                              alpha: 0.4,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      Text(
-                        opt['icon']!,
-                        style: const TextStyle(fontSize: 24),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              opt['title']!,
-                              style: TextStyle(
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.w600,
-                                color: isSelected
-                                    ? AppColors.lightPrimary
-                                    : AppColors.lightForeground,
-                              ),
-                            ),
-                            Text(
-                              opt['desc']!,
-                              style: AppTextStyles.micro.copyWith(
-                                color: AppColors.lightForeground.withValues(
-                                  alpha: 0.4,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (isSelected)
-                        const Icon(
-                          Icons.check_circle,
-                          color: AppColors.lightPrimary,
-                        ),
-                    ],
-                  ),
-                ),
+                  if (isSelected)
+                    const Icon(
+                      Icons.check_circle,
+                      color: AppColors.lightPrimary,
+                    ),
+                ],
               ),
-            );
-          }),
-          const SizedBox(height: AppSpacing.p40),
-        ],
-      ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
