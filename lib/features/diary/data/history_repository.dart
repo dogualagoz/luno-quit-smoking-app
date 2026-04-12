@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:luno_quit_smoking_app/features/history/data/models/daily_log.dart';
+import 'package:luno_quit_smoking_app/features/diary/data/models/daily_log.dart';
 import 'package:luno_quit_smoking_app/services/local_storage/hive_service.dart';
 
 class HistoryRepository {

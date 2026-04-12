@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_error_widget.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
-import 'package:luno_quit_smoking_app/features/history/application/history_provider.dart';
-import 'package:luno_quit_smoking_app/features/history/presentation/widgets/daily_log_card.dart';
-import 'package:luno_quit_smoking_app/features/history/presentation/widgets/history_bar_chart.dart';
-import 'package:luno_quit_smoking_app/features/history/presentation/widgets/today_summary_card.dart';
-import 'package:luno_quit_smoking_app/features/history/presentation/widgets/average_summary_card.dart';
+import 'package:luno_quit_smoking_app/features/diary/application/history_provider.dart';
+import 'package:luno_quit_smoking_app/features/diary/presentation/widgets/daily_log_card.dart';
+import 'package:luno_quit_smoking_app/features/diary/presentation/widgets/history_bar_chart.dart';
+import 'package:luno_quit_smoking_app/features/diary/presentation/widgets/today_summary_card.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
@@ -92,10 +92,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: AppSpacing.p24),
-                    Text('Geçmiş & Kayıt 📋', style: AppTextStyles.header),
+                    Text('Günlüğüm 📖', style: AppTextStyles.header),
                     const SizedBox(height: 8),
                     Text(
-                      "Gerçeklerle yüzleşmenin en acı yolu: rakamlar.",
+                      "Atılan her adım, yazılan her satır daha temiz bir geleceğe.",
                       style: AppTextStyles.body.copyWith(color: Colors.grey),
                     ),
                     const SizedBox(height: AppSpacing.p24),
@@ -104,57 +104,14 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                     TodaySummaryCard(logs: logs),
                     const SizedBox(height: AppSpacing.p24),
 
-                    // --- Ortalama İstatistik Masası ---
-                    AverageSummaryCard(logs: logs),
-                    const SizedBox(height: AppSpacing.p24),
-
-                    // --- Analitik Grafiği (Haftalık/Aylık/Yıllık) ---
-                    LunoCard(
-                      padding: AppSpacing.cardPaddingLarge,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                _selectedFilter == 'H'
-                                    ? "Bu Hafta"
-                                    : _selectedFilter == 'A'
-                                        ? "Bu Ay"
-                                        : "Bu Yıl",
-                                style: AppTextStyles.cardHeader.copyWith(
-                                  color: theme.colorScheme.onSurface,
-                                ),
-                              ),
-                              _buildFilterButtons(isDark),
-                            ],
-                          ),
-                          const SizedBox(height: AppSpacing.p24),
-                          HistoryBarChart(
-                            data: _calculateChartData(logs),
-                            filter: _selectedFilter,
-                          ),
-                        ],
-                      ),
-                    ),
+                    // --- Analitik Grafiği ve Ortalama İstatistik ---
+                    _buildCombinedChartCard(logs, theme, isDark),
 
                     const SizedBox(height: AppSpacing.p24),
-                    Text("Günlük Kayıtlar", style: AppTextStyles.cardHeader),
-                    const SizedBox(height: AppSpacing.p12),
+                    Text("Sayfalar", style: AppTextStyles.cardHeader),
 
-                    // --- Detaylı Aktivite Akışı (Günlük Kayıt Kartları) ---
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: logs.length,
-                      itemBuilder: (ctx, index) {
-                        return DailyLogCard(
-                          log: logs[index],
-                          pricePerCigarette: pricePerCigarette,
-                        );
-                      },
-                    ),
+                    // --- Günlük Akışı ---
+                    ..._buildGroupedDiaryList(logs, pricePerCigarette, theme),
 
                     const SizedBox(
                       height: AppSpacing.p96,
@@ -169,6 +126,143 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             onRetry: () => ref.invalidate(historyLogsProvider),
           ),
         ),
+      ),
+    );
+  }
+
+  // --- UI Bileşen Oluşturucuları ---
+  List<Widget> _buildGroupedDiaryList(List<dynamic> logs, double pricePerCigarette, ThemeData theme) {
+    if (logs.isEmpty) return [];
+
+    final Map<String, List<dynamic>> groupedLogs = {};
+    for (var log in logs) {
+      final logDate = DateTime(log.date.year, log.date.month, log.date.day);
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final yesterday = DateTime(now.year, now.month, now.day - 1);
+      
+      String header;
+      if (logDate == today) {
+        header = "Bugün";
+      } else if (logDate == yesterday) {
+        header = "Dün";
+      } else {
+        header = DateFormat('dd MMMM yyyy, EEEE', 'tr_TR').format(logDate);
+      }
+
+      if (!groupedLogs.containsKey(header)) groupedLogs[header] = [];
+      groupedLogs[header]!.add(log);
+    }
+
+    final widgets = <Widget>[];
+    groupedLogs.forEach((dateString, dayLogs) {
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.only(top: 24, bottom: 16),
+          child: Row(
+            children: [
+              Icon(Icons.calendar_today_rounded, size: 18, color: theme.colorScheme.primary),
+              const SizedBox(width: 8),
+              Text(
+                dateString,
+                style: AppTextStyles.bodySemibold.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      for (int i = 0; i < dayLogs.length; i++) {
+        widgets.add(
+          DailyLogCard(
+            log: dayLogs[i],
+            pricePerCigarette: pricePerCigarette,
+          ),
+        );
+      }
+    });
+
+    return widgets;
+  }
+
+  Widget _buildCombinedChartCard(List<dynamic> logs, ThemeData theme, bool isDark) {
+    final chartData = _calculateChartData(logs);
+    
+    // Geçen gün sayısına göre ortalama hesapla
+    final now = DateTime.now();
+    int totalSum = chartData.values.fold(0, (sum, val) => sum + val);
+    
+    int elapsedDays = 1;
+    if (_selectedFilter == 'H') {
+      elapsedDays = now.weekday; // 1 (Pzt) ile 7 (Paz) arası
+    } else if (_selectedFilter == 'A') {
+      elapsedDays = now.day; // Ayın kaçıncı günüysek ona kadar
+    } else if (_selectedFilter == 'Y') {
+      elapsedDays = now.difference(DateTime(now.year, 1, 1)).inDays + 1;
+    }
+    
+    final double average = elapsedDays > 0 ? totalSum / elapsedDays : 0;
+    
+    return LunoCard(
+      padding: AppSpacing.cardPaddingLarge,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "İstatistikler",
+                style: AppTextStyles.cardHeader.copyWith(
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              _buildFilterButtons(isDark),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.p24),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                average.toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), ''),
+                style: AppTextStyles.largeNumber.copyWith(
+                  fontSize: 48,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                "sigara/gün",
+                style: AppTextStyles.body.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _selectedFilter == 'H'
+                ? "Bu hafta boyunca ortalama"
+                : _selectedFilter == 'A'
+                    ? "Bu ay boyunca ortalama"
+                    : "Bu yıl boyunca ortalama",
+            style: AppTextStyles.label.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.p24),
+          HistoryBarChart(
+            data: chartData,
+            filter: _selectedFilter,
+          ),
+        ],
       ),
     );
   }

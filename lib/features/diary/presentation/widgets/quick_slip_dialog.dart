@@ -4,8 +4,8 @@ import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_button.dart';
-import 'package:luno_quit_smoking_app/features/history/application/history_provider.dart';
-import 'package:luno_quit_smoking_app/features/history/data/models/daily_log.dart';
+import 'package:luno_quit_smoking_app/features/diary/application/history_provider.dart';
+import 'package:luno_quit_smoking_app/features/diary/data/models/daily_log.dart';
 import 'package:uuid/uuid.dart';
 
 class QuickSlipDialog extends ConsumerStatefulWidget {

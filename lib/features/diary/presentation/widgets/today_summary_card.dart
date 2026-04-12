@@ -8,8 +8,8 @@ import 'package:luno_quit_smoking_app/core/widgets/luno_button.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
 import 'package:luno_quit_smoking_app/core/providers/firebase_providers.dart';
-import 'package:luno_quit_smoking_app/features/history/data/models/daily_log.dart';
-import 'package:luno_quit_smoking_app/features/history/application/history_provider.dart';
+import 'package:luno_quit_smoking_app/features/diary/data/models/daily_log.dart';
+import 'package:luno_quit_smoking_app/features/diary/application/history_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 

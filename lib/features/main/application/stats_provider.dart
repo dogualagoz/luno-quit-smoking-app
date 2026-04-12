@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
-import 'package:luno_quit_smoking_app/features/history/application/history_provider.dart';
+import 'package:luno_quit_smoking_app/features/diary/application/history_provider.dart';
 import 'package:luno_quit_smoking_app/features/main/application/quit_calculator.dart';
 import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart';
 

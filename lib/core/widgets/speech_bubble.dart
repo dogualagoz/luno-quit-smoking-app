@@ -94,6 +94,7 @@ class _SpeechBubbleState extends State<SpeechBubble> with TickerProviderStateMix
       children: [
         // ANA BALON
         Container(
+          width: double.infinity, // Balonun her zaman tam genişlikte ve ortalı olması için
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(
             color: colorScheme.surface,

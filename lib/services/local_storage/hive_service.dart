@@ -1,6 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/models/user_profile.dart';
-import 'package:luno_quit_smoking_app/features/history/data/models/daily_log.dart';
+import 'package:luno_quit_smoking_app/features/diary/data/models/daily_log.dart';
 
 class HiveService {
   //Box isimlerini burada sabit tutmak hata payını azaltır

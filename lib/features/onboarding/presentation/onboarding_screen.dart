@@ -58,11 +58,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   bool _isButtonEnabled = true;
   String _buttonLabel = "Başlayalım";
 
-  // --- Animasyon kontrolleri ---
+  // --- Animasyon kontrollleri ---
   late AnimationController _bubbleScaleController;
   late AnimationController _contentSlideController;
   late Animation<double> _bubbleScale;
   late Animation<Offset> _contentOffset;
+
+  // --- GlobalKey for Legal Step ---
+  final GlobalKey<FinalLegalStepState> _legalStepKey = GlobalKey<FinalLegalStepState>();
 
   // --- Geçiş durumu ---
   _TransitionPhase _phase = _TransitionPhase.idle;
@@ -96,14 +99,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       vsync: this,
       duration: const Duration(milliseconds: 350),
     );
-    _contentOffset = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(-1.2, 0),
-    ).animate(CurvedAnimation(
-      parent: _contentSlideController,
-      curve: Curves.easeInOutCubic,
-    ));
-    _contentSlideController.value = 0.0;
+    // İlk değeri sıfırlıyoruz, tween'i geçiş anında belirleyeceğiz
+    _contentOffset = AlwaysStoppedAnimation(Offset.zero);
+    _contentSlideController.value = 1.0;
 
     // İlk sayfa yüklendiğinde animasyonları başlat
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -165,11 +163,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     setState(() => _phase = _TransitionPhase.bubbleShrink);
     await _bubbleScaleController.reverse();
 
-    // 2️⃣ İçerik sola kayıyor
+    // 2️⃣ Mevcut içerik sola kayarak çıkıyor
     setState(() {
       _phase = _TransitionPhase.contentOut;
       _startTyping = false;
+      _contentOffset = Tween<Offset>(
+        begin: Offset.zero,
+        end: const Offset(-1.2, 0),
+      ).animate(CurvedAnimation(
+        parent: _contentSlideController,
+        curve: Curves.easeInOutCubic,
+      ));
     });
+    _contentSlideController.value = 0.0;
     await _contentSlideController.forward();
 
     // 3️⃣ Sayfa değişiyor + Ciğerito yeni pozisyona gidiyor
@@ -182,13 +188,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     _updateMascotPosition(newConfig);
     await Future.delayed(const Duration(milliseconds: 400));
 
-    // 4️⃣ Yeni içerik sağdan geliyor
+    // 4️⃣ Yeni içerik sağdan sola gelerek giriyor
     setState(() {
       _phase = _TransitionPhase.contentIn;
       _showContent = true;
+      _contentOffset = Tween<Offset>(
+        begin: const Offset(1.2, 0),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(
+        parent: _contentSlideController,
+        curve: Curves.easeInOutCubic,
+      ));
     });
-    _contentSlideController.value = 1.0;
-    await _contentSlideController.reverse();
+    _contentSlideController.value = 0.0;
+    await _contentSlideController.forward();
 
     // 5️⃣ Yeni balon büyüyor
     setState(() => _phase = _TransitionPhase.bubbleGrow);
@@ -208,24 +221,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     setState(() => _phase = _TransitionPhase.bubbleShrink);
     await _bubbleScaleController.reverse();
 
+    // 2️⃣ Mevcut içerik sağa kayarak çıkıyor
     setState(() {
       _phase = _TransitionPhase.contentOut;
       _startTyping = false;
+      _contentOffset = Tween<Offset>(
+        begin: Offset.zero,
+        end: const Offset(1.2, 0),
+      ).animate(CurvedAnimation(
+        parent: _contentSlideController,
+        curve: Curves.easeInOutCubic,
+      ));
     });
-    // İçerik sağa kayıyor (geri gidiyoruz)
     _contentSlideController.value = 0.0;
-    final oldTween = _contentOffset;
-    _contentOffset = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(1.2, 0),
-    ).animate(CurvedAnimation(
-      parent: _contentSlideController,
-      curve: Curves.easeInOutCubic,
-    ));
     await _contentSlideController.forward();
-
-    // Tweeni geri al
-    _contentOffset = oldTween;
 
     final newPage = _currentPage - 1;
     final newConfig = _getStepConfig(newPage);
@@ -237,29 +246,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     _updateMascotPosition(newConfig);
     await Future.delayed(const Duration(milliseconds: 400));
 
+    // 4️⃣ Yeni içerik soldan sağa gelerek giriyor
     setState(() {
       _phase = _TransitionPhase.contentIn;
       _showContent = true;
+      _contentOffset = Tween<Offset>(
+        begin: const Offset(-1.2, 0),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(
+        parent: _contentSlideController,
+        curve: Curves.easeInOutCubic,
+      ));
     });
-    _contentSlideController.value = 1.0;
-    _contentOffset = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(1.2, 0),
-    ).animate(CurvedAnimation(
-      parent: _contentSlideController,
-      curve: Curves.easeInOutCubic,
-    ));
-    await _contentSlideController.reverse();
-
-    // Tweeni orijinale döndür
-    _contentOffset = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(-1.2, 0),
-    ).animate(CurvedAnimation(
-      parent: _contentSlideController,
-      curve: Curves.easeInOutCubic,
-    ));
     _contentSlideController.value = 0.0;
+    await _contentSlideController.forward();
 
     setState(() => _phase = _TransitionPhase.bubbleGrow);
     await _bubbleScaleController.forward();
@@ -272,6 +272,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
   // --- İleri/Geri navigasyon ---
   void _nextPage() {
+    // Özel durum: Yasal onay sayfasındayız ama kullanıcı işaretlememiş
+    if (_currentPage == 11 && !_isButtonEnabled) {
+      _legalStepKey.currentState?.triggerError();
+      return;
+    }
+
     if (_currentPage < _totalSteps - 1) {
       _transitionToPage(_currentPage + 1);
     } else {
@@ -435,7 +441,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           mascotSize: AppMascotSizes.large,
           bubbleText: "Sıkıcı ama önemli kısım. Son bir şey, söz.",
           arrowDirection: BubbleArrowDirection.top,
-          buttonLabel: "Kabul ediyorum",
+          buttonLabel: "Devam",
         );
 
       // 12: Özet + İsim - Yorum + Kartlar
@@ -445,7 +451,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           mascotSize: AppMascotSizes.medium,
           bubbleText: "İşte gerçekler... Ama birlikte değiştireceğiz, söz.",
           arrowDirection: BubbleArrowDirection.top,
-          buttonLabel: "Hazırım, başlayalım!",
+          buttonLabel: "Devam",
         );
 
       default:
@@ -514,9 +520,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         onValidStateChanged: (isValid) => _updateButtonState(isEnabled: isValid),
       );
       case 11: return FinalLegalStep(
+        key: _legalStepKey,
         onValidStateChanged: (isValid) => _updateButtonState(
           isEnabled: isValid,
-          label: "Kabul ediyorum",
         ),
       );
       case 12: return SummaryStep(
@@ -529,7 +535,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         },
         onValidStateChanged: (isValid) => _updateButtonState(
           isEnabled: isValid,
-          label: "Hazırım, başlayalım!",
         ),
       );
       default: return null;
@@ -693,9 +698,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         icon: _currentPage == _totalSteps - 1
             ? Icons.check
             : Icons.arrow_forward,
-        onPressed: _isButtonEnabled && _phase == _TransitionPhase.idle
+        onPressed: (_isButtonEnabled || _currentPage == 11) && _phase == _TransitionPhase.idle
             ? _nextPage
-            : () {},
+            : () {}, // Legal ekranındıysa her zaman tıklanabilir ki hatayı tetikleyelim
       ),
     );
   }

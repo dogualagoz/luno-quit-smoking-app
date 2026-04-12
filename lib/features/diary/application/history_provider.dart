@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luno_quit_smoking_app/core/providers/firebase_providers.dart';
-import 'package:luno_quit_smoking_app/features/history/data/history_repository.dart';
-import 'package:luno_quit_smoking_app/features/history/data/models/daily_log.dart';
+import 'package:luno_quit_smoking_app/features/diary/data/history_repository.dart';
+import 'package:luno_quit_smoking_app/features/diary/data/models/daily_log.dart';
 
 final historyRepositoryProvider = Provider<HistoryRepository>((ref) {
   return HistoryRepository(

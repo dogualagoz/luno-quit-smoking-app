@@ -11,7 +11,7 @@ import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_button.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
-import 'package:luno_quit_smoking_app/features/history/application/history_provider.dart';
+import 'package:luno_quit_smoking_app/features/diary/application/history_provider.dart';
 
 /// Kriz ekranı — 3 aşamalı:
 /// 1. Bekleme (idle): Maskot + istatistikler + "Kriz Geldi" butonu

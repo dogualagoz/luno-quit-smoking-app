@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:luno_quit_smoking_app/core/constants/app_constants.dart';
 import 'package:luno_quit_smoking_app/core/constants/damage_model.dart';
-import 'package:luno_quit_smoking_app/features/history/data/models/daily_log.dart';
+import 'package:luno_quit_smoking_app/features/diary/data/models/daily_log.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/models/user_profile.dart';
 import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart';
 

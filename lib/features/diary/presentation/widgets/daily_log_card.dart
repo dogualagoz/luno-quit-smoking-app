@@ -4,7 +4,7 @@ import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
-import 'package:luno_quit_smoking_app/features/history/data/models/daily_log.dart';
+import 'package:luno_quit_smoking_app/features/diary/data/models/daily_log.dart';
 
 class DailyLogCard extends StatefulWidget {
   final DailyLog log;
@@ -86,22 +86,18 @@ class _DailyLogCardState extends State<DailyLogCard>
               onTap: hasDetails ? _toggleExpand : null,
               child: Row(
                 children: [
-                  // Tarih
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _getRelativeDateString(widget.log.date),
-                        style: AppTextStyles.caption
-                            .copyWith(color: Theme.of(context).hintColor),
+                  // Zaman
+                  SizedBox(
+                    width: 50,
+                    child: Text(
+                      DateFormat('HH:mm').format(widget.log.date),
+                      style: AppTextStyles.bodySemibold.copyWith(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
-                      Text(
-                        DateFormat('dd MMM').format(widget.log.date),
-                        style: AppTextStyles.bodySemibold,
-                      ),
-                    ],
+                    ),
                   ),
-                  const SizedBox(width: AppSpacing.p16),
+                  const SizedBox(width: AppSpacing.p12),
 
                   // Dikey Ayıraç
                   Container(
@@ -317,17 +313,6 @@ class _DailyLogCardState extends State<DailyLogCard>
     );
   }
 
-  String _getRelativeDateString(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = DateTime(now.year, now.month, now.day - 1);
-    final logDate = DateTime(date.year, date.month, date.day);
-
-    if (logDate == today) return "Bugün";
-    if (logDate == yesterday) return "Dün";
-
-    return DateFormat('EEEE', 'tr_TR').format(date);
-  }
 
   String _getLogType() {
     try {

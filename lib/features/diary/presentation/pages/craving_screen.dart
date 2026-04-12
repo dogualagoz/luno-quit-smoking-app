@@ -3,37 +3,39 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
-import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_button.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_progress_bar.dart';
-import 'package:luno_quit_smoking_app/features/history/application/history_provider.dart';
-import 'package:luno_quit_smoking_app/features/history/data/models/daily_log.dart';
+import 'package:luno_quit_smoking_app/features/diary/application/history_provider.dart';
+import 'package:luno_quit_smoking_app/features/diary/data/models/daily_log.dart';
 import 'package:luno_quit_smoking_app/core/providers/firebase_providers.dart';
 import 'package:uuid/uuid.dart';
 
-// Steps (reuse)
+// Steps
+import '../widgets/craving_steps/smoked_check_step.dart';
+import '../widgets/craving_steps/congratulations_step.dart';
 import '../widgets/craving_steps/smoke_count_step.dart';
+import '../widgets/craving_steps/intensity_step.dart';
 import '../widgets/craving_steps/mood_step.dart';
 import '../widgets/craving_steps/activity_step.dart';
 import '../widgets/craving_steps/companion_step.dart';
 import '../widgets/craving_steps/location_step.dart';
 import '../widgets/craving_steps/notes_step.dart';
 
-/// Geçmiş sekmesinden "Kayıt Ekle" butonuyla açılan sigara kayıt ekranı.
-/// Kullanıcı içtiği sigaraları kaydeder: kaç tane, nerede, hangi ruh halinde vs.
-class SlipLogScreen extends ConsumerStatefulWidget {
-  const SlipLogScreen({super.key});
+class CravingScreen extends ConsumerStatefulWidget {
+  const CravingScreen({super.key});
 
   @override
-  ConsumerState<SlipLogScreen> createState() => _SlipLogScreenState();
+  ConsumerState<CravingScreen> createState() => _CravingScreenState();
 }
 
-class _SlipLogScreenState extends ConsumerState<SlipLogScreen> {
+class _CravingScreenState extends ConsumerState<CravingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-
+  
   // Form State
+  bool? _hasSmoked;
   int _smokeCount = 1;
+  double _intensity = 5;
   String? _location;
   final List<String> _selectedMoods = [];
   final List<String> _selectedContext = [];
@@ -42,52 +44,99 @@ class _SlipLogScreenState extends ConsumerState<SlipLogScreen> {
   final TextEditingController _otherMoodController = TextEditingController();
   final TextEditingController _otherActivityController = TextEditingController();
 
-  List<Widget> get _steps => [
-    SmokeCountStep(
-      count: _smokeCount,
-      onValueChanged: (val) => setState(() => _smokeCount = val),
-    ),
-    LocationStep(
-      location: _location,
-      onLocationChanged: (val) => setState(() => _location = val),
-    ),
-    MoodStep(
-      selectedMoods: _selectedMoods,
-      otherController: _otherMoodController,
-      onMoodSelected: (val) {
-        setState(() {
-          if (_selectedMoods.contains(val)) {
-            _selectedMoods.remove(val);
-          } else {
-            _selectedMoods.add(val);
-          }
-        });
+  // Adımları dinamik olarak oluşturuyoruz
+  List<Widget> get _steps {
+    final List<Widget> steps = [];
+
+    // STEP 0: Sigara İçtin mi? (Ana Sorun)
+    steps.add(SmokedCheckStep(
+      hasSmoked: _hasSmoked,
+      onStatusChanged: (val) {
+        setState(() => _hasSmoked = val);
+        _nextPage(); // Seçim yapınca otomatik bir sonrakine geç
       },
-    ),
-    ActivityStep(
-      selectedActivities: _selectedContext,
-      otherController: _otherActivityController,
-      onActivitySelected: (val) {
-        setState(() {
-          if (_selectedContext.contains(val)) {
-            _selectedContext.remove(val);
-          } else {
-            _selectedContext.add(val);
-          }
-        });
-      },
-    ),
-    CompanionStep(
-      selectedCompanions: _selectedCompanions,
-      onCompanionSelected: (val) {
-        setState(() {
-          _selectedCompanions.clear();
-          _selectedCompanions.add(val);
-        });
-      },
-    ),
-    NotesStep(controller: _notesController),
-  ];
+    ));
+
+    if (_hasSmoked == null) return steps;
+
+    if (_hasSmoked == false) {
+      // --- İÇMEDİ (Kriz Akışı) ---
+      steps.addAll([
+        IntensityStep(
+          value: _intensity,
+          onValueChanged: (val) => setState(() => _intensity = val),
+        ),
+        MoodStep(
+          selectedMoods: _selectedMoods,
+          otherController: _otherMoodController,
+          onMoodSelected: _toggleMood,
+        ),
+        ActivityStep(
+          selectedActivities: _selectedContext,
+          otherController: _otherActivityController,
+          onActivitySelected: _toggleActivity,
+        ),
+        NotesStep(controller: _notesController),
+        const CongratulationsStep(),
+      ]);
+    } else {
+      // --- İÇTİ (Slip Akışı) ---
+      steps.addAll([
+        SmokeCountStep(
+          count: _smokeCount,
+          onValueChanged: (val) => setState(() => _smokeCount = val),
+        ),
+        LocationStep(
+          location: _location,
+          onLocationChanged: (val) => setState(() => _location = val),
+        ),
+        MoodStep(
+          selectedMoods: _selectedMoods,
+          otherController: _otherMoodController,
+          onMoodSelected: _toggleMood,
+        ),
+        ActivityStep(
+          selectedActivities: _selectedContext,
+          otherController: _otherActivityController,
+          onActivitySelected: _toggleActivity,
+        ),
+        CompanionStep(
+          selectedCompanions: _selectedCompanions,
+          onCompanionSelected: _toggleCompanion,
+        ),
+        NotesStep(controller: _notesController),
+      ]);
+    }
+
+    return steps;
+  }
+
+  void _toggleMood(String val) {
+    setState(() {
+      if (_selectedMoods.contains(val)) {
+        _selectedMoods.remove(val);
+      } else {
+        _selectedMoods.add(val);
+      }
+    });
+  }
+
+  void _toggleActivity(String val) {
+    setState(() {
+      if (_selectedContext.contains(val)) {
+        _selectedContext.remove(val);
+      } else {
+        _selectedContext.add(val);
+      }
+    });
+  }
+
+  void _toggleCompanion(String val) {
+    setState(() {
+      _selectedCompanions.clear();
+      _selectedCompanions.add(val);
+    });
+  }
 
   int get _totalSteps => _steps.length;
 
@@ -136,10 +185,10 @@ class _SlipLogScreenState extends ConsumerState<SlipLogScreen> {
     final log = DailyLog(
       id: const Uuid().v4(),
       date: DateTime.now(),
-      cravingIntensity: 0,
-      hasSmoked: true,
-      smokeCount: _smokeCount,
-      type: 'slip',
+      cravingIntensity: _hasSmoked == false ? _intensity.toInt() : 0,
+      hasSmoked: _hasSmoked ?? false,
+      smokeCount: _hasSmoked == true ? _smokeCount : 0,
+      type: _hasSmoked == true ? 'slip' : 'craving',
       location: _location,
       moods: finalMoods,
       context: finalActivities,
@@ -151,11 +200,13 @@ class _SlipLogScreenState extends ConsumerState<SlipLogScreen> {
     context.pop();
     ref.read(historyLogsProvider.notifier).addLog(log);
 
-    // Analytics: Sigara içme olayını logla
-    ref.read(analyticsServiceProvider).logSmokeLogged(
-          count: log.smokeCount,
-          reason: log.note,
-        );
+    // Analytics: Olayları logla
+    final analytics = ref.read(analyticsServiceProvider);
+    if (log.hasSmoked) {
+      analytics.logSmokeLogged(count: log.smokeCount, reason: log.note);
+    } else {
+      analytics.logCravingResisted(intensity: log.cravingIntensity);
+    }
   }
 
   @override
@@ -203,9 +254,7 @@ class _SlipLogScreenState extends ConsumerState<SlipLogScreen> {
           const SizedBox(width: 16),
           Text(
             "${_currentPage + 1}/$_totalSteps",
-            style: AppTextStyles.bodySemibold.copyWith(
-              color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -213,13 +262,11 @@ class _SlipLogScreenState extends ConsumerState<SlipLogScreen> {
   }
 
   Widget _buildFooter() {
+    // İlk sayfada seçim yapana kadar butonu gizle (UX açısından daha temiz)
+    if (_currentPage == 0 && _hasSmoked == null) return const SizedBox.shrink();
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.p24,
-        0,
-        AppSpacing.p24,
-        AppSpacing.p24,
-      ),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.p24, 0, AppSpacing.p24, AppSpacing.p24),
       child: LunoButton(
         text: _currentPage == _totalSteps - 1 ? "Kaydet" : "Devam Et",
         icon: _currentPage == _totalSteps - 1 ? Icons.check : Icons.arrow_forward,
