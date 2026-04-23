@@ -21,6 +21,7 @@ class EmailRegisterScreen extends ConsumerStatefulWidget {
 
 class _EmailRegisterScreenState extends ConsumerState<EmailRegisterScreen> {
   bool _isPasswordVisible = false;
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -90,7 +91,9 @@ class _EmailRegisterScreenState extends ConsumerState<EmailRegisterScreen> {
               const SizedBox(height: AppSpacing.p32),
 
               // Form Kutusu
-              Container(
+              Form(
+                key: _formKey,
+                child: Container(
                 padding: AppSpacing.cardPaddingLarge,
                 decoration: BoxDecoration(
                   color: AppColors.lightCard,
@@ -113,6 +116,12 @@ class _EmailRegisterScreenState extends ConsumerState<EmailRegisterScreen> {
                       controller: _emailController,
                       hint: 'ornek@mail.com',
                       icon: Icons.mail_outline,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (val) {
+                        if (val == null || val.trim().isEmpty) return 'E-posta boş bırakılamaz';
+                        if (!val.contains('@')) return 'Geçerli bir e-posta gir';
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 20),
                     Text('Şifre', style: AppTextStyles.label),
@@ -128,11 +137,17 @@ class _EmailRegisterScreenState extends ConsumerState<EmailRegisterScreen> {
                           () => _isPasswordVisible = !_isPasswordVisible,
                         );
                       },
+                      validator: (val) {
+                        if (val == null || val.isEmpty) return 'Şifre boş bırakılamaz';
+                        if (val.length < 6) return 'Şifre en az 6 karakter olmalı';
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 24),
                     _buildRegisterButton(authState.isLoading),
                   ],
                 ),
+              ),
               ),
 
               const SizedBox(height: AppSpacing.p24),
@@ -208,41 +223,60 @@ class _EmailRegisterScreenState extends ConsumerState<EmailRegisterScreen> {
     bool isPassword = false,
     bool isPasswordVisible = false,
     VoidCallback? onToggleVisibility,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.lightInputBg,
-        borderRadius: AppRadius.input,
-        border: Border.all(color: AppColors.lightBorder),
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: isPassword && !isPasswordVisible,
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(
-            color: AppColors.lightMutedForeground.withValues(alpha: 0.5),
-          ),
-          prefixIcon: Icon(
-            icon,
-            color: AppColors.lightMutedForeground,
-            size: 20,
-          ),
-          suffixIcon: isPassword
-              ? IconButton(
-                  icon: Icon(
-                    isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                    color: AppColors.lightMutedForeground,
-                    size: 20,
-                  ),
-                  onPressed: onToggleVisibility,
-                )
-              : null,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
-          ),
+    return TextFormField(
+      controller: controller,
+      obscureText: isPassword && !isPasswordVisible,
+      keyboardType: keyboardType,
+      validator: validator,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(
+          color: AppColors.lightMutedForeground.withValues(alpha: 0.5),
+        ),
+        prefixIcon: Icon(
+          icon,
+          color: AppColors.lightMutedForeground,
+          size: 20,
+        ),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(
+                  isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  color: AppColors.lightMutedForeground,
+                  size: 20,
+                ),
+                onPressed: onToggleVisibility,
+              )
+            : null,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.lightBorder),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.lightBorder),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.lightPrimary, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.lightDestructive),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.lightDestructive, width: 1.5),
+        ),
+        filled: true,
+        fillColor: AppColors.lightInputBg,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
         ),
       ),
     );
@@ -253,15 +287,14 @@ class _EmailRegisterScreenState extends ConsumerState<EmailRegisterScreen> {
       onTap: isLoading
           ? null
           : () {
-              if (_emailController.text.isNotEmpty &&
-                  _passwordController.text.isNotEmpty) {
-                ref
-                    .read(authControllerProvider.notifier)
-                    .signUpWithEmailAndPassword(
-                      _emailController.text.trim(),
-                      _passwordController.text.trim(),
-                    );
-              }
+              // Form validasyonu geçmeden istek gönderilmez
+              if (_formKey.currentState?.validate() != true) return;
+              ref
+                  .read(authControllerProvider.notifier)
+                  .signUpWithEmailAndPassword(
+                    _emailController.text.trim(),
+                    _passwordController.text.trim(),
+                  );
             },
       child: Container(
         width: double.infinity,

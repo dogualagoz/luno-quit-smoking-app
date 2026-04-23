@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/auth_repository.dart';
 import '../../onboarding/data/onboarding_repository.dart';
 import '../../onboarding/data/firestore_repository.dart';
+import '../../../services/local_storage/hive_service.dart';
 
 /// AuthService Provider
 final authServiceProvider = Provider<AuthService>((ref) {
@@ -88,17 +89,30 @@ class AuthService {
 
     if (cloudProfile != null) {
       // BULUTTA VERİ VAR → Bulut profili her zaman öncelikli (hesabın gerçek sahibi)
+      // Önce tüm yerel veriyi temizle, sonra bulut verisini yaz
+      await HiveService.clearAllData();
       await _onboardingRepository.saveProfile(cloudProfile);
     } else {
       // BULUTTA VERİ YOK → Yeni hesap veya ilk senkronizasyon
       final localProfile = _onboardingRepository.getProfile();
+
       if (localProfile != null) {
-        final profileToSync = localProfile.copyWith(
-          userId: userId,
-          email: user.email,
-        );
-        await _onboardingRepository.saveProfile(profileToSync);
-        await _firestoreRepository.saveProfile(profileToSync);
+        // GÜVENLİK KONTROLÜ: Yerel profil başka bir kullanıcıya mı ait?
+        final isOwnData = localProfile.userId == null || localProfile.userId == userId;
+
+        if (isOwnData) {
+          // Sahipsiz veri veya aynı kullanıcının verisi → sahiplen ve Firestore'a yaz
+          final profileToSync = localProfile.copyWith(
+            userId: userId,
+            email: user.email,
+          );
+          await _onboardingRepository.saveProfile(profileToSync);
+          await _firestoreRepository.saveProfile(profileToSync);
+        } else {
+          // BAŞKA KULLANICININ VERİSİ → Tüm yerel veriyi temizle
+          // Router onboarding'e yönlendirecek (hasProfile artık false)
+          await HiveService.clearAllData();
+        }
       }
     }
 
@@ -106,27 +120,24 @@ class AuthService {
     _ref.invalidate(userProfileProvider);
   }
 
-  /// Oturumu kapatır ve cihazdaki yerel verileri tamamen temizler.
+  /// Oturumu kapatır ve cihazdaki tüm yerel verileri temizler.
   Future<void> signOut() async {
     // 1. Firebase ve Google oturumunu kapat
     await _authRepository.signOut();
-    // 2. ÖNEMLİ: Cihazdaki yerel onboarding verilerini sil
-    // Bu sayede yeni bir hesapla girince eski veriler karışmaz.
-    await _onboardingRepository.deleteProfile();
+    // 2. Tüm yerel verileri sil (profil + günlük loglar)
+    // Bu sayede başka bir hesapla girince eski kullanıcının verileri görünmez.
+    await HiveService.clearAllData();
   }
 
-  /// Hesabı tamamen siler, yerel ve (gerekirse) bulut verileri dahil temizler.
+  /// Hesabı tamamen siler, yerel ve bulut verileri dahil temizler.
   Future<void> deleteAccount() async {
     final user = _authRepository.currentUser;
     if (user != null) {
-      // 1. İsteğe bağlı: kullanıcının buluttaki verisini (users collection) silebiliriz.
-      // await _firestoreRepository.deleteProfile(user.uid); 
-      
-      // 2. Firebase ve Google Auth id'sini (hesabı) tamamen sil
-      await _authRepository.deleteAccount();
+      // 1. Önce tüm yerel verileri temizle (profil + günlük loglar)
+      await HiveService.clearAllData();
 
-      // 3. Yerel verileri (Hive) temizle
-      await _onboardingRepository.deleteProfile();
+      // 2. Firebase ve Google Auth kimliğini (hesabı) tamamen sil
+      await _authRepository.deleteAccount();
     }
   }
 }

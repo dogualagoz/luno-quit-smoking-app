@@ -30,4 +30,11 @@ class HiveService {
   static Box<DailyLog> getDailyLogsBox() {
     return Hive.box<DailyLog>(dailyLogsBoxName);
   }
+
+  /// Tüm yerel verileri temizler (Logout ve hesap silme işlemlerinde çağrılır).
+  /// Profil ve günlük loglar dahil tüm kutular sıfırlanır.
+  static Future<void> clearAllData() async {
+    await getUserBox().clear();
+    await getDailyLogsBox().clear();
+  }
 }

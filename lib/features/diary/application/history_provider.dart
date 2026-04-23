@@ -1,9 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luno_quit_smoking_app/core/providers/firebase_providers.dart';
+import 'package:luno_quit_smoking_app/features/auth/data/auth_repository.dart';
 import 'package:luno_quit_smoking_app/features/diary/data/history_repository.dart';
 import 'package:luno_quit_smoking_app/features/diary/data/models/daily_log.dart';
 
+// Auth durumu değiştiğinde (giriş/çıkış) provider yeniden oluşturulur,
+// böylece eski kullanıcının logları bir sonraki kullanıcıya görünmez.
 final historyRepositoryProvider = Provider<HistoryRepository>((ref) {
+  // Auth state'i izliyoruz; kullanıcı değişince provider yeniden oluşur
+  ref.watch(authStateProvider);
   return HistoryRepository(
     firestore: ref.watch(firestoreProvider),
     auth: ref.watch(firebaseAuthProvider),

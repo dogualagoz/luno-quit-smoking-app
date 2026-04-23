@@ -124,6 +124,15 @@ class AuthSelectionScreen extends ConsumerWidget {
                     border: Border.all(color: theme.dividerColor),
                     onPressed: () => context.push(AppRouter.emailLogin),
                   ),
+                  const SizedBox(height: AppSpacing.p12),
+                  _AuthButton(
+                    iconData: Icons.person_add_outlined,
+                    text: 'E-posta ile kayıt ol',
+                    backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
+                    textColor: colorScheme.primary,
+                    border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
+                    onPressed: () => context.push(AppRouter.register),
+                  ),
                   const SizedBox(height: AppSpacing.p16),
 
                   _AuthButton(

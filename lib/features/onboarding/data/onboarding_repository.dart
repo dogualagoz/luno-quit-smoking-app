@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:luno_quit_smoking_app/services/local_storage/hive_service.dart';
 import 'package:luno_quit_smoking_app/core/providers/firebase_providers.dart';
+import 'package:luno_quit_smoking_app/features/auth/data/auth_repository.dart';
 import '../../../core/services/analytics_service.dart';
 import 'models/user_profile.dart';
 
@@ -11,11 +12,15 @@ final onboardingRepositoryProvider = Provider((ref) {
   return OnboardingRepository(analytics);
 });
 
-// Kullanıcı profilini reaktif olarak takip eden provider
+// Kullanıcı profilini reaktif olarak takip eden provider.
+// Auth durumu değiştiğinde (giriş/çıkış) profil otomatik yeniden okunur.
 final userProfileProvider = StateProvider<UserProfile?>((ref) {
+  // Auth state'i izliyoruz; kullanıcı değişince profil tekrar okunur
+  ref.watch(authStateProvider);
   final repo = ref.watch(onboardingRepositoryProvider);
   return repo.getProfile();
 });
+
 
 class OnboardingRepository {
   final AnalyticsService _analytics;
