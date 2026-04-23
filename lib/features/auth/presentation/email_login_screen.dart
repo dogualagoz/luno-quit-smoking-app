@@ -150,30 +150,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                 ),
               ),
 
-              const SizedBox(height: AppSpacing.p24),
 
-              // Kayıt Ol Linki
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Hesabın yok mu? ',
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.lightMutedForeground,
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () => context.push('/register'),
-                    child: Text(
-                      'Kayıt ol',
-                      style: AppTextStyles.body.copyWith(
-                        color: AppColors.lightPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
 
               const SizedBox(height: AppSpacing.p32),
 
@@ -205,12 +182,6 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                     onTap: () => ref
                         .read(authControllerProvider.notifier)
                         .signInWithGoogle(),
-                  ),
-                  const SizedBox(width: 20),
-                  _buildSocialIcon(
-                    Icons.face_retouching_natural_outlined,
-                    isAnonym: true,
-                    onTap: () => context.go('/'),
                   ),
                 ],
               ),
@@ -326,7 +297,6 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
   Widget _buildSocialIcon(
     IconData icon, {
     bool isGoogle = false,
-    bool isAnonym = false,
     required VoidCallback onTap,
   }) {
     return InkWell(

@@ -32,26 +32,35 @@ final routerProvider = Provider<GoRouter>((ref) {
     observers: [analytics.getObserver()],
     redirect: (context, state) {
       final isLoggedIn = authState.value != null;
-      final isBoardingFinished = onboardingRepo.isProfileCreated();
+      final hasProfile = onboardingRepo.isProfileCreated();
+      final location = state.matchedLocation;
 
-      final goingToOnboarding = state.matchedLocation == AppRouter.onboarding;
+      final goingToSplash = location == AppRouter.splash;
+      final goingToOnboarding = location == AppRouter.onboarding;
       final goingToAuth =
-          state.matchedLocation == AppRouter.authSelection ||
-          state.matchedLocation == AppRouter.emailLogin ||
-          state.matchedLocation == AppRouter.register;
+          location == AppRouter.authSelection ||
+          location == AppRouter.emailLogin ||
+          location == AppRouter.register;
 
-      // 1. Giriş yapılmışsa ve auth veya onboarding sayfalarındaysa -> Ana Sayfa
-      if (isLoggedIn && (goingToAuth || goingToOnboarding)) {
+      // Splash her zaman geçer
+      if (goingToSplash) return null;
+
+      // 1. Giriş yapılmış + profil var → auth/onboarding sayfalarından ana sayfaya yönlendir
+      if (isLoggedIn && hasProfile && (goingToAuth || goingToOnboarding)) {
         return AppRouter.root;
       }
 
-      // 2. Giriş yapılmamışsa ve auth sayfasında değilse (veya splash'ten geliyorsa) -> Onboarding (WelcomeScreen)
-      // Bu sayede kullanıcıyı her zaman WelcomeScreen karşılar.
-      if (!isLoggedIn && !goingToOnboarding && !goingToAuth && state.matchedLocation != AppRouter.splash) {
+      // 2. Giriş yapılmış ama profil yok → onboarding'e yönlendir (hesap var, veri yok)
+      if (isLoggedIn && !hasProfile && !goingToOnboarding) {
         return AppRouter.onboarding;
       }
 
-      // 3. Hiçbir durum uymuyorsa olduğu yerde kalsın
+      // 3. Giriş yapılmamış + profil yok → welcome/auth sayfalarında kalabilir, diğer yerlere gidemez
+      if (!isLoggedIn && !goingToOnboarding && !goingToAuth) {
+        return AppRouter.onboarding;
+      }
+
+      // 4. Hiçbir koşul uymuyorsa olduğu yerde kalsın
       return null;
     },
     routes: [
@@ -80,7 +89,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRouter.craving,
-        builder: (context, state) => const CravingScreen(),
+        builder: (context, state) {
+          final initialSmoked = state.extra as bool?;
+          return CravingScreen(initialSmoked: initialSmoked);
+        },
       ),
       GoRoute(
         path: AppRouter.slipLog,

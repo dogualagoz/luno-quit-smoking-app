@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_button.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_progress_bar.dart';
 import 'package:luno_quit_smoking_app/features/diary/application/history_provider.dart';
@@ -22,7 +23,10 @@ import '../widgets/craving_steps/location_step.dart';
 import '../widgets/craving_steps/notes_step.dart';
 
 class CravingScreen extends ConsumerStatefulWidget {
-  const CravingScreen({super.key});
+  /// null = normal akış (sor), false = krize direnmiş, true = sigara içmiş
+  final bool? initialSmoked;
+
+  const CravingScreen({super.key, this.initialSmoked});
 
   @override
   ConsumerState<CravingScreen> createState() => _CravingScreenState();
@@ -141,6 +145,21 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
   int get _totalSteps => _steps.length;
 
   @override
+  void initState() {
+    super.initState();
+    // Parametre verilmişse ilk soruyu atla
+    if (widget.initialSmoked != null) {
+      _hasSmoked = widget.initialSmoked;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_pageController.hasClients) {
+          _pageController.jumpToPage(1);
+          setState(() => _currentPage = 1);
+        }
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _pageController.dispose();
     _notesController.dispose();
@@ -252,10 +271,24 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
             child: LunoProgressBar(value: (_currentPage + 1) / _totalSteps),
           ),
           const SizedBox(width: 16),
-          Text(
-            "${_currentPage + 1}/$_totalSteps",
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          // Kullanıcı çok zor bir kriz anındaysa sadece 1 satır doldurup Hızlı Kaydederek çıkabilsin
+          if (_currentPage > 0)
+            TextButton(
+              onPressed: _submit,
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.primary,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              ),
+              child: Text(
+                'Hızlı Kaydet',
+                style: AppTextStyles.label.copyWith(fontWeight: FontWeight.bold),
+              ),
+            )
+          else
+            Text(
+              "${_currentPage + 1}/$_totalSteps",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
         ],
       ),
     );

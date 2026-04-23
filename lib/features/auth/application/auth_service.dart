@@ -4,12 +4,13 @@ import '../data/auth_repository.dart';
 import '../../onboarding/data/onboarding_repository.dart';
 import '../../onboarding/data/firestore_repository.dart';
 
-/// AuthService Provider: Uygulama mantığını (business logic) yürüten servisi sağlar.
+/// AuthService Provider
 final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService(
     ref.watch(authRepositoryProvider),
     ref.watch(onboardingRepositoryProvider),
     ref.watch(firestoreRepositoryProvider),
+    ref,
   );
 });
 
@@ -17,11 +18,13 @@ class AuthService {
   final AuthRepository _authRepository;
   final OnboardingRepository _onboardingRepository;
   final FirestoreRepository _firestoreRepository;
+  final Ref _ref;
 
   AuthService(
     this._authRepository,
     this._onboardingRepository,
     this._firestoreRepository,
+    this._ref,
   );
 
   /// Google ile giriş yapar ve gerekirse verileri senkronize eder.
@@ -84,24 +87,23 @@ class AuthService {
     final cloudProfile = await _firestoreRepository.fetchProfile(userId);
 
     if (cloudProfile != null) {
-      // 2. BULUTTA VERI VAR: Kullanıcı uygulamayı silip yüklemiş veya yeni bir cihazda.
-      // Buluttaki veriyi alıp yerel (Hive) belleğe kaydediyoruz.
+      // BULUTTA VERİ VAR → Bulut profili her zaman öncelikli (hesabın gerçek sahibi)
       await _onboardingRepository.saveProfile(cloudProfile);
     } else {
-      // 3. BULUTTA VERI YOK: Yeni giriş yapmış bir kullanıcı.
+      // BULUTTA VERİ YOK → Yeni hesap veya ilk senkronizasyon
       final localProfile = _onboardingRepository.getProfile();
       if (localProfile != null) {
-        // Yereldeki (Hive) veriye Firebase UserId ve Email ekleyip buluta yedekliyoruz.
         final profileToSync = localProfile.copyWith(
           userId: userId,
           email: user.email,
         );
-        await _onboardingRepository.saveProfile(
-          profileToSync,
-        ); // Yereli güncelle
-        await _firestoreRepository.saveProfile(profileToSync); // Buluta yedekle
+        await _onboardingRepository.saveProfile(profileToSync);
+        await _firestoreRepository.saveProfile(profileToSync);
       }
     }
+
+    // UI'ın güncel profili görmesi için provider'ı yenile
+    _ref.invalidate(userProfileProvider);
   }
 
   /// Oturumu kapatır ve cihazdaki yerel verileri tamamen temizler.

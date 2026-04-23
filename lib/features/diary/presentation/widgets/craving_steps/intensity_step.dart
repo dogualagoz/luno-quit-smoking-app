@@ -74,6 +74,43 @@ class IntensityStep extends StatelessWidget {
                     fontSize: 40,
                   ),
                 ),
+                const SizedBox(height: AppSpacing.p24),
+                // Dinamik motivasyon/öneri mesajı
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: Container(
+                    key: ValueKey<int>(value.round()),
+                    padding: const EdgeInsets.all(AppSpacing.p16),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          value > 7 ? Icons.warning_amber_rounded :
+                          value > 4 ? Icons.self_improvement : Icons.check_circle_outline,
+                          color: primaryColor,
+                          size: 28,
+                        ),
+                        const SizedBox(width: AppSpacing.p12),
+                        Expanded(
+                          child: Text(
+                            value > 8 ? "Şu an en zor anındasın. Ama inan hepsi geçecek. Sadece 3 dakika derin nefes al ve ertele." :
+                            value > 5 ? "Biraz zorluyor farkındayım... Kalkıp bir bardak su içmek ya da yüzünü yıkamak iyi gelebilir." :
+                            value > 2 ? "Aklına geldi ama kontrol sende. Çok iyi gidiyorsun, bu minik krizler seni güçlendirir." :
+                            "Neredeyse hiç zorlanmadan atlattın. Gurur verici! 🎉",
+                            style: AppTextStyles.bodySemibold.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

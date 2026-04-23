@@ -61,14 +61,14 @@ class _QuickSlipDialogState extends ConsumerState<QuickSlipDialog> {
             ),
             const SizedBox(height: AppSpacing.p16),
             Text(
-              "Kaçamak Yaptın 😔",
+              "Kayıt Düşelim",
               style: AppTextStyles.cardHeader.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              "Dürüstçe kaydetmek de başarının bir parçasıdır. Kaç tane içtin?",
+              "Kaydetmek en büyük adımdır. Kaç tane oldu?",
               textAlign: TextAlign.center,
               style: AppTextStyles.caption.copyWith(color: Theme.of(context).hintColor),
             ),

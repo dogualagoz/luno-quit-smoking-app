@@ -519,7 +519,7 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen>
               text: "Krizi Kaydet",
               icon: Icons.shield_outlined,
               onPressed: () {
-                context.push(AppRouter.craving);
+                context.push(AppRouter.craving, extra: false);
                 // Başarı ekranından çıkınca idle'a geri dön
                 Future.delayed(const Duration(milliseconds: 500), () {
                   if (mounted) _reset();

@@ -82,9 +82,9 @@ class WelcomeScreen extends StatelessWidget {
                     children: [
                       WidgetSpan(
                         child: GestureDetector(
-                          onTap: () => context.go(AppRouter.authSelection),
+                          onTap: () => context.push(AppRouter.emailLogin),
                           child: Text(
-                            "O zaman giriş yap",
+                            "Giriş yap",
                             style: AppTextStyles.bodySemibold.copyWith(
                               color: colors.primary,
                               decoration: TextDecoration.underline,

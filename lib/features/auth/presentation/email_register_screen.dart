@@ -191,12 +191,6 @@ class _EmailRegisterScreenState extends ConsumerState<EmailRegisterScreen> {
                         .read(authControllerProvider.notifier)
                         .signInWithGoogle(),
                   ),
-                  const SizedBox(width: 20),
-                  _buildSocialIcon(
-                    Icons.face_retouching_natural_outlined,
-                    isAnonym: true,
-                    onTap: () => context.go('/'),
-                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.p40),
@@ -311,7 +305,6 @@ class _EmailRegisterScreenState extends ConsumerState<EmailRegisterScreen> {
   Widget _buildSocialIcon(
     IconData icon, {
     bool isGoogle = false,
-    bool isAnonym = false,
     required VoidCallback onTap,
   }) {
     return InkWell(
