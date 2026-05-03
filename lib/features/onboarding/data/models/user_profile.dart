@@ -40,6 +40,9 @@ class UserProfile extends HiveObject {
   @HiveField(11)
   final String? email; // Kullanıcı e-postası için
 
+  @HiveField(12, defaultValue: 0)
+  final int weeklySmokingGoal; // Haftalık azaltma hedefi (sigara adet). 0 = hedef girilmemiş.
+
   UserProfile({
     required this.nickname,
     required this.dailyCigarettes,
@@ -53,6 +56,7 @@ class UserProfile extends HiveObject {
     this.triggerMoment,
     this.userId,
     this.email,
+    this.weeklySmokingGoal = 0,
   });
 
   /// Sadece değişen alanları güncelleyerek yeni bir kopya oluşturur
@@ -69,6 +73,7 @@ class UserProfile extends HiveObject {
     String? triggerMoment,
     String? userId,
     String? email,
+    int? weeklySmokingGoal,
   }) {
     return UserProfile(
       nickname: nickname ?? this.nickname,
@@ -83,6 +88,7 @@ class UserProfile extends HiveObject {
       triggerMoment: triggerMoment ?? this.triggerMoment,
       userId: userId ?? this.userId,
       email: email ?? this.email,
+      weeklySmokingGoal: weeklySmokingGoal ?? this.weeklySmokingGoal,
     );
   }
 
@@ -100,6 +106,7 @@ class UserProfile extends HiveObject {
     'triggerMoment': triggerMoment,
     'userId': userId,
     'email': email,
+    'weeklySmokingGoal': weeklySmokingGoal,
   };
 
   /// Firestore'dan gelen JSON'dan UserProfile oluşturur
@@ -118,5 +125,6 @@ class UserProfile extends HiveObject {
     triggerMoment: json['triggerMoment'] as String?,
     userId: json['userId'] as String?,
     email: json['email'] as String?,
+    weeklySmokingGoal: json['weeklySmokingGoal'] as int? ?? 0,
   );
 }

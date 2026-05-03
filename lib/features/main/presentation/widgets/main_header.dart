@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/theme_provider.dart';
+import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
+import 'package:luno_quit_smoking_app/features/diary/application/streak_provider.dart';
 
+/// Ana sayfa başlık bileşeni.
+/// Karşılama metni + seri (streak) göstergesi içerir.
+/// Dark mode toggle buradan kaldırıldı — Ayarlar > Araçlar & Görünüm'den erişilebilir.
 class MainHeader extends ConsumerWidget {
   final String userName;
   final String subText;
@@ -12,11 +16,7 @@ class MainHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final themeMode = ref.watch(themeModeProvider);
-    
-    final isDarkMode = themeMode == ThemeMode.dark ||
-        (themeMode == ThemeMode.system &&
-            MediaQuery.of(context).platformBrightness == Brightness.dark);
+    final streak = ref.watch(streakProvider);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -27,7 +27,7 @@ class MainHeader extends ConsumerWidget {
             children: [
               // Merhaba, x
               Text(
-                "Merhaba, $userName 💨",
+                'Merhaba, $userName 💨',
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w900,
                   fontSize: 22.4,
@@ -38,7 +38,7 @@ class MainHeader extends ConsumerWidget {
               ),
               const SizedBox(height: 4),
 
-              // altındaki yazı
+              // Alt bilgi metni
               Text(
                 subText,
                 style: textTheme.bodySmall?.copyWith(
@@ -52,24 +52,73 @@ class MainHeader extends ConsumerWidget {
           ),
         ),
 
-        //Ay ikonu (tema değiştirici)
-        GestureDetector(
-          onTap: () => ref.read(themeModeProvider.notifier).toggleTheme(),
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.secondary.withValues(alpha: 0.4),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              isDarkMode ? Icons.light_mode_outlined : Icons.nightlight_outlined,
-              size: 20,
-              color: theme.colorScheme.primary,
-            ),
+        // Streak rozeti — sadece streak > 0 olduğunda göster
+        if (streak > 0) _StreakBadge(streak: streak),
+      ],
+    );
+  }
+}
+
+/// Streak sayısını gösteren rozet.
+/// Tema renklerini kullanır, animasyonla belirir.
+class _StreakBadge extends StatelessWidget {
+  final int streak;
+
+  const _StreakBadge({required this.streak});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 400),
+      child: Container(
+        key: ValueKey(streak),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          // Tema primary rengin açık tonu — tema.md secondary/accent benzeri
+          color: primary.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: primary.withValues(alpha: 0.25),
+            width: 1.2,
           ),
         ),
-      ],
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Alev ikonu
+            Text(
+              '🔥',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(width: 5),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '$streak',
+                  style: AppTextStyles.bodySemibold.copyWith(
+                    color: primary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    height: 1.1,
+                  ),
+                ),
+                Text(
+                  'günlük seri',
+                  style: AppTextStyles.micro.copyWith(
+                    color: primary.withValues(alpha: 0.75),
+                    fontSize: 9.5,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

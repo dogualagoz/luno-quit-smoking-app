@@ -83,9 +83,9 @@ class MainShell extends StatelessWidget {
                           "Kriz",
                         ),
                         _buildNavItem(
-                          Icons.history_rounded,
-                          Icons.history_outlined,
-                          "Geçmiş",
+                          Icons.menu_book_outlined,
+                          Icons.menu_book_rounded,
+                          "Günlük",
                         ),
                         _buildNavItem(
                           Icons.settings_outlined,

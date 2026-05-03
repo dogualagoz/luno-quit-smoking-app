@@ -44,6 +44,15 @@ class SettingsController extends StateNotifier<SettingsState> {
     );
   }
 
+  /// Haftalık sigara azaltma hedefini günceller
+  void updateWeeklySmokingGoal(int value) {
+    if (state.profile == null) return;
+    state = state.copyWith(
+      profile: state.profile!.copyWith(weeklySmokingGoal: value),
+      isDirty: true,
+    );
+  }
+
   Future<void> saveSettings() async {
     if (!state.isDirty || state.profile == null) return;
     

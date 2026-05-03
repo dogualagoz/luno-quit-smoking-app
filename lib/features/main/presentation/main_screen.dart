@@ -12,7 +12,6 @@ import 'package:luno_quit_smoking_app/core/widgets/quote_card.dart';
 import 'package:luno_quit_smoking_app/core/widgets/stat_grid.dart';
 import 'package:luno_quit_smoking_app/core/widgets/speech_bubble.dart';
 import 'package:luno_quit_smoking_app/features/main/presentation/widgets/main_header.dart';
-import 'package:luno_quit_smoking_app/features/main/presentation/widgets/daily_checkin_card.dart';
 import 'package:luno_quit_smoking_app/core/widgets/swipeable_damage_cards.dart';
 import 'package:luno_quit_smoking_app/features/diary/presentation/widgets/today_summary_card.dart';
 import 'package:luno_quit_smoking_app/features/main/application/stats_provider.dart';
@@ -36,6 +35,17 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Sayfa oluştuktan sonra, bugün log yoksa check-in pop-up'u göster
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_hasLogForToday()) {
+        _showCheckinPopup(context);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // --- Durum İzleme (İstatistikler ve Kullanıcı Verileri) ---
@@ -80,9 +90,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   // Konuşma Balonu
                   SpeechBubble(text: statsData.prepSubtext),
                   AppSpacing.sectionGap,
-
-                  // Günlük Check-in Kartı (bugün log yoksa göster)
-                  _buildCheckinSection(),
 
                   // Organ Hasar Kartları
                   SwipeableDamageCards(organs: statsData.organDamages),
@@ -136,34 +143,176 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         log.date.day == today.day);
   }
 
-  // Check-in kartı — AnimatedSwitcher ile smooth geçiş
-  Widget _buildCheckinSection() {
-    final hasLog = _hasLogForToday();
+  /// Bugün log girilmemişse otomatik açılan günlük check-in bottom sheet'i
+  void _showCheckinPopup(BuildContext context) {
+    HapticFeedback.lightImpact();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final bgColor = isDark
+        ? theme.colorScheme.surface
+        : AppColors.lightBackground;
+    final successColor =
+        isDark ? AppColors.darkChartSuccess : AppColors.lightChartSuccess;
+    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+    final warningColor =
+        isDark ? AppColors.darkChartWarning : AppColors.lightChartWarning;
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 500),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeIn,
-      transitionBuilder: (child, animation) {
-        return FadeTransition(
-          opacity: animation,
-          child: SizeTransition(
-            sizeFactor: animation,
-            child: child,
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          bottom: true,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.p20,
+              AppSpacing.p16,
+              AppSpacing.p20,
+              AppSpacing.p32,
+            ),
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+              // Tema.md shadow-sm
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, -4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Handle
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(9999),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.p20),
+
+                // Başlık satırı
+                Text(
+                  'Bugün nasıl gidiyor?',
+                  style: AppTextStyles.cardHeader.copyWith(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.p8),
+                Text(
+                  'Ciğerito merak ediyor...',
+                  style: AppTextStyles.caption.copyWith(
+                    color: theme.hintColor,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.p24),
+
+                // Seçenek kartları (Tema.md StatCard anatomy)
+                Row(
+                  children: [
+                    // Temiz Gün
+                    Expanded(
+                      child: _CheckinOptionCard(
+                        icon: Icons.shield_outlined,
+                        title: 'Temiz Gün',
+                        subtitle: 'İçmedim ✨',
+                        color: successColor,
+                        onTap: () {
+                          HapticFeedback.mediumImpact();
+                          Navigator.pop(sheetContext);
+                          _saveCleanDay();
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.p12),
+
+                    // Birkaç Dal
+                    Expanded(
+                      child: _CheckinOptionCard(
+                        icon: Icons.smoking_rooms_outlined,
+                        title: 'Birkaç Dal',
+                        subtitle: 'Kaydet 📝',
+                        color: primary,
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.pop(sheetContext);
+                          _showQuickCountSheet(context);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.p12),
+
+                    // Zor Gün
+                    Expanded(
+                      child: _CheckinOptionCard(
+                        icon: Icons.thunderstorm_outlined,
+                        title: 'Zor Gün',
+                        subtitle: 'Detaylı ⚡',
+                        color: warningColor,
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.pop(sheetContext);
+                          context.push(AppRouter.craving);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: AppSpacing.p20),
+
+                // Alt kapatma linki
+                Center(
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(sheetContext),
+                    child: Text(
+                      'Sonra Hatırlat',
+                      style: AppTextStyles.bodySemibold.copyWith(
+                        color: theme.hintColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
-      child: hasLog
-          ? const SizedBox.shrink(key: ValueKey('checkin-empty'))
-          : Padding(
-              key: const ValueKey('checkin-card'),
-              padding: const EdgeInsets.only(bottom: 20),
-              child: DailyCheckinCard(
-                onFewSmokes: () => _showQuickCountSheet(context),
-                onToughDay: () => context.push(AppRouter.craving),
-              ),
-            ),
     );
+  }
+
+  /// Temiz gün kaydı oluştur
+  void _saveCleanDay() {
+    final log = DailyLog(
+      id: const Uuid().v4(),
+      date: DateTime.now(),
+      cravingIntensity: 0,
+      hasSmoked: false,
+      smokeCount: 0,
+      type: 'craving',
+      moods: const [],
+      context: const [],
+      companions: const [],
+      note: 'Temiz Gün ✨',
+    );
+    ref.read(historyLogsProvider.notifier).addLog(log);
+    ref.read(analyticsServiceProvider).logCravingResisted(intensity: 0);
   }
 
   // FAB'dan açılan akıllı kayıt menüsü
@@ -495,6 +644,100 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: color, size: 24),
+      ),
+    );
+  }
+}
+
+/// Pop-up check-in içindeki tek seçenek kartı.
+/// Tema.md StatCard anatomisine uygun; renk, ikon, başlık ve altyazı alır.
+class _CheckinOptionCard extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _CheckinOptionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  State<_CheckinOptionCard> createState() => _CheckinOptionCardState();
+}
+
+class _CheckinOptionCardState extends State<_CheckinOptionCard> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.93 : 1.0,
+        duration: const Duration(milliseconds: 110),
+        curve: Curves.easeOut,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 110),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+          decoration: BoxDecoration(
+            // Tema.md: card bg + border renkleri
+            color: _pressed
+                ? widget.color.withValues(alpha: 0.14)
+                : widget.color.withValues(alpha: 0.07),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: _pressed
+                  ? widget.color.withValues(alpha: 0.35)
+                  : widget.color.withValues(alpha: 0.18),
+              width: 1.2,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // İkon kabı — Tema.md: icon container radius 12px, padding 10px
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: widget.color.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(widget.icon, color: widget.color, size: 20),
+              ),
+              const SizedBox(height: 10),
+              // Başlık — Tema.md: body semibold 13.6px
+              Text(
+                widget.title,
+                textAlign: TextAlign.center,
+                style: AppTextStyles.bodySemibold.copyWith(
+                  fontSize: 13,
+                  height: 1.2,
+                ),
+              ),
+              const SizedBox(height: 3),
+              // Alt yazı — Tema.md: caption 12.5px, primary renk
+              Text(
+                widget.subtitle,
+                textAlign: TextAlign.center,
+                style: AppTextStyles.caption.copyWith(
+                  color: widget.color,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

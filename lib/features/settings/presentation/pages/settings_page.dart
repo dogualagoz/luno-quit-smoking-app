@@ -18,6 +18,7 @@ import '../../../../core/theme/theme_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:luno_quit_smoking_app/features/diary/application/history_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -41,9 +42,23 @@ class SettingsPage extends ConsumerWidget {
         ? DateFormat('dd.MM.yyyy').format(originalProfile.createdAt)
         : "-";
 
-    // Sliders değerleri (Controller'dan geliyor)
-    final int dailyCig = userProfile?.dailyCigarettes ?? 0;
+    // Slider değerleri (Controller'dan geliyor)
+    final int weeklyGoal = userProfile?.weeklySmokingGoal ?? 0;
     final double price = userProfile?.packPrice ?? 0.0;
+
+    // Bu haftaki toplam sigara sayısı (progress için)
+    final logs = ref.watch(historyLogsProvider).value ?? [];
+    final now = DateTime.now();
+    final startOfWeek = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(Duration(days: now.weekday - 1));
+    final int weeklyActual = logs
+        .where((log) =>
+            log.hasSmoked &&
+            !log.date.isBefore(startOfWeek))
+        .fold(0, (sum, log) => sum + log.smokeCount);
     
     return PopScope(
       canPop: true,
@@ -90,20 +105,22 @@ class SettingsPage extends ConsumerWidget {
                             style: AppTextStyles.cardHeader,
                           ),
                           const SizedBox(height: AppSpacing.p24),
-                          SettingsSlider(
-                            label: "Günlük ortalama",
-                            value: dailyCig.toString(),
-                            unit: " adet",
-                            progress: (dailyCig / 40.0).clamp(0.0, 1.0),
-                            activeColor: AppColors.lightPrimary,
-                            icon: Icons.smoke_free_rounded,
-                            subtext: "Hedef sıfır, unutma.",
+
+                          // --- Haftalık Azaltma Hedefi ---
+                          _WeeklyGoalSection(
+                            weeklyGoal: weeklyGoal,
+                            weeklyActual: weeklyActual,
                             onChanged: (val) {
-                              final newVal = (val * 40).round();
-                              ref.read(settingsControllerProvider.notifier)
-                                 .updateDailyCigarettes(newVal);
+                              // Max 140 adet (günde 20 x 7)
+                              const int maxWeeklySmoking = 140;
+                              final newVal =
+                                  (val * maxWeeklySmoking).round();
+                              ref
+                                  .read(settingsControllerProvider.notifier)
+                                  .updateWeeklySmokingGoal(newVal);
                             },
                           ),
+
                           const SizedBox(height: AppSpacing.p24),
                           SettingsSlider(
                             label: "Paket fiyatı",
@@ -113,8 +130,10 @@ class SettingsPage extends ConsumerWidget {
                             activeColor: AppColors.lightChartWarning,
                             icon: Icons.currency_lira_rounded,
                             onChanged: (val) {
-                               final newPrice = (val * 150).round().toDouble();
-                               ref.read(settingsControllerProvider.notifier)
+                              final newPrice =
+                                  (val * 150).round().toDouble();
+                              ref
+                                  .read(settingsControllerProvider.notifier)
                                   .updatePackPrice(newPrice);
                             },
                           ),
@@ -377,6 +396,165 @@ class SettingsPage extends ConsumerWidget {
         ),
       ),
     ),
+    );
+  }
+}
+
+/// Ayarlar sayfasındaki haftalık sigara azaltma hedefi bölümü.
+/// Slider ile hedef adet girilir, progress bar ile bu haftaki gerçekle karşılaştırılır.
+class _WeeklyGoalSection extends StatelessWidget {
+  // Sabitler
+  static const int _maxWeeklySmoking = 140; // Günde 20 × 7 gün
+  static const int _goalNotSet = 0;
+
+  final int weeklyGoal;
+  final int weeklyActual;
+  final ValueChanged<double> onChanged;
+
+  const _WeeklyGoalSection({
+    required this.weeklyGoal,
+    required this.weeklyActual,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    final bool goalSet = weeklyGoal > _goalNotSet;
+
+    // İlerleme oranı
+    final double progress = goalSet
+        ? (weeklyActual / weeklyGoal).clamp(0.0, 1.0)
+        : 0.0;
+
+    // Renk: %100 altı = yeşil, %80-100 arası = sarı, %100 üstü = kırmızı
+    Color progressColor;
+    if (!goalSet || weeklyActual == 0) {
+      progressColor = AppColors.lightChartSuccess;
+    } else if (progress < 0.8) {
+      progressColor = AppColors.lightChartSuccess;
+    } else if (progress < 1.0) {
+      progressColor = AppColors.lightChartWarning;
+    } else {
+      progressColor = AppColors.lightDestructive;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Başlık + ikon
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Icons.flag_outlined,
+                size: 18,
+                color: primary,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Haftalık Azaltma Hedefi',
+                  style: AppTextStyles.label.copyWith(
+                    color: theme.hintColor,
+                  ),
+                ),
+                Text(
+                  goalSet ? '$weeklyGoal adet/hafta' : 'Hedef belirlenmedi',
+                  style: AppTextStyles.bodySemibold.copyWith(
+                    color: goalSet
+                        ? theme.colorScheme.onSurface
+                        : theme.hintColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+
+        // Slider
+        const SizedBox(height: AppSpacing.p12),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            activeTrackColor: primary,
+            inactiveTrackColor: primary.withValues(alpha: 0.15),
+            thumbColor: primary,
+            overlayColor: primary.withValues(alpha: 0.1),
+            trackHeight: 4,
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+          ),
+          child: Slider(
+            value: (weeklyGoal / _maxWeeklySmoking).clamp(0.0, 1.0),
+            onChanged: onChanged,
+          ),
+        ),
+
+        // Hız çizelgesi etiketleri
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '0',
+                style: AppTextStyles.micro.copyWith(color: theme.hintColor),
+              ),
+              Text(
+                '${_maxWeeklySmoking ~/ 2}',
+                style: AppTextStyles.micro.copyWith(color: theme.hintColor),
+              ),
+              Text(
+                '$_maxWeeklySmoking',
+                style: AppTextStyles.micro.copyWith(color: theme.hintColor),
+              ),
+            ],
+          ),
+        ),
+
+        // Progress bar — Bu haftaki gerçek vs hedef
+        if (goalSet) ...[
+          const SizedBox(height: AppSpacing.p16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Bu hafta: $weeklyActual içildi',
+                style: AppTextStyles.caption.copyWith(
+                  color: theme.hintColor,
+                ),
+              ),
+              Text(
+                weeklyActual >= weeklyGoal ? 'Hedef aşıldı 🚨' : 'Hedef: $weeklyGoal',
+                style: AppTextStyles.caption.copyWith(
+                  color: progressColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Tema.md: progress bar radius 9999
+          ClipRRect(
+            borderRadius: BorderRadius.circular(9999),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 8,
+              backgroundColor: progressColor.withValues(alpha: 0.12),
+              valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
