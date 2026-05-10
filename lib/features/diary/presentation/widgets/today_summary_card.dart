@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luno_quit_smoking_app/core/router/app_router.dart';
@@ -26,11 +27,24 @@ class TodaySummaryCard extends ConsumerStatefulWidget {
 class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  Timer? _timer;
 
   @override
   void dispose() {
     _pageController.dispose();
+    _timer?.cancel();
     super.dispose();
+  }
+
+  void _checkTimer(bool isBurning) {
+    if (isBurning && _timer == null) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+        if (mounted) setState(() {});
+      });
+    } else if (!isBurning && _timer != null) {
+      _timer?.cancel();
+      _timer = null;
+    }
   }
 
   @override
@@ -63,11 +77,46 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
         ? AppColors.darkChartSuccess
         : AppColors.lightChartSuccess;
 
-    // Bugün için finansal ve zaman hesaplamaları
+    // Bugün için finansal ve zaman hesaplamaları (Kademeli Yanma Etkisi)
     final double pricePerCigarette =
         profile.packPrice / profile.cigarettesPerPack;
-    final double todayCost = todaySmoked * pricePerCigarette;
-    final int todayTimeLostMinutes = todaySmoked * 11; // Sigara başına 11 dk kayıp
+
+    double todayCost = 0.0;
+    int todayTimeLostMinutes = 0;
+    bool isBurning = false;
+    double activeBurnRatio = 0.0;
+    double minRatio = 1.0;
+
+    for (var log in todayLogs) {
+      if (_getLogType(log) == 'slip') {
+        int count = log.smokeCount as int;
+        // Bir sigara = 11 dakika.
+        int totalSec = count * 11 * 60;
+        int passedSec = DateTime.now().difference(log.date).inSeconds;
+        
+        double ratio = 1.0;
+        if (totalSec > 0 && passedSec >= 0) {
+          ratio = (passedSec / totalSec).clamp(0.0, 1.0);
+        } else if (passedSec < 0) {
+          ratio = 0.0;
+        }
+        
+        if (ratio < 1.0) {
+          isBurning = true;
+          if (ratio < minRatio) minRatio = ratio;
+        }
+        
+        double realizedCount = count * ratio;
+        todayCost += realizedCount * pricePerCigarette;
+        todayTimeLostMinutes += (count * 11 * ratio).round();
+      }
+    }
+    
+    if (isBurning) {
+      activeBurnRatio = minRatio;
+    }
+    
+    _checkTimer(isBurning);
 
     // --- Dünün Karşılaştırmalı Verileri ---
     final yesterdayDate = DateTime.now().subtract(const Duration(days: 1));
@@ -206,6 +255,75 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
                 ),
               );
             }),
+          ),
+          
+          const SizedBox(height: AppSpacing.p16),
+          // Yanan Para / Kademeli İşlem Barı
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isBurning ? "Paramız yanıyor... 🔥" : "Şu an güvendeyiz",
+                      style: AppTextStyles.micro.copyWith(
+                        color: isBurning 
+                            ? AppColors.lightDestructive 
+                            : primary.withValues(alpha: 0.6),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (isBurning)
+                      Text(
+                        "%${(activeBurnRatio * 100).toInt()} tamamlandı",
+                        style: AppTextStyles.micro.copyWith(
+                          color: AppColors.lightDestructive.withValues(alpha: 0.8),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: isBurning 
+                        ? AppColors.lightDestructive.withValues(alpha: 0.2)
+                        : primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(5),
+                    boxShadow: isBurning ? [
+                      BoxShadow(
+                        color: AppColors.lightDestructive.withValues(alpha: 0.2),
+                        blurRadius: 4,
+                        spreadRadius: 1,
+                      )
+                    ] : null,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(5),
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(
+                        begin: isBurning ? activeBurnRatio : 1.0,
+                        end: isBurning ? activeBurnRatio : 1.0,
+                      ),
+                      duration: const Duration(seconds: 1),
+                      builder: (context, val, child) {
+                        return LinearProgressIndicator(
+                          value: val,
+                          backgroundColor: Colors.transparent,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            isBurning ? AppColors.lightDestructive : primary.withValues(alpha: 0.3)
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
 
           // Alt Aksiyon Alanı ve Motivasyon Mesajı

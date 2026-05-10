@@ -29,8 +29,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   // Filtreler: 'H' (Haftalık), 'A' (Aylık), 'Y' (Yıllık)
   String _selectedFilter = 'A';
 
-  // Haftalık takvim için kaçıncı haftayı gösteriyoruz (0 = bu hafta, -1 = geçen hafta...)
-  int _weekOffset = 0;
+  // Aylık takvim için kaçıncı ayı gösteriyoruz (0 = bu ay, -1 = geçen ay...)
+  int _monthOffset = 0;
 
   // Seçili gün (takvimde tıklanan gün)
   DateTime? _selectedDay;
@@ -41,15 +41,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     initializeDateFormatting('tr_TR', null); // DateFormat için türkçe
   }
 
-  /// Gösterilen haftanın Pazartesi gününü döndürür
-  DateTime _weekStart() {
+  /// Gösterilen ayın başlangıcını döndürür
+  DateTime _monthStart() {
     final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    // Haftanın başı: bugün - (weekday-1) + offset*7
-    return today.subtract(
-      Duration(days: today.weekday - _kStartOfWeekDay) -
-          Duration(days: _weekOffset * 7),
-    );
+    return DateTime(now.year, now.month + _monthOffset, 1);
   }
 
   @override
@@ -158,19 +153,33 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     );
   }
 
-  // --- Haftalık Takvim + Detay Bölümü ---
+  // --- Aylık Takvim + Detay Bölümü ---
   Widget _buildCalendarSection(
     List<DailyLog> logs,
     double pricePerCigarette,
     ThemeData theme,
   ) {
-    final weekStart = _weekStart();
-    final weekDays = List.generate(
-      7,
-      (i) => weekStart.add(Duration(days: i)),
+    final monthStart = _monthStart();
+    
+    // Ayın ilk gününden geriye giderek pazartesiyi bul (ızgaranın başı)
+    final startOfGrid = monthStart.subtract(
+      Duration(days: monthStart.weekday - _kStartOfWeekDay),
+    );
+    
+    // Gösterilecek ayın gün sayısı
+    final nextMonthStart = DateTime(monthStart.year, monthStart.month + 1, 1);
+    final daysInMonth = nextMonthStart.difference(monthStart).inDays;
+    
+    // Toplam grid hücresi: Başlangıç boşlukları + ayın günleri
+    final totalDaysNeeded = (monthStart.weekday - _kStartOfWeekDay) + daysInMonth;
+    final totalWeeks = (totalDaysNeeded / 7).ceil();
+    
+    final gridDays = List.generate(
+      totalWeeks * 7,
+      (i) => startOfGrid.add(Duration(days: i)),
     );
 
-    // Bu haftada log olan günleri bul
+    // Bu aydaki logları bul
     final Set<String> loggedDays = logs.map((log) {
       final d = log.date;
       return '${d.year}-${d.month}-${d.day}';
@@ -200,70 +209,95 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         LunoCard(
           child: Column(
             children: [
-              // Hafta başlığı + ok navigasyonu
+              // Ay başlığı + ok navigasyonu
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Önceki hafta oku
-                  _buildWeekArrow(
+                  // Önceki ay oku
+                  _buildMonthArrow(
                     icon: Icons.chevron_left_rounded,
-                    onTap: () => setState(() => _weekOffset--),
+                    onTap: () => setState(() => _monthOffset--),
                   ),
 
-                  // Hafta aralığı metni
+                  // Ay metni
                   Text(
-                    _formatWeekRange(weekStart),
+                    DateFormat('MMMM yyyy', 'tr_TR').format(monthStart),
                     style: AppTextStyles.bodySemibold.copyWith(
                       color: theme.colorScheme.onSurface,
-                      fontSize: 13,
+                      fontSize: 14,
                     ),
                   ),
 
-                  // Sonraki hafta oku (gelecek haftaya geçilmez)
-                  _buildWeekArrow(
+                  // Sonraki ay oku (gelecek aya geçilmez)
+                  _buildMonthArrow(
                     icon: Icons.chevron_right_rounded,
-                    onTap: _weekOffset < 0
-                        ? () => setState(() => _weekOffset++)
+                    onTap: _monthOffset < 0
+                        ? () => setState(() => _monthOffset++)
                         : null,
-                    disabled: _weekOffset >= 0,
+                    disabled: _monthOffset >= 0,
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.p16),
 
-              // 7 günlük hücre satırı
+              // Gün başlıkları (Pt, Sa, Ça...)
               Row(
-                children: weekDays.asMap().entries.map((entry) {
-                  final day = entry.value;
-                  final dayKey = '${day.year}-${day.month}-${day.day}';
-                  final hasLog = loggedDays.contains(dayKey);
-                  final isToday = day == today;
-                  final isSelected = _selectedDay != null &&
-                      day.year == _selectedDay!.year &&
-                      day.month == _selectedDay!.month &&
-                      day.day == _selectedDay!.day;
-                  final isFuture = day.isAfter(today);
-
-                  return Expanded(
-                    child: GestureDetector(
-                      onTap: isFuture
-                          ? null
-                          : () => setState(() {
-                                _selectedDay =
-                                    isSelected ? null : day;
-                              }),
-                      child: _CalendarDayCell(
-                        day: day,
-                        hasLog: hasLog,
-                        isToday: isToday,
-                        isSelected: isSelected,
-                        isFuture: isFuture,
-                        primary: theme.colorScheme.primary,
-                      ),
-                    ),
-                  );
-                }).toList(),
+                children: _CalendarDayCell._weekdayLabels
+                    .skip(1)
+                    .map((label) => Expanded(
+                          child: Text(
+                            label,
+                            textAlign: TextAlign.center,
+                            style: AppTextStyles.caption.copyWith(
+                              color: theme.hintColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ))
+                    .toList(),
               ),
+              const SizedBox(height: 8),
+
+              // Haftalar satırları
+              ...List.generate(totalWeeks, (weekIndex) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: List.generate(7, (dayIndex) {
+                      final day = gridDays[weekIndex * 7 + dayIndex];
+                      final dayKey = '${day.year}-${day.month}-${day.day}';
+                      final hasLog = loggedDays.contains(dayKey);
+                      final isToday = day == today;
+                      final isSelected = _selectedDay != null &&
+                          day.year == _selectedDay!.year &&
+                          day.month == _selectedDay!.month &&
+                          day.day == _selectedDay!.day;
+                      final isFuture = day.isAfter(today);
+                      final isCurrentMonth = day.month == monthStart.month;
+
+                      return Expanded(
+                        child: GestureDetector(
+                          onTap: (isFuture || !isCurrentMonth)
+                              ? null
+                              : () => setState(() {
+                                    _selectedDay =
+                                        isSelected ? null : day;
+                                  }),
+                          child: _CalendarDayCell(
+                            day: day,
+                            hasLog: hasLog,
+                            isToday: isToday,
+                            isSelected: isSelected,
+                            isFuture: isFuture,
+                            isCurrentMonth: isCurrentMonth,
+                            primary: theme.colorScheme.primary,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                );
+              }),
             ],
           ),
         ),
@@ -281,17 +315,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     );
   }
 
-  // Hafta aralığı metin formatı — "1–7 May 2026" gibi
-  String _formatWeekRange(DateTime weekStart) {
-    final weekEnd = weekStart.add(const Duration(days: 6));
-    final startStr =
-        DateFormat('d MMM', 'tr_TR').format(weekStart);
-    final endStr = DateFormat('d MMM yyyy', 'tr_TR').format(weekEnd);
-    return '$startStr – $endStr';
-  }
-
   // Ok butonu
-  Widget _buildWeekArrow({
+  Widget _buildMonthArrow({
     required IconData icon,
     VoidCallback? onTap,
     bool disabled = false,
@@ -554,7 +579,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 }
 
-// --- Haftalık Takvim Gün Hücresi ---
+// --- Aylık Takvim Gün Hücresi ---
 // Tema.md: card radius 16px, primary renk, border, shadow-sm uyumlu
 class _CalendarDayCell extends StatelessWidget {
   final DateTime day;
@@ -562,6 +587,7 @@ class _CalendarDayCell extends StatelessWidget {
   final bool isToday;
   final bool isSelected;
   final bool isFuture;
+  final bool isCurrentMonth;
   final Color primary;
 
   const _CalendarDayCell({
@@ -570,6 +596,7 @@ class _CalendarDayCell extends StatelessWidget {
     required this.isToday,
     required this.isSelected,
     required this.isFuture,
+    required this.isCurrentMonth,
     required this.primary,
   });
 
@@ -587,7 +614,11 @@ class _CalendarDayCell extends StatelessWidget {
     Color textColor;
     Color borderColor;
 
-    if (isSelected) {
+    if (!isCurrentMonth) {
+      bgColor = Colors.transparent;
+      textColor = theme.hintColor.withValues(alpha: 0.2);
+      borderColor = Colors.transparent;
+    } else if (isSelected) {
       bgColor = primary;
       textColor = Colors.white;
       borderColor = primary;
@@ -612,7 +643,7 @@ class _CalendarDayCell extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(10),
@@ -621,15 +652,6 @@ class _CalendarDayCell extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Gün etiketi — Pt, Sa, Ça ...
-            Text(
-              _weekdayLabels[day.weekday],
-              style: AppTextStyles.micro.copyWith(
-                color: textColor.withValues(alpha: isSelected ? 0.85 : 0.65),
-                fontSize: 10,
-              ),
-            ),
-            const SizedBox(height: 4),
             // Gün sayısı
             Text(
               '${day.day}',
@@ -641,10 +663,10 @@ class _CalendarDayCell extends StatelessWidget {
                     : FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             // Log var mı nokta göstergesi
             AnimatedOpacity(
-              opacity: hasLog ? 1.0 : 0.0,
+              opacity: (hasLog && isCurrentMonth) ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 200),
               child: Container(
                 width: 4,

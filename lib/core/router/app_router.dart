@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/main/presentation/main_screen.dart';
@@ -66,11 +67,46 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: AppRouter.splash,
-        builder: (context, state) => const SplashScreen(),
+        pageBuilder: (context, state) => const NoTransitionPage(
+          child: SplashScreen(),
+        ),
       ),
       GoRoute(
         path: AppRouter.onboarding,
-        builder: (context, state) => const WelcomeScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const WelcomeScreen(),
+          transitionDuration: const Duration(milliseconds: 800),
+          reverseTransitionDuration: const Duration(milliseconds: 400),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            // Splash içeriği (logo, tagline) fade-out olurken welcome kayarak gelir
+            final fadeIn = CurvedAnimation(
+              parent: animation,
+              curve: const Interval(0.0, 0.75, curve: Curves.easeOut),
+            );
+            final slideIn = Tween<Offset>(
+              begin: const Offset(0, 0.06),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: const Interval(0.0, 0.80, curve: Curves.easeOutCubic),
+            ));
+            // Splash arka planı da yavaşça solar
+            final fadeOut = Tween<double>(begin: 1.0, end: 0.0).animate(
+              CurvedAnimation(
+                parent: secondaryAnimation,
+                curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
+              ),
+            );
+            return FadeTransition(
+              opacity: fadeOut,
+              child: FadeTransition(
+                opacity: fadeIn,
+                child: SlideTransition(position: slideIn, child: child),
+              ),
+            );
+          },
+        ),
       ),
       GoRoute(
         path: AppRouter.authSelection,

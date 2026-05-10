@@ -60,8 +60,9 @@ class QuitCalculator {
       moneyLabel: "Harcanan Para",
       moneyValue: damage.formattedMoney,
       moneyDecimal: ",${damage.moneyDecimalPart}",
-      moneySubtext:
-          "₺${(burnRate * 60).toStringAsFixed(1)}/dk yanıyor",
+      moneySubtext: damage.isCurrentlyBurning 
+          ? "Paramız yanıyor... 🔥" 
+          : "Şu an güvendeyiz",
       moneyAction: "ne alabilirdin? — dokun",
       timeLabel: "Kaybedilen Zaman",
       timeValue: damage.daysLost.toString(),
@@ -82,6 +83,7 @@ class QuitCalculator {
       progress: totalDamageScore,
       type: QuitStatType.loss,
       isEstimatedToday: damage.isEstimatedToday,
+      isCurrentlyBurning: damage.isCurrentlyBurning,
     );
   }
 
@@ -230,7 +232,8 @@ class QuitCalculator {
     }
     
     double liveSmoked = 0.0;
-    bool isEstimatedToday = true;
+    bool isEstimatedToday = false;
+    bool isCurrentlyBurning = false;
 
     // Kayıt oluşturulan günden bugüne kadar döngü
     for (DateTime d = createdDate; !d.isAfter(todayStr); d = DateTime(d.year, d.month, d.day + 1)) {
@@ -238,17 +241,28 @@ class QuitCalculator {
       
       if (d.year == todayStr.year && d.month == todayStr.month && d.day == todayStr.day) {
         if (hasLog) {
-          liveSmoked += loggedSmokesByDate[d]!;
-          if (lastLogTodayTime != null) {
-            final msSinceLastLog = now.difference(lastLogTodayTime).inMilliseconds;
-            if (msSinceLastLog > 0) {
-              liveSmoked += (rates.cigarettesPerSecond / 1000) * msSinceLastLog;
+          double realizedTodaySmokes = 0;
+          for (var log in logs) {
+            if (log.type == 'slip' && log.hasSmoked && log.date.year == d.year && log.date.month == d.month && log.date.day == d.day) {
+              int count = log.smokeCount as int;
+              // Orijinal: 11 dakika
+              int totalSec = count * 11 * 60;
+              int passedSec = now.difference(log.date).inSeconds;
+              
+              double ratio = 1.0;
+              if (totalSec > 0 && passedSec >= 0) {
+                ratio = (passedSec / totalSec).clamp(0.0, 1.0);
+              } else if (passedSec < 0) {
+                ratio = 0.0;
+              }
+              
+              if (ratio < 1.0) isCurrentlyBurning = true;
+              realizedTodaySmokes += count * ratio;
             }
           }
-          isEstimatedToday = false;
+          liveSmoked += realizedTodaySmokes;
         } else {
-          final msToday = now.difference(todayStr).inMilliseconds;
-          liveSmoked += (rates.cigarettesPerSecond / 1000) * msToday;
+          // Log yoksa, 0 kabul ediyoruz (Artık saniye saniye artmasın)
         }
       } else {
         if (hasLog) {
@@ -308,6 +322,7 @@ class QuitCalculator {
       timeDigits: timeDigits,
       distanceKm: distanceKm,
       isEstimatedToday: isEstimatedToday,
+      isCurrentlyBurning: isCurrentlyBurning,
       liveSmokedToday: liveSmoked, // Bugün içilen (tahmin dahil)
       loggedSmokesByDate: loggedSmokesByDate,
       resistedCravings: resistedCravings,
@@ -341,6 +356,7 @@ class DamageMetrics {
   final List<String> timeDigits;
   final double distanceKm;
   final bool isEstimatedToday;
+  final bool isCurrentlyBurning;
   final double liveSmokedToday;
   final Map<DateTime, int> loggedSmokesByDate;
   final int resistedCravings;
@@ -355,6 +371,7 @@ class DamageMetrics {
     required this.timeDigits,
     required this.distanceKm,
     required this.isEstimatedToday,
+    required this.isCurrentlyBurning,
     required this.liveSmokedToday,
     required this.loggedSmokesByDate,
     required this.resistedCravings,

@@ -81,7 +81,7 @@ class StatCard extends StatelessWidget {
             _buildHeader(colorScheme, textTheme),
             const SizedBox(height: 4),
             _buildValue(colorScheme, textTheme, context),
-            if (isMoney) ...[const SizedBox(height: 4), const _BurningBar()],
+            if (isMoney) ...[const SizedBox(height: 4), _BurningBar(isBurning: showBurnIndicator)],
             const SizedBox(height: 4),
             if (subtext != null) _buildSubtext(colorScheme, textTheme),
           ],
@@ -324,7 +324,8 @@ class _FlickeringFlameState extends State<_FlickeringFlame>
 
 /// Para kartı için "Yanan Bar" - Sürekli akan bir fırın efekti
 class _BurningBar extends StatefulWidget {
-  const _BurningBar();
+  final bool isBurning;
+  const _BurningBar({required this.isBurning});
 
   @override
   State<_BurningBar> createState() => _BurningBarState();
@@ -339,8 +340,8 @@ class _BurningBarState extends State<_BurningBar>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat();
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
   }
 
   @override
@@ -356,6 +357,31 @@ class _BurningBarState extends State<_BurningBar>
     return LayoutBuilder(
       builder: (context, constraints) {
         final barWidth = constraints.maxWidth * 0.8;
+
+        if (!widget.isBurning) {
+          return Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.centerLeft,
+            children: [
+              Container(
+                height: 10,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              Container(
+                height: 10,
+                width: constraints.maxWidth, // Tamamen dolu
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+            ],
+          );
+        }
 
         return AnimatedBuilder(
           animation: _controller,
@@ -387,17 +413,9 @@ class _BurningBarState extends State<_BurningBar>
                       end: Alignment.centerRight,
                       colors: [
                         Colors.pink.shade100.withValues(alpha: 0.3),
-                        Colors.pink.shade400,
-                        Colors.orange.shade400,
-                        Colors.pink.shade400,
-                        Colors.pink.shade100.withValues(alpha: 0.2),
-                      ],
-                      stops: [
-                        0.0,
-                        (_controller.value - 0.2).clamp(0.0, 1.0),
-                        _controller.value,
-                        (_controller.value + 0.2).clamp(0.0, 1.0),
-                        1.0,
+                        Colors.pink.shade300,
+                        Color.lerp(Colors.pink.shade400, Colors.orange.shade400, _controller.value)!,
+                        Color.lerp(Colors.orange.shade400, Colors.deepOrange, _controller.value)!,
                       ],
                     ),
                   ),
@@ -405,7 +423,7 @@ class _BurningBarState extends State<_BurningBar>
 
                 // Ucundaki Alev (Sıkıca bitişik)
                 Positioned(
-                  left: barWidth - 14 + (sin(_controller.value * 2 * pi) * 1.5),
+                  left: barWidth - 14,
                   top: -8,
                   child: const _FlickeringFlame(size: 26),
                 ),

@@ -41,6 +41,7 @@ class QuitStats {
   final QuitStatType type; // success or loss
 
   final bool isEstimatedToday; // TRUE if no log entered for today
+  final bool isCurrentlyBurning; // Yanma efekti için
 
   QuitStats({
     required this.rawMoney,
@@ -65,5 +66,6 @@ class QuitStats {
     required this.progress,
     required this.type,
     this.isEstimatedToday = true,
+    this.isCurrentlyBurning = false,
   });
 }

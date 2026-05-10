@@ -41,7 +41,7 @@ class StatGrid extends StatelessWidget {
             icon: Icons.savings_outlined,
             iconColor: AppColors.lightChartPrimary,
             isMoney: true,
-            showBurnIndicator: true,
+            showBurnIndicator: stats.isCurrentlyBurning,
           ),
         ),
         // 2. İçilen Sigara
