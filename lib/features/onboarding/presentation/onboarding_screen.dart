@@ -21,6 +21,7 @@ import 'widgets/cigarettes_interstitial_step.dart';
 import 'widgets/money_interstitial_step.dart';
 import '../application/onboarding_provider.dart';
 import '../../../core/constants/app_constants.dart';
+import 'onboarding_step_configs.dart';
 
 /// Onboarding geçiş durumları
 enum _TransitionPhase {
@@ -303,163 +304,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     }
   }
 
-  // ═══════════════════════════════════════════
-  //  STEP KONFİGÜRASYON TANIMLARI
-  // ═══════════════════════════════════════════
   OnboardingStepConfig _getStepConfig(int page) {
-    switch (page) {
-      // 0: Intro - Sadece yorum
-      case 0:
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.center,
-          mascotSize: AppMascotSizes.hero,
-          bubbleText: "Hoş geldin! Ben Ciğerito. Seninle birlikte sigarayı tarihe gömmeye geldim.\n\nBaşarabilirsin! Birlikte planlayacağız, birlikte savaşacağız ve en sonunda sen kazanacaksın.",
-          arrowDirection: BubbleArrowDirection.top,
-          buttonLabel: "Başlayalım",
-        );
-
-      // 1: Legal - Sadece yorum
-      case 1:
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.center,
-          mascotSize: AppMascotSizes.hero,
-          bubbleText: "Burada kimse seni yargılamaz.\n\nBu yolculuk senin iradenle ve doğru verilerle şekillenecek. Lütfen sorulara dürüst yanıt ver ki sana en iyi şekilde yardımcı olabileyim.",
-          arrowDirection: BubbleArrowDirection.top,
-          buttonLabel: "Devam",
-        );
-
-      // 2: Kaç yıldır içiyorsun? - Soru
-      case 2:
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.topLeft,
-          mascotSize: AppMascotSizes.medium,
-          bubbleText: "Daha yolun başındayız ya da yolun sonuna gelmişiz...",
-          arrowDirection: BubbleArrowDirection.left,
-          buttonLabel: "Devam",
-        );
-
-      // 3: Yıl Interstitial - Yorum
-      case 3:
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.center,
-          mascotSize: AppMascotSizes.hero,
-          bubbleText: "$_smokingYears yıl içmişsin ha? Merak etme, birlikte bırakmamız $_smokingYears gün bile sürmeyecek!",
-          arrowDirection: BubbleArrowDirection.top,
-          buttonLabel: "Devam",
-        );
-
-      // 4: Günde kaç sigara? - Soru
-      case 4:
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.topLeft,
-          mascotSize: AppMascotSizes.medium,
-          bubbleText: "Dürüst ol dostum, her sigara ciğerimizde fırt hırsızı... Kaç tane içiyorsan öyle kulemizi kuralım!",
-          arrowDirection: BubbleArrowDirection.left,
-          buttonLabel: "Devam",
-        );
-
-      // 5: Sigara Interstitial - Yorum + İstatistik kartı
-      case 5:
-        final totalCigs = _smokingYears * 365 * _dailyCigarettes;
-        final totalHeight = totalCigs * 0.085;
-        String comparison;
-        if (totalHeight < 324) {
-          comparison = "Eyfel Kulesi";
-        } else if (totalHeight < 828) {
-          comparison = "Burj Khalifa";
-        } else if (totalHeight < 8848) {
-          comparison = "Everest Dağı";
-        } else {
-          comparison = "Uzay Sınırı";
-        }
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.center,
-          mascotSize: AppMascotSizes.hero,
-          bubbleText: "$_smokingYears yılda toplam $totalCigs tane sigara içmişsin. Vay be bu sigaraları üst üste koysak boyu $comparison'ni geçiyor!",
-          arrowDirection: BubbleArrowDirection.top,
-          buttonLabel: "Devam",
-        );
-
-      // 6: Paket fiyatı - Soru
-      case 6:
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.topLeft,
-          mascotSize: AppMascotSizes.medium,
-          bubbleText: "Bu parayı bana harcasan daha iyi olurdu. Mesela bana temiz hava alırdın.",
-          arrowDirection: BubbleArrowDirection.left,
-          buttonLabel: "Devam",
-        );
-
-      // 7: Para Interstitial - Yorum + Kazanç kartı
-      case 7:
-        final dailyPacks = _dailyCigarettes / 20.0;
-        final monthly = (dailyPacks * _packetPrice * 30).toInt();
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.center,
-          mascotSize: AppMascotSizes.hero,
-          bubbleText: "Sadece bir ayda harcadığın para yaklaşık ₺$monthly! Bu parayla neler yapabileceğini bir düşün...",
-          arrowDirection: BubbleArrowDirection.top,
-          buttonLabel: "Devam",
-        );
-
-      // 8: Kaç kez denedin? - Soru
-      case 8:
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.topLeft,
-          mascotSize: AppMascotSizes.medium,
-          bubbleText: "Hata yapmak insanidir, ama denememek Ciğerito'nun kalbini kırar.",
-          arrowDirection: BubbleArrowDirection.left,
-          buttonLabel: "Devam",
-        );
-
-      // 9: Nedenler - Soru
-      case 9:
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.topLeft,
-          mascotSize: AppMascotSizes.medium,
-          bubbleText: "En azından bir neden seç. Ciğerito senin için savaşıyor!",
-          arrowDirection: BubbleArrowDirection.left,
-          buttonLabel: "Devam",
-        );
-
-      // 10: Tetikleyiciler - Soru
-      case 10:
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.topLeft,
-          mascotSize: AppMascotSizes.medium,
-          bubbleText: "Tetikleyicini bil, düşmanını tanı. Ciğerito yanındayken stres yok!",
-          arrowDirection: BubbleArrowDirection.left,
-          buttonLabel: "Devam",
-        );
-
-      // 11: Son yasal uyarı - Yorum + Kartlar
-      case 11:
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.center,
-          mascotSize: AppMascotSizes.large,
-          bubbleText: "Sıkıcı ama önemli kısım. Son bir şey, söz.",
-          arrowDirection: BubbleArrowDirection.top,
-          buttonLabel: "Devam",
-        );
-
-      // 12: Özet + İsim - Yorum + Kartlar
-      case 12:
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.center,
-          mascotSize: AppMascotSizes.medium,
-          bubbleText: "İşte gerçekler... Ama birlikte değiştireceğiz, söz.",
-          arrowDirection: BubbleArrowDirection.top,
-          buttonLabel: "Devam",
-        );
-
-      default:
-        return OnboardingStepConfig(
-          mascotPosition: MascotPosition.center,
-          mascotSize: AppMascotSizes.hero,
-          bubbleText: "",
-          arrowDirection: BubbleArrowDirection.top,
-        );
-    }
+    return getOnboardingStepConfig(
+      page,
+      smokingYears: _smokingYears,
+      dailyCigarettes: _dailyCigarettes,
+      packetPrice: _packetPrice,
+    );
   }
 
   // --- İçerik widget'ını getir (Ciğerito ve SpeechBubble HARİÇ) ---

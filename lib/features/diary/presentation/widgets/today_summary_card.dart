@@ -1,20 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:luno_quit_smoking_app/core/router/app_router.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_colors.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_spacing.dart';
 import 'package:luno_quit_smoking_app/core/theme/app_text_styles.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_button.dart';
 import 'package:luno_quit_smoking_app/core/widgets/luno_card.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
-import 'package:luno_quit_smoking_app/core/providers/firebase_providers.dart';
-import 'package:luno_quit_smoking_app/features/diary/data/models/daily_log.dart';
-import 'package:luno_quit_smoking_app/features/diary/application/history_provider.dart';
-import 'package:go_router/go_router.dart';
-import 'package:uuid/uuid.dart';
+import 'package:luno_quit_smoking_app/features/diary/presentation/widgets/burn_progress_bar.dart';
+import 'package:luno_quit_smoking_app/features/diary/presentation/widgets/quick_log_sheet.dart';
+import 'package:luno_quit_smoking_app/features/diary/presentation/widgets/summary_slide.dart';
 
-// --- Widget Durumu ve Yaşam Döngüsü ---
 class TodaySummaryCard extends ConsumerStatefulWidget {
   final List<dynamic> logs;
 
@@ -47,40 +43,41 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
     }
   }
 
+  String _logType(dynamic log) {
+    try {
+      return log.type ?? 'craving';
+    } catch (_) {
+      return 'craving';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // --- Veri Hesaplama ve Hazırlık ---
     final profile = ref.watch(userProfileProvider);
     if (profile == null) return const SizedBox.shrink();
 
-    // Sadece 'Bugün' için logları filtrele
+    final now = DateTime.now();
     final todayLogs = widget.logs.where((log) {
-      final now = DateTime.now();
       return log.date.year == now.year &&
           log.date.month == now.month &&
           log.date.day == now.day;
     }).toList();
 
-    // Bugün içilen sigara ve krizlere direnme sayılarını topla
     final int todaySmoked = todayLogs
-        .where((log) => _getLogType(log) == 'slip')
+        .where((log) => _logType(log) == 'slip')
         .fold(0, (sum, log) => sum + (log.smokeCount as int));
-
     final int todayCravings = todayLogs
-        .where((log) => _getLogType(log) == 'craving')
+        .where((log) => _logType(log) == 'craving')
         .fold(0, (sum, _) => sum + 1);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final hasSmokedToday = todaySmoked > 0;
     final primary = context.primary;
-    final successColor = isDark
-        ? AppColors.darkChartSuccess
-        : AppColors.lightChartSuccess;
-
-    // Bugün için finansal ve zaman hesaplamaları (Kademeli Yanma Etkisi)
+    final successColor = context.chartSuccess;
     final double pricePerCigarette =
         profile.packPrice / profile.cigarettesPerPack;
 
+    // Gradual burn calculation — 1 cigarette = 11 minutes
     double todayCost = 0.0;
     int todayTimeLostMinutes = 0;
     bool isBurning = false;
@@ -88,96 +85,73 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
     double minRatio = 1.0;
 
     for (var log in todayLogs) {
-      if (_getLogType(log) == 'slip') {
-        int count = log.smokeCount as int;
-        // Bir sigara = 11 dakika.
-        int totalSec = count * 11 * 60;
-        int passedSec = DateTime.now().difference(log.date).inSeconds;
-        
+      if (_logType(log) == 'slip') {
+        final int count = log.smokeCount as int;
+        final int totalSec = count * 11 * 60;
+        final int passedSec =
+            DateTime.now().difference(log.date as DateTime).inSeconds;
         double ratio = 1.0;
         if (totalSec > 0 && passedSec >= 0) {
           ratio = (passedSec / totalSec).clamp(0.0, 1.0);
         } else if (passedSec < 0) {
           ratio = 0.0;
         }
-        
         if (ratio < 1.0) {
           isBurning = true;
           if (ratio < minRatio) minRatio = ratio;
         }
-        
-        double realizedCount = count * ratio;
-        todayCost += realizedCount * pricePerCigarette;
+        todayCost += count * ratio * pricePerCigarette;
         todayTimeLostMinutes += (count * 11 * ratio).round();
       }
     }
-    
-    if (isBurning) {
-      activeBurnRatio = minRatio;
-    }
-    
+    if (isBurning) activeBurnRatio = minRatio;
     _checkTimer(isBurning);
 
-    // --- Dünün Karşılaştırmalı Verileri ---
-    final yesterdayDate = DateTime.now().subtract(const Duration(days: 1));
+    final yesterdayDate = now.subtract(const Duration(days: 1));
     final yesterdayLogs = widget.logs.where((log) {
       return log.date.year == yesterdayDate.year &&
           log.date.month == yesterdayDate.month &&
           log.date.day == yesterdayDate.day;
     }).toList();
-
-    // Dün kayıt girilmiş mi? (Yanlış kıyaslama yapmamak için kritik)
     final bool hasYesterdayLogs = yesterdayLogs.isNotEmpty;
-
     final int yesterdaySmoked = yesterdayLogs
-        .where((log) => _getLogType(log) == 'slip')
+        .where((log) => _logType(log) == 'slip')
         .fold(0, (sum, log) => sum + (log.smokeCount as int));
-
     final double yesterdayCost = yesterdaySmoked * pricePerCigarette;
     final int yesterdayTimeLostMinutes = yesterdaySmoked * 11;
 
-    // --- Ana Widget Yapısı ---
     return LunoCard(
       padding: EdgeInsets.zero,
       child: Column(
         children: [
-          // Slider Alanı (Sigara Sayısı, Maliyet, Zaman)
           Container(
             height: 240,
             padding: const EdgeInsets.fromLTRB(
-              AppSpacing.p20,
-              AppSpacing.p20,
-              AppSpacing.p20,
-              0,
-            ),
+              AppSpacing.p20, AppSpacing.p20, AppSpacing.p20, 0),
             child: PageView(
               controller: _pageController,
-              onPageChanged: (index) => setState(() => _currentPage = index),
+              onPageChanged: (index) =>
+                  setState(() => _currentPage = index),
               children: [
-                // Slide 1: Günlük Özet (Sigara Sayısı)
-                _buildSlide(
-                  context,
+                SummarySlide(
                   title: "Bugünün Özeti",
                   value: todaySmoked.toString(),
                   unit: "sigara",
-                  badge: hasSmokedToday
-                      ? _buildBadge("Kayıp", primary, isDark)
-                      : _buildBadge(
-                          "Temiz",
-                          successColor,
-                          isDark,
-                          icon: Icons.star,
-                        ),
-                  extra: todayCravings > 0
-                      ? _buildMiniBadge(
-                          "$todayCravings krize direndin",
-                          successColor,
-                        )
-                      : null,
                   hasSmoked: hasSmokedToday,
                   primaryColor: primary,
+                  badge: buildSlideBadge(
+                    hasSmokedToday ? "Kayıp" : "Temiz",
+                    hasSmokedToday ? primary : successColor,
+                    isDark,
+                    icon: hasSmokedToday ? null : Icons.star,
+                  ),
+                  extra: todayCravings > 0
+                      ? buildSlideMiniBadge(
+                          "$todayCravings krize direndin", successColor)
+                      : null,
                   comparisonData: hasYesterdayLogs
-                      ? _getComparisonData(
+                      ? getSlideComparisonData(
+                          context,
                           current: todaySmoked.toDouble(),
                           previous: yesterdaySmoked.toDouble(),
                           unit: "sigara",
@@ -185,25 +159,19 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
                         )
                       : null,
                 ),
-                // Slide 2: Günlük Maliyet (Finansal)
-                _buildSlide(
-                  context,
+                SummarySlide(
                   title: "Bugünkü Maliyet",
                   value: todayCost.toStringAsFixed(1),
                   unit: "₺",
-                  badge: _buildBadge(
-                    "Finansal",
-                    AppColors.lightChartPrimary,
-                    isDark,
-                  ),
-                  extra: _buildMiniBadge(
-                    "Yanan para miktarı",
-                    AppColors.lightChartPrimary,
-                  ),
                   hasSmoked: hasSmokedToday,
                   primaryColor: AppColors.lightChartPrimary,
+                  badge: buildSlideBadge(
+                      "Finansal", AppColors.lightChartPrimary, isDark),
+                  extra: buildSlideMiniBadge(
+                      "Yanan para miktarı", AppColors.lightChartPrimary),
                   comparisonData: hasYesterdayLogs
-                      ? _getComparisonData(
+                      ? getSlideComparisonData(
+                          context,
                           current: todayCost,
                           previous: yesterdayCost,
                           unit: "TL",
@@ -212,21 +180,18 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
                         )
                       : null,
                 ),
-                // Slide 3: Zaman Kaybı
-                _buildSlide(
-                  context,
+                SummarySlide(
                   title: "Kaybedilen Zaman",
                   value: todayTimeLostMinutes.toString(),
                   unit: "dakika",
-                  badge: _buildBadge("Zaman", Colors.blueGrey, isDark),
-                  extra: _buildMiniBadge(
-                    "Hayatından çalınan süre",
-                    Colors.blueGrey,
-                  ),
                   hasSmoked: hasSmokedToday,
                   primaryColor: Colors.blueGrey,
+                  badge: buildSlideBadge("Zaman", Colors.blueGrey, isDark),
+                  extra: buildSlideMiniBadge(
+                      "Hayatından çalınan süre", Colors.blueGrey),
                   comparisonData: hasYesterdayLogs
-                      ? _getComparisonData(
+                      ? getSlideComparisonData(
+                          context,
                           current: todayTimeLostMinutes.toDouble(),
                           previous: yesterdayTimeLostMinutes.toDouble(),
                           unit: "dakika",
@@ -238,7 +203,7 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
             ),
           ),
 
-          // Sayfa Göstergeleri (Noktalar)
+          // Page dots
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(3, (index) {
@@ -256,77 +221,14 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
               );
             }),
           ),
-          
+
           const SizedBox(height: AppSpacing.p16),
-          // Yanan Para / Kademeli İşlem Barı
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      isBurning ? "Paramız yanıyor... 🔥" : "Şu an güvendeyiz",
-                      style: AppTextStyles.micro.copyWith(
-                        color: isBurning 
-                            ? AppColors.lightDestructive 
-                            : primary.withValues(alpha: 0.6),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (isBurning)
-                      Text(
-                        "%${(activeBurnRatio * 100).toInt()} tamamlandı",
-                        style: AppTextStyles.micro.copyWith(
-                          color: AppColors.lightDestructive.withValues(alpha: 0.8),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: isBurning 
-                        ? AppColors.lightDestructive.withValues(alpha: 0.2)
-                        : primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: isBurning ? [
-                      BoxShadow(
-                        color: AppColors.lightDestructive.withValues(alpha: 0.2),
-                        blurRadius: 4,
-                        spreadRadius: 1,
-                      )
-                    ] : null,
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(5),
-                    child: TweenAnimationBuilder<double>(
-                      tween: Tween<double>(
-                        begin: isBurning ? activeBurnRatio : 1.0,
-                        end: isBurning ? activeBurnRatio : 1.0,
-                      ),
-                      duration: const Duration(seconds: 1),
-                      builder: (context, val, child) {
-                        return LinearProgressIndicator(
-                          value: val,
-                          backgroundColor: Colors.transparent,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            isBurning ? AppColors.lightDestructive : primary.withValues(alpha: 0.3)
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          BurnProgressBar(
+            isBurning: isBurning,
+            activeBurnRatio: activeBurnRatio,
+            primary: primary,
           ),
 
-          // Alt Aksiyon Alanı ve Motivasyon Mesajı
           Padding(
             padding: const EdgeInsets.all(AppSpacing.p20),
             child: Column(
@@ -334,21 +236,21 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
                 SizedBox(
                   width: double.infinity,
                   child: LunoButton(
-                    text: "Sigara İçtim", // Hızlı sigara ekleme
+                    text: "Sigara İçtim",
                     icon: Icons.smoking_rooms_outlined,
-                    onPressed: () => _showQuickAddSheet(context),
+                    onPressed: () => showQuickLogSheet(context, ref),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.p16),
-                // Dinamik motivasyon mesajı
                 Text(
                   hasSmokedToday
                       ? "Zararın neresinden dönersen kârdır. Kaydettiğin sürece ilerliyorsun."
                       : "Tertemiz! Bugün duman yok, hedefe bir adım daha yakınsın.",
                   style: AppTextStyles.caption.copyWith(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.8),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.8),
                     fontStyle: FontStyle.italic,
                   ),
                   textAlign: TextAlign.center,
@@ -358,330 +260,6 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
           ),
         ],
       ),
-    );
-  }
-
-  // --- Slide Oluşturucu ---
-  // Her bir istatistik görünümünü (Başlık, Değer, Birim ve Karşılaştırma Rozeti) oluşturur
-  Widget _buildSlide(
-    BuildContext context, {
-    required String title,
-    required String value,
-    required String unit,
-    required Widget badge,
-    Widget? extra,
-    required bool hasSmoked,
-    required Color primaryColor,
-    Map<String, dynamic>? comparisonData,
-  }) {
-    final String? comparisonText = comparisonData?['text'];
-    final double? percent = (comparisonData?['percent'] as num?)?.toDouble();
-    final Color? comparisonColor = comparisonData?['color'];
-
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(title, style: AppTextStyles.cardHeader),
-            badge,
-          ],
-        ),
-        const Spacer(),
-        Column(
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Text(
-                      value,
-                      style: AppTextStyles.largeNumber.copyWith(
-                        fontSize: 56,
-                        color: hasSmoked
-                            ? primaryColor
-                            : Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                    if (percent != null && percent > 0)
-                      Positioned(
-                        top: -10,
-                        right: -36,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: comparisonColor?.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            "%${percent.toStringAsFixed(0)}",
-                            style: AppTextStyles.micro.copyWith(
-                              color: comparisonColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                // Rozetle çakışmayı önlemek için ayarlanmış dinamik boşluk
-                SizedBox(width: (percent != null && percent > 0) ? 36 : 8),
-                Text(
-                  unit,
-                  style: AppTextStyles.body.copyWith(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.5),
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-            // Açıklayıcı karşılaştırma metni (Örn: "düne göre 5 TL kardasın")
-            if (comparisonText != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                comparisonText,
-                style: AppTextStyles.body.copyWith(
-                  fontSize: 14,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.6),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ],
-        ),
-        if (extra != null) ...[const SizedBox(height: AppSpacing.p12), extra],
-        const Spacer(),
-      ],
-    );
-  }
-
-  // --- Yardımcı Metodlar ve UI Bileşenleri ---
-  
-  // Dün ve bugün arasındaki farkı ve yüzdeyi hesaplar
-  Map<String, dynamic>? _getComparisonData({
-    required double current,
-    required double previous,
-    required String unit,
-    bool isImprovementBetter = true,
-    bool isCurrency = false,
-  }) {
-    if (previous == 0 && current == 0) return null;
-
-    final diff = current - previous;
-    final isImprovement = isImprovementBetter ? diff > 0 : diff < 0;
-
-    if (diff == 0) {
-      return {'text': 'Dünle aynı', 'percent': 0.0, 'color': Colors.grey};
-    }
-
-    final absDiff = diff.abs();
-    final percent = previous > 0 ? (absDiff / previous * 100) : 0.0;
-    final Color color = isImprovement
-        ? (context.chartSuccess)
-        : (context.destructive);
-
-    String text = "";
-    if (isCurrency) {
-      text = isImprovement
-          ? "düne göre ${absDiff.toStringAsFixed(0)} TL kardasın"
-          : "düne göre ${absDiff.toStringAsFixed(0)} TL fazla harcadın";
-    } else if (unit == "dakika") {
-      text = isImprovement
-          ? "düne göre $absDiff dakika kazandın"
-          : "düne göre $absDiff dakika kaybettin";
-    } else {
-      final diffText = absDiff.toInt().toString();
-      text = isImprovement
-          ? "düne göre $diffText $unit az içtin"
-          : "düne göre $diffText $unit fazla içtin";
-    }
-
-    return {'text': text, 'percent': percent, 'color': color};
-  }
-
-  // Krizler veya diğer ikincil bilgiler için mini bilgi etiketi
-  Widget _buildMiniBadge(String text, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.info_outline, size: 14, color: color),
-          const SizedBox(width: 6),
-          Text(
-            text,
-            style: AppTextStyles.caption.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Ana durum rozeti (Kart içi slaytların sağ üstü)
-  Widget _buildBadge(String text, Color color, bool isDark, {IconData? icon}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: isDark ? 0.2 : 0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 12, color: color),
-            const SizedBox(width: 4),
-          ],
-          Text(
-            text,
-            style: AppTextStyles.micro.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Log tipi için güvenli erişim (eski kayıtlar için)
-  String _getLogType(dynamic log) {
-    try {
-      return log.type ?? 'craving';
-    } catch (_) {
-      return 'craving';
-    }
-  }
-
-  // Hızlı sigara ekleme için alt menü (Bottom Sheet)
-  void _showQuickAddSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (BuildContext sheetContext) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-        final bgColor = isDark
-            ? Theme.of(context).colorScheme.surface
-            : AppColors.lightBackground;
-
-        return SafeArea(
-          bottom: true,
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.p24),
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.p24),
-                Text(
-                  "Bi' sigara yandı...",
-                  style: AppTextStyles.cardHeader.copyWith(fontSize: 20),
-                ),
-                const SizedBox(height: AppSpacing.p8),
-                Text(
-                  "Neden içtiğine dair not düşmek ister misin? Yoksa sadece sayıyı mı ekleyelim?",
-                  style: AppTextStyles.body.copyWith(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.p32),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton.icon(
-                    icon: const Icon(Icons.flash_on_rounded),
-                    label: const Text("Boş ver, sadece 1 sigara ekle"),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: isDark
-                          ? Theme.of(
-                              context,
-                            ).colorScheme.surfaceContainerHighest
-                          : Colors.grey.shade200,
-                      foregroundColor: Theme.of(context).colorScheme.onSurface,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      final log = DailyLog(
-                        id: const Uuid().v4(),
-                        date: DateTime.now(),
-                        cravingIntensity: 0,
-                        hasSmoked: true,
-                        smokeCount: 1,
-                        type: 'slip',
-                        moods: const [],
-                        context: const [],
-                        companions: const [],
-                      );
-
-                      ref.read(historyLogsProvider.notifier).addLog(log);
-                      ref.read(analyticsServiceProvider).logSmokeLogged(count: 1);
-                      Navigator.pop(sheetContext);
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: AppSpacing.p12),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: LunoButton(
-                    text: "Neden içtiğini paylaş",
-                    icon: Icons.edit_note_rounded,
-                    onPressed: () {
-                      Navigator.pop(sheetContext);
-                      context.push(AppRouter.slipLog);
-                    },
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.p24),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }
