@@ -81,6 +81,11 @@ class AuthService {
   }
 
   Future<void> signOut() async {
+    final user = _authRepository.currentUser;
+    if (user != null) {
+      await _syncService.syncUserProfile(user);
+      await _syncService.syncDailyLogs(user);
+    }
     await _authRepository.signOut();
     await HiveService.clearAllData();
     _ref.invalidate(userProfileProvider);
