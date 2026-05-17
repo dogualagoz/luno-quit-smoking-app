@@ -43,6 +43,12 @@ class UserProfile extends HiveObject {
   @HiveField(12, defaultValue: 0)
   final int weeklySmokingGoal; // Haftalık azaltma hedefi (sigara adet). 0 = hedef girilmemiş.
 
+  @HiveField(13)
+  final DateTime updatedAt;
+
+  @HiveField(14, defaultValue: false)
+  final bool onboardingCompleted;
+
   UserProfile({
     required this.nickname,
     required this.dailyCigarettes,
@@ -57,9 +63,13 @@ class UserProfile extends HiveObject {
     this.userId,
     this.email,
     this.weeklySmokingGoal = 0,
-  });
+    DateTime? updatedAt,
+    this.onboardingCompleted = false,
+  }) : updatedAt = updatedAt ?? DateTime.now().toUtc();
 
-  /// Sadece değişen alanları güncelleyerek yeni bir kopya oluşturur
+  /// Returns a copy with the given fields replaced. By default [updatedAt] is
+  /// bumped to now; pass it explicitly to preserve the original timestamp
+  /// (used by sync code that imports remote records as-is).
   UserProfile copyWith({
     String? nickname,
     int? dailyCigarettes,
@@ -74,6 +84,9 @@ class UserProfile extends HiveObject {
     String? userId,
     String? email,
     int? weeklySmokingGoal,
+    DateTime? updatedAt,
+    bool? onboardingCompleted,
+    bool touch = true,
   }) {
     return UserProfile(
       nickname: nickname ?? this.nickname,
@@ -89,10 +102,11 @@ class UserProfile extends HiveObject {
       userId: userId ?? this.userId,
       email: email ?? this.email,
       weeklySmokingGoal: weeklySmokingGoal ?? this.weeklySmokingGoal,
+      updatedAt: updatedAt ?? (touch ? DateTime.now().toUtc() : this.updatedAt),
+      onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
     );
   }
 
-  /// Firestore ile uyum için JSON dönüşümü
   Map<String, dynamic> toJson() => {
     'nickname': nickname,
     'dailyCigarettes': dailyCigarettes,
@@ -107,9 +121,10 @@ class UserProfile extends HiveObject {
     'userId': userId,
     'email': email,
     'weeklySmokingGoal': weeklySmokingGoal,
+    'updatedAt': updatedAt.toIso8601String(),
+    'onboardingCompleted': onboardingCompleted,
   };
 
-  /// Firestore'dan gelen JSON'dan UserProfile oluşturur
   factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
     nickname: json['nickname'] as String,
     dailyCigarettes: json['dailyCigarettes'] as int,
@@ -126,5 +141,9 @@ class UserProfile extends HiveObject {
     userId: json['userId'] as String?,
     email: json['email'] as String?,
     weeklySmokingGoal: json['weeklySmokingGoal'] as int? ?? 0,
+    updatedAt: json['updatedAt'] != null
+        ? DateTime.parse(json['updatedAt'] as String)
+        : DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+    onboardingCompleted: json['onboardingCompleted'] as bool? ?? false,
   );
 }

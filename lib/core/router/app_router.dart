@@ -33,7 +33,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     observers: [analytics.getObserver()],
     redirect: (context, state) {
       final isLoggedIn = authState.value != null;
-      final hasProfile = onboardingRepo.isProfileCreated();
+      final hasProfile = onboardingRepo.isOnboardingCompleted();
       final location = state.matchedLocation;
 
       final goingToSplash = location == AppRouter.splash;

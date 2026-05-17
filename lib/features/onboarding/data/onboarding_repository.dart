@@ -6,21 +6,17 @@ import 'package:luno_quit_smoking_app/features/auth/data/auth_repository.dart';
 import '../../../core/services/analytics_service.dart';
 import 'models/user_profile.dart';
 
-// Bu repository'i uygulamanın her yerinden çağırmak için bir provider oluşturuyoruz
 final onboardingRepositoryProvider = Provider((ref) {
   final analytics = ref.watch(analyticsServiceProvider);
   return OnboardingRepository(analytics);
 });
 
-// Kullanıcı profilini reaktif olarak takip eden provider.
-// Auth durumu değiştiğinde (giriş/çıkış) profil otomatik yeniden okunur.
-final userProfileProvider = StateProvider<UserProfile?>((ref) {
-  // Auth state'i izliyoruz; kullanıcı değişince profil tekrar okunur
+/// Reads the locally stored profile. Re-evaluated when the auth state changes
+/// (different user logging in) so the UI always reflects the current session.
+final userProfileProvider = Provider<UserProfile?>((ref) {
   ref.watch(authStateProvider);
-  final repo = ref.watch(onboardingRepositoryProvider);
-  return repo.getProfile();
+  return ref.watch(onboardingRepositoryProvider).getProfile();
 });
-
 
 class OnboardingRepository {
   final AnalyticsService _analytics;
@@ -28,30 +24,30 @@ class OnboardingRepository {
 
   Box<UserProfile> get _box => HiveService.getUserBox();
 
-  // Kullanıcı profilini kaydeder
+  /// Persists the profile to Hive (the source of truth). Cloud propagation is
+  /// the caller's responsibility via [SyncService.syncUserProfile].
   Future<void> saveProfile(UserProfile profile) async {
     await _box.put(HiveService.userProfileKey, profile);
 
-    // Analytics: Profil oluşturulduğunda kullanıcı özelliklerini set et ve olayı logla
     await _analytics.setUserProfile(
       dailyCigarettes: profile.dailyCigarettes,
       packPrice: profile.packPrice,
       yearsSmoking: profile.smokingYears,
     );
-    await _analytics.logOnboardingComplete();
+    if (profile.onboardingCompleted) {
+      await _analytics.logOnboardingComplete();
+    }
   }
 
-  // Kullanıcı profilini getirir (yoksa null döner)
-  UserProfile? getProfile() {
-    return _box.get(HiveService.userProfileKey);
+  UserProfile? getProfile() => _box.get(HiveService.userProfileKey);
+
+  /// Onboarding is considered complete only when the profile explicitly
+  /// flags it — a partially-filled record is not enough.
+  bool isOnboardingCompleted() {
+    final profile = _box.get(HiveService.userProfileKey);
+    return profile?.onboardingCompleted ?? false;
   }
 
-  //Profil var mı kontrolü (Onboarding bitti mi ?)
-  bool isProfileCreated() {
-    return _box.containsKey(HiveService.userProfileKey);
-  }
-
-  //Profili sil (Test amaçlı veya hesabı sıfırlamak için)
   Future<void> deleteProfile() async {
     await _box.delete(HiveService.userProfileKey);
   }

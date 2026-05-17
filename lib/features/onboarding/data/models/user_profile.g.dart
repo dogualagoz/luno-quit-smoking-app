@@ -30,13 +30,15 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
       userId: fields[10] as String?,
       email: fields[11] as String?,
       weeklySmokingGoal: fields[12] == null ? 0 : fields[12] as int,
+      updatedAt: fields[13] as DateTime?,
+      onboardingCompleted: fields[14] == null ? false : fields[14] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserProfile obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.nickname)
       ..writeByte(1)
@@ -62,7 +64,11 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
       ..writeByte(11)
       ..write(obj.email)
       ..writeByte(12)
-      ..write(obj.weeklySmokingGoal);
+      ..write(obj.weeklySmokingGoal)
+      ..writeByte(13)
+      ..write(obj.updatedAt)
+      ..writeByte(14)
+      ..write(obj.onboardingCompleted);
   }
 
   @override

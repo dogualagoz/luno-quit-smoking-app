@@ -38,6 +38,9 @@ class DailyLog extends HiveObject {
   @HiveField(10, defaultValue: 'craving')
   final String type; // 'craving' veya 'slip'
 
+  @HiveField(11)
+  final DateTime updatedAt;
+
   DailyLog({
     required this.id,
     required this.date,
@@ -49,10 +52,10 @@ class DailyLog extends HiveObject {
     required this.context,
     required this.companions,
     this.note,
-    this.type = 'craving', // Varsayılan olarak kriz
-  });
+    this.type = 'craving',
+    DateTime? updatedAt,
+  }) : updatedAt = updatedAt ?? DateTime.now().toUtc();
 
-  // Firestore'dan okuma için
   factory DailyLog.fromMap(Map<String, dynamic> map, String documentId) {
     return DailyLog(
       id: documentId,
@@ -66,10 +69,13 @@ class DailyLog extends HiveObject {
       companions: List<String>.from(map['companions'] ?? []),
       note: map['note'] as String?,
       type: map['type'] as String? ?? 'craving',
+      updatedAt: map['updatedAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] as int,
+              isUtc: true)
+          : DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
     );
   }
 
-  // Firestore'a yazma için
   Map<String, dynamic> toMap() {
     return {
       'date': date.millisecondsSinceEpoch,
@@ -82,9 +88,12 @@ class DailyLog extends HiveObject {
       'companions': companions,
       'note': note,
       'type': type,
+      'updatedAt': updatedAt.millisecondsSinceEpoch,
     };
   }
 
+  /// By default [updatedAt] is bumped to now. Pass it explicitly to preserve
+  /// the original timestamp (used by sync code importing remote records).
   DailyLog copyWith({
     String? id,
     DateTime? date,
@@ -97,6 +106,8 @@ class DailyLog extends HiveObject {
     List<String>? companions,
     String? note,
     String? type,
+    DateTime? updatedAt,
+    bool touch = true,
   }) {
     return DailyLog(
       id: id ?? this.id,
@@ -110,6 +121,7 @@ class DailyLog extends HiveObject {
       companions: companions ?? this.companions,
       note: note ?? this.note,
       type: type ?? this.type,
+      updatedAt: updatedAt ?? (touch ? DateTime.now().toUtc() : this.updatedAt),
     );
   }
 }

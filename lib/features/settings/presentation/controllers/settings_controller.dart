@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/firebase_providers.dart';
+import '../../../../core/services/sync_service.dart';
 import '../../../../features/onboarding/data/onboarding_repository.dart';
 import '../../../../features/onboarding/data/models/user_profile.dart';
 
@@ -17,15 +19,17 @@ class SettingsState {
 }
 
 class SettingsController extends StateNotifier<SettingsState> {
-  final OnboardingRepository _repository;
+  final Ref _ref;
 
-  SettingsController(this._repository) : super(SettingsState()) {
+  SettingsController(this._ref) : super(SettingsState()) {
     _init();
   }
 
+  OnboardingRepository get _repository =>
+      _ref.read(onboardingRepositoryProvider);
+
   void _init() {
-    final profile = _repository.getProfile();
-    state = SettingsState(profile: profile);
+    state = SettingsState(profile: _repository.getProfile());
   }
 
   void updateDailyCigarettes(int value) {
@@ -44,7 +48,6 @@ class SettingsController extends StateNotifier<SettingsState> {
     );
   }
 
-  /// Haftalık sigara azaltma hedefini günceller
   void updateWeeklySmokingGoal(int value) {
     if (state.profile == null) return;
     state = state.copyWith(
@@ -55,14 +58,20 @@ class SettingsController extends StateNotifier<SettingsState> {
 
   Future<void> saveSettings() async {
     if (!state.isDirty || state.profile == null) return;
-    
+
     await _repository.saveProfile(state.profile!);
+    _ref.invalidate(userProfileProvider);
+
+    final user = _ref.read(firebaseAuthProvider).currentUser;
+    if (user != null) {
+      await _ref.read(syncServiceProvider).syncUserProfile(user);
+    }
+
     state = state.copyWith(isDirty: false);
   }
 }
 
 final settingsControllerProvider =
     StateNotifierProvider<SettingsController, SettingsState>((ref) {
-  final repository = ref.watch(onboardingRepositoryProvider);
-  return SettingsController(repository);
+  return SettingsController(ref);
 });
