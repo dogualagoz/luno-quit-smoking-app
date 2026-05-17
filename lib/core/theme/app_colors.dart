@@ -61,3 +61,42 @@ abstract final class AppColors {
   static const mascotTear = Color(0xFFA8D8E8);
   static const mascotSparkle = Color(0xFFF0C987);
 }
+
+/// Resolves design-token colors against the active brightness so callers can
+/// write `context.primary` instead of repeating the dark/light ternary.
+extension AppColorsContext on BuildContext {
+  bool get _isDark => Theme.of(this).brightness == Brightness.dark;
+
+  Color get primary =>
+      _isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+  Color get foreground =>
+      _isDark ? AppColors.darkForeground : AppColors.lightForeground;
+  Color get card => _isDark ? AppColors.darkCard : AppColors.lightCard;
+  Color get mutedForeground => _isDark
+      ? AppColors.darkMutedForeground
+      : AppColors.lightMutedForeground;
+  Color get secondary =>
+      _isDark ? AppColors.darkSecondary : AppColors.lightSecondary;
+  Color get accent => _isDark ? AppColors.darkAccent : AppColors.lightAccent;
+  Color get border => _isDark ? AppColors.darkBorder : AppColors.lightBorder;
+  Color get destructive =>
+      _isDark ? AppColors.darkDestructive : AppColors.lightDestructive;
+
+  Color get chartPrimary =>
+      _isDark ? AppColors.darkChartPrimary : AppColors.lightChartPrimary;
+  Color get chartSuccess =>
+      _isDark ? AppColors.darkChartSuccess : AppColors.lightChartSuccess;
+  Color get chartInfo =>
+      _isDark ? AppColors.darkChartInfo : AppColors.lightChartInfo;
+  Color get chartWarning =>
+      _isDark ? AppColors.darkChartWarning : AppColors.lightChartWarning;
+  Color get chartPurple =>
+      _isDark ? AppColors.darkChartPurple : AppColors.lightChartPurple;
+
+  List<Color> get gradientPrimary => _isDark
+      ? AppColors.gradientPrimaryDark
+      : AppColors.gradientPrimaryLight;
+  List<Color> get gradientSuccess => _isDark
+      ? AppColors.gradientSuccessDark
+      : AppColors.gradientSuccessLight;
+}

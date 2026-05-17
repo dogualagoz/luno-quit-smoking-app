@@ -54,12 +54,9 @@ class _DailyLogCardState extends State<DailyLogCard>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final successColor =
-        isDark ? AppColors.darkChartSuccess : AppColors.lightChartSuccess;
-    final primaryColor =
-        isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
-    final warningColor =
-        isDark ? AppColors.darkChartWarning : AppColors.lightChartWarning;
+    final successColor = context.chartSuccess;
+    final primaryColor = context.primary;
+    final warningColor = context.chartWarning;
 
     final isCraving = _getLogType() == 'craving';
     final statusColor = isCraving ? successColor : primaryColor;
