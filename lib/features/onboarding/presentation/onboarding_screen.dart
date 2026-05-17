@@ -56,7 +56,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
   // --- Buton durumu ---
   bool _isButtonEnabled = true;
-  String _buttonLabel = "Başlayalım";
 
   // --- Animasyon kontrollleri ---
   late AnimationController _bubbleScaleController;
@@ -128,12 +127,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   }
 
   // --- Buton durumu güncelleme ---
-  void _updateButtonState({required bool isEnabled, String? label}) {
+  void _updateButtonState({required bool isEnabled}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         setState(() {
           _isButtonEnabled = isEnabled;
-          if (label != null) _buttonLabel = label;
         });
       }
     });

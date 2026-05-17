@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../auth/data/auth_repository.dart';
+import '../../onboarding/data/onboarding_repository.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with TickerProviderStateMixin {
   // Giriş sekansı — tüm entrance animasyonlarını sürüyor
   late final AnimationController _entranceController;
@@ -154,8 +157,21 @@ class _SplashScreenState extends State<SplashScreen>
     _entranceController.forward();
 
     Future.delayed(const Duration(milliseconds: 2800), () {
-      if (mounted) context.go(AppRouter.onboarding);
+      if (!mounted) return;
+      context.go(_resolveInitialRoute());
     });
+  }
+
+  /// Picks the right post-splash destination so the user doesn't see a 1-frame
+  /// flash of the wrong screen before the router redirect kicks in.
+  String _resolveInitialRoute() {
+    final isLoggedIn = ref.read(authStateProvider).value != null;
+    final onboarded =
+        ref.read(onboardingRepositoryProvider).isOnboardingCompleted();
+
+    if (isLoggedIn && onboarded) return AppRouter.root;
+    if (!isLoggedIn && onboarded) return AppRouter.authSelection;
+    return AppRouter.onboarding;
   }
 
   @override

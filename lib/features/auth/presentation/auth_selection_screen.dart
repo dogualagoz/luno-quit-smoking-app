@@ -138,9 +138,7 @@ class AuthSelectionScreen extends ConsumerWidget {
                   _AuthButton(
                     iconData: Icons.face_retouching_natural_outlined,
                     text: 'Anonim olarak devam et',
-                    backgroundColor: theme.brightness == Brightness.light 
-                        ? AppColors.lightMuted.withOpacity(0.3)
-                        : colorScheme.secondaryContainer.withOpacity(0.3),
+                    backgroundColor: context.secondary.withValues(alpha: 0.3),
                     textColor: theme.hintColor,
                     isDotted: true,
                     onPressed: () => context.go(AppRouter.root),
@@ -154,7 +152,7 @@ class AuthSelectionScreen extends ConsumerWidget {
                     width: double.infinity,
                     padding: AppSpacing.cardPadding,
                     decoration: BoxDecoration(
-                      color: AppColors.lightDestructive.withOpacity(0.05),
+                      color: context.destructive.withValues(alpha: 0.05),
                       borderRadius: AppRadius.mainCard,
                     ),
                     child: Text(

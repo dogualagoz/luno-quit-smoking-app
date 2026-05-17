@@ -21,7 +21,6 @@ class QuitCalculator {
     final now = atTime ?? DateTime.now();
 
     final damage = _calculateDamageMetrics(profile, logs, now);
-    final burnRate = _calculateBurnRate(profile);
     final organs = _calculateOrganDamages(profile);
     final totalDamageScore = _calculateTotalDamageScore(organs);
 
@@ -207,8 +206,6 @@ class QuitCalculator {
         profile.dailyCigarettes;
 
     // 2. Uygulama Kullanıldığından Beri Canlı Zarar (Hybrid)
-    final rates = calculateRates(profile);
-
     final createdDate = DateTime(profile.createdAt.year, profile.createdAt.month, profile.createdAt.day);
     final todayStr = DateTime(now.year, now.month, now.day);
     
@@ -244,7 +241,7 @@ class QuitCalculator {
           double realizedTodaySmokes = 0;
           for (var log in logs) {
             if (log.type == 'slip' && log.hasSmoked && log.date.year == d.year && log.date.month == d.month && log.date.day == d.day) {
-              int count = log.smokeCount as int;
+              int count = log.smokeCount;
               // Orijinal: 11 dakika
               int totalSec = count * 11 * 60;
               int passedSec = now.difference(log.date).inSeconds;
@@ -328,13 +325,6 @@ class QuitCalculator {
       resistedCravings: resistedCravings,
       todayStr: todayStr,
     );
-  }
-
-  /// Dakika başına yanma hızını (₺/sn) hesaplar.
-  static double _calculateBurnRate(UserProfile profile) {
-    final pricePerCigarette = profile.packPrice / profile.cigarettesPerPack;
-    // Saniye hızı döndür, calculate metodunda dk'ya çevrilecek
-    return (profile.dailyCigarettes * pricePerCigarette) / 86400;
   }
 
   /// Binlik ayırıcı ekler (Örn: 292075 → 292.075)
