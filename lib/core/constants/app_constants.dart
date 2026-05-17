@@ -48,6 +48,12 @@ class AppBusinessRules {
 
   /// Bir aydaki ortalama gün sayısı
   static const int daysPerMonth = 30;
+
+  // ── 4-7-8 breathing technique (Dr. Andrew Weil) ──
+  static const int breathingInhaleSeconds = 4;
+  static const int breathingHoldSeconds = 7;
+  static const int breathingExhaleSeconds = 8;
+  static const int breathingTargetCycles = 3;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
