@@ -18,11 +18,11 @@ class OnboardingNotifier extends StateNotifier<AsyncValue<void>> {
   OnboardingRepository get _repository =>
       _ref.read(onboardingRepositoryProvider);
 
-  /// Persists the user-collected onboarding data to Hive and marks onboarding
-  /// as complete. If the user is already authenticated, the profile is also
-  /// pushed to Firestore via [SyncService]; otherwise it waits for the next
-  /// successful sign-in.
-  Future<void> completeOnboarding({
+  /// Persists the user-collected onboarding data to Hive and marks the
+  /// profile as completed. If a Firebase user is already signed in, the
+  /// profile is pushed to Firestore as well; otherwise the next successful
+  /// sign-in will sync it via [SyncService].
+  Future<void> finalizeOnboarding({
     required String nickname,
     required int dailyCigarettes,
     required int smokingYears,
@@ -32,12 +32,12 @@ class OnboardingNotifier extends StateNotifier<AsyncValue<void>> {
     List<String> quitReasons = const [],
     String? triggerMoment,
     DateTime? quitDate,
-    String? userId,
-    String? email,
   }) async {
     state = const AsyncValue.loading();
 
     try {
+      final user = _ref.read(firebaseAuthProvider).currentUser;
+
       final profile = UserProfile(
         nickname: nickname,
         dailyCigarettes: dailyCigarettes,
@@ -49,15 +49,14 @@ class OnboardingNotifier extends StateNotifier<AsyncValue<void>> {
         triggerMoment: triggerMoment,
         quitDate: quitDate,
         createdAt: DateTime.now(),
-        userId: userId,
-        email: email,
+        userId: user?.uid,
+        email: user?.email,
         onboardingCompleted: true,
       );
 
       await _repository.saveProfile(profile);
       _ref.invalidate(userProfileProvider);
 
-      final user = _ref.read(firebaseAuthProvider).currentUser;
       if (user != null) {
         await _ref.read(syncServiceProvider).syncUserProfile(user);
       }
@@ -65,27 +64,6 @@ class OnboardingNotifier extends StateNotifier<AsyncValue<void>> {
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
-    }
-  }
-
-  /// Attaches Firebase auth identity to an already-completed local profile and
-  /// pushes it to Firestore.
-  Future<void> updateProfileAuth({
-    required String userId,
-    String? email,
-  }) async {
-    final currentProfile = _repository.getProfile();
-    if (currentProfile == null) return;
-    final updatedProfile = currentProfile.copyWith(
-      userId: userId,
-      email: email,
-    );
-    await _repository.saveProfile(updatedProfile);
-    _ref.invalidate(userProfileProvider);
-
-    final user = _ref.read(firebaseAuthProvider).currentUser;
-    if (user != null) {
-      await _ref.read(syncServiceProvider).syncUserProfile(user);
     }
   }
 }

@@ -33,36 +33,35 @@ final routerProvider = Provider<GoRouter>((ref) {
     observers: [analytics.getObserver()],
     redirect: (context, state) {
       final isLoggedIn = authState.value != null;
-      final hasProfile = onboardingRepo.isOnboardingCompleted();
+      final onboarded = onboardingRepo.isOnboardingCompleted();
       final location = state.matchedLocation;
 
-      final goingToSplash = location == AppRouter.splash;
-      final goingToOnboarding = location == AppRouter.onboarding;
-      final goingToAuth =
-          location == AppRouter.authSelection ||
+      // Splash is self-managing — let it decide where to go.
+      if (location == AppRouter.splash) return null;
+
+      final atOnboarding = location == AppRouter.onboarding;
+      final atAuthPage = location == AppRouter.authSelection ||
           location == AppRouter.emailLogin ||
           location == AppRouter.register;
 
-      // Splash her zaman geçer
-      if (goingToSplash) return null;
-
-      // 1. Giriş yapılmış + profil var → auth/onboarding sayfalarından ana sayfaya yönlendir
-      if (isLoggedIn && hasProfile && (goingToAuth || goingToOnboarding)) {
-        return AppRouter.root;
+      // Logged in + onboarded → main app. Auth/onboarding pages are off-limits.
+      if (isLoggedIn && onboarded) {
+        return (atAuthPage || atOnboarding) ? AppRouter.root : null;
       }
 
-      // 2. Giriş yapılmış ama profil yok → onboarding'e yönlendir (hesap var, veri yok)
-      if (isLoggedIn && !hasProfile && !goingToOnboarding) {
-        return AppRouter.onboarding;
+      // Logged in but onboarding not finished → finish it.
+      if (isLoggedIn && !onboarded) {
+        return atOnboarding ? null : AppRouter.onboarding;
       }
 
-      // 3. Giriş yapılmamış + profil yok → welcome/auth sayfalarında kalabilir, diğer yerlere gidemez
-      if (!isLoggedIn && !goingToOnboarding && !goingToAuth) {
-        return AppRouter.onboarding;
+      // Logged out, onboarding done locally → user just needs to sign in.
+      if (!isLoggedIn && onboarded) {
+        return atAuthPage ? null : AppRouter.authSelection;
       }
 
-      // 4. Hiçbir koşul uymuyorsa olduğu yerde kalsın
-      return null;
+      // Logged out + no onboarding → start at onboarding. Auth pages are
+      // reachable so a returning user can sign in without re-onboarding.
+      return (atOnboarding || atAuthPage) ? null : AppRouter.onboarding;
     },
     routes: [
       GoRoute(

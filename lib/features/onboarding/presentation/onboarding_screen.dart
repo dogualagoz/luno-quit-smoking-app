@@ -290,7 +290,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   }
 
   Future<void> _finishOnboarding() async {
-    await ref.read(onboardingProvider.notifier).completeOnboarding(
+    await ref.read(onboardingProvider.notifier).finalizeOnboarding(
       nickname: _userName.trim().isEmpty ? AppMockData.userName : _userName,
       dailyCigarettes: _dailyCigarettes,
       smokingYears: _smokingYears,
