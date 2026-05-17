@@ -17,7 +17,7 @@ class LocationStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+    final primaryColor = context.primary;
 
     final List<Map<String, dynamic>> quickLocations = [
       {'name': 'Ev', 'icon': Icons.home},

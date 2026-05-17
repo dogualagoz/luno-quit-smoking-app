@@ -8,8 +8,7 @@ class CongratulationsStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final successColor = isDark ? AppColors.darkChartSuccess : AppColors.lightChartSuccess;
+    final successColor = context.chartSuccess;
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.p24),

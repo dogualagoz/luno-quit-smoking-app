@@ -175,7 +175,7 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
             horizontalInterval: _getMaxY() / 3,
             getDrawingHorizontalLine: (value) {
               return FlLine(
-                color: (isDark ? AppColors.darkBorder : AppColors.lightBorder)
+                color: (context.border)
                     .withValues(alpha: 0.15),
                 strokeWidth: 2,
                 dashArray: [6, 6], // Noktalı şık çizgiler
@@ -276,7 +276,7 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
               ? Colors.transparent 
               : (isTouched
                   ? null
-                  : (isDark ? AppColors.darkPrimary : AppColors.lightPrimary)
+                  : (context.primary)
                         .withValues(alpha: 0.4)),
           width: isTouched && !isFuture ? touchedWidth : normalWidth,
           borderRadius: BorderRadius.circular(
@@ -286,7 +286,7 @@ class _HistoryBarChartState extends State<HistoryBarChart> {
             show: true,
             toY: maxY,
             // Sütunların aktığı o soluk zemin pisti (Gelecek için biraz daha silik)
-            color: (isDark ? AppColors.darkBorder : AppColors.lightBorder)
+            color: (context.border)
                 .withValues(alpha: isFuture ? 0.03 : 0.08),
           ),
         ),

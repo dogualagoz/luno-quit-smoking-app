@@ -159,7 +159,7 @@ class AuthSelectionScreen extends ConsumerWidget {
                       "Anonim girişte verilerin yalnızca bu cihazda saklanır. Hesap oluşturursan cihazlar arası senkron yapabilirsin.",
                       textAlign: TextAlign.center,
                       style: AppTextStyles.micro.copyWith(
-                        color: colorScheme.onSurface.withOpacity(0.6),
+                        color: colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ),
@@ -232,7 +232,7 @@ class AuthSelectionScreen extends ConsumerWidget {
             // Loading Overlay
             if (authState.isLoading)
               Container(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 child: const Center(child: CircularProgressIndicator()),
               ),
           ],

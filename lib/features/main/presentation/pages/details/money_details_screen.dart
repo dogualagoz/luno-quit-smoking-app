@@ -58,9 +58,9 @@ class MoneyDetailsScreen extends ConsumerWidget {
     return Container(
       padding: AppSpacing.cardPaddingLarge,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
+        color: context.card,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: (isDark ? AppColors.darkBorder : AppColors.lightBorder).withValues(alpha:0.5)),
+        border: Border.all(color: (context.border).withValues(alpha:0.5)),
         boxShadow: [
           BoxShadow(
             color: AppColors.lightChartPrimary.withValues(alpha: 0.1),
@@ -113,9 +113,9 @@ class MoneyDetailsScreen extends ConsumerWidget {
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-             color: isDark ? AppColors.darkCard : AppColors.lightCard,
+             color: context.card,
              borderRadius: BorderRadius.circular(16),
-             border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
+             border: Border.all(color: context.border),
           ),
           child: Row(
             children: [
@@ -164,9 +164,9 @@ class MoneyDetailsScreen extends ConsumerWidget {
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.darkCard : AppColors.lightCard,
+            color: context.card,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: (isDark ? AppColors.darkBorder : AppColors.lightBorder).withValues(alpha: 0.5)),
+            border: Border.all(color: (context.border).withValues(alpha: 0.5)),
           ),
           child: Row(
             children: [

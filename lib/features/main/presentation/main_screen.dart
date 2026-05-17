@@ -152,10 +152,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         ? theme.colorScheme.surface
         : AppColors.lightBackground;
     final successColor =
-        isDark ? AppColors.darkChartSuccess : AppColors.lightChartSuccess;
-    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+        context.chartSuccess;
+    final primary = context.primary;
     final warningColor =
-        isDark ? AppColors.darkChartWarning : AppColors.lightChartWarning;
+        context.chartWarning;
 
     showModalBottomSheet(
       context: context,
@@ -322,9 +322,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     final bgColor = isDark
         ? Theme.of(context).colorScheme.surface
         : AppColors.lightBackground;
-    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+    final primary = context.primary;
     final successColor =
-        isDark ? AppColors.darkChartSuccess : AppColors.lightChartSuccess;
+        context.chartSuccess;
 
     showModalBottomSheet(
       context: context,
@@ -483,7 +483,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     final bgColor = isDark
         ? Theme.of(context).colorScheme.surface
         : AppColors.lightBackground;
-    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+    final primary = context.primary;
 
     int count = 1;
 

@@ -72,7 +72,7 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final hasSmokedToday = todaySmoked > 0;
-    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+    final primary = context.primary;
     final successColor = isDark
         ? AppColors.darkChartSuccess
         : AppColors.lightChartSuccess;
@@ -482,7 +482,6 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
 
     final diff = current - previous;
     final isImprovement = isImprovementBetter ? diff > 0 : diff < 0;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (diff == 0) {
       return {'text': 'Dünle aynı', 'percent': 0.0, 'color': Colors.grey};
@@ -491,8 +490,8 @@ class _TodaySummaryCardState extends ConsumerState<TodaySummaryCard> {
     final absDiff = diff.abs();
     final percent = previous > 0 ? (absDiff / previous * 100) : 0.0;
     final Color color = isImprovement
-        ? (isDark ? AppColors.darkChartSuccess : AppColors.lightChartSuccess)
-        : (isDark ? AppColors.darkDestructive : AppColors.lightDestructive);
+        ? (context.chartSuccess)
+        : (context.destructive);
 
     String text = "";
     if (isCurrency) {

@@ -54,7 +54,7 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
               Text(
                 "Günde kaç sigara içiyorsun?",
                 style: AppTextStyles.label.copyWith(
-                  color: AppColors.lightForeground.withOpacity(0.6),
+                  color: AppColors.lightForeground.withValues(alpha: 0.6),
                 ),
               ),
               const SizedBox(height: AppSpacing.p20),
@@ -66,14 +66,14 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
               Text(
                 "adet / gün",
                 style: AppTextStyles.body.copyWith(
-                  color: AppColors.lightForeground.withOpacity(0.4),
+                  color: AppColors.lightForeground.withValues(alpha: 0.4),
                 ),
               ),
               const SizedBox(height: AppSpacing.p24),
               SliderTheme(
                 data: SliderTheme.of(context).copyWith(
                   activeTrackColor: AppColors.lightPrimary,
-                  inactiveTrackColor: AppColors.lightPrimary.withOpacity(0.2),
+                  inactiveTrackColor: AppColors.lightPrimary.withValues(alpha: 0.2),
                   thumbColor: AppColors.lightPrimary,
                   trackHeight: 8.0,
                 ),
@@ -98,7 +98,7 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.lightPrimary.withOpacity(0.05)
+                              ? AppColors.lightPrimary.withValues(alpha: 0.05)
                               : AppColors.lightCard,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
@@ -110,7 +110,7 @@ class _DailyCigarettesStepState extends State<DailyCigarettesStep> {
                           style: TextStyle(
                             color: isSelected
                                 ? AppColors.lightPrimary
-                                : AppColors.lightForeground.withOpacity(0.7),
+                                : AppColors.lightForeground.withValues(alpha: 0.7),
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                             fontSize: 12,
                           ),

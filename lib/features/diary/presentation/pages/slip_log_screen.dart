@@ -193,7 +193,7 @@ class _SlipLogScreenState extends ConsumerState<SlipLogScreen> {
           IconButton(
             icon: Icon(
               _currentPage == 0 ? Icons.close : Icons.arrow_back,
-              color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+              color: context.foreground,
             ),
             onPressed: _previousPage,
           ),
@@ -204,7 +204,7 @@ class _SlipLogScreenState extends ConsumerState<SlipLogScreen> {
           Text(
             "${_currentPage + 1}/$_totalSteps",
             style: AppTextStyles.bodySemibold.copyWith(
-              color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+              color: context.foreground,
             ),
           ),
         ],

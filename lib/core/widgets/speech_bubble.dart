@@ -86,7 +86,7 @@ class _SpeechBubbleState extends State<SpeechBubble> with TickerProviderStateMix
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final borderColor = colorScheme.primary.withOpacity(0.1);
+    final borderColor = colorScheme.primary.withValues(alpha: 0.1);
     const borderWidth = 2.0;
 
     return Stack(
@@ -102,7 +102,7 @@ class _SpeechBubbleState extends State<SpeechBubble> with TickerProviderStateMix
             border: Border.all(color: borderColor, width: borderWidth),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -121,7 +121,7 @@ class _SpeechBubbleState extends State<SpeechBubble> with TickerProviderStateMix
                     TextSpan(
                       text: visiblePart,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface.withOpacity(0.8),
+                        color: colorScheme.onSurface.withValues(alpha: 0.8),
                         fontWeight: FontWeight.w500,
                       ),
                     ),

@@ -263,7 +263,7 @@ class _CravingScreenState extends ConsumerState<CravingScreen> {
           IconButton(
             icon: Icon(
               _currentPage == 0 ? Icons.close : Icons.arrow_back,
-              color: isDark ? AppColors.darkForeground : AppColors.lightForeground,
+              color: context.foreground,
             ),
             onPressed: _previousPage,
           ),

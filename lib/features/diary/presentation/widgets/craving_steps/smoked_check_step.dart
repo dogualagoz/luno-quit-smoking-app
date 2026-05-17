@@ -15,7 +15,6 @@ class SmokedCheckStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.p24),
@@ -42,7 +41,7 @@ class SmokedCheckStep extends StatelessWidget {
                   title: "Hayır,\nİçmedim!",
                   subtitle: "Krizi yendim",
                   icon: Icons.shield_outlined,
-                  color: isDark ? AppColors.darkChartSuccess : AppColors.lightChartSuccess,
+                  color: context.chartSuccess,
                   isSelected: hasSmoked == false,
                   onTap: () => onStatusChanged(false),
                 ),
@@ -54,7 +53,7 @@ class SmokedCheckStep extends StatelessWidget {
                   title: "Evet,\nİçtim",
                   subtitle: "Kaçamak yaptım",
                   icon: Icons.smoking_rooms,
-                  color: isDark ? AppColors.darkPrimary : AppColors.lightPrimary,
+                  color: context.primary,
                   isSelected: hasSmoked == true,
                   onTap: () => onStatusChanged(true),
                 ),

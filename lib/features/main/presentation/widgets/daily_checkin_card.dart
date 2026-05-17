@@ -70,12 +70,11 @@ class _DailyCheckinCardState extends ConsumerState<DailyCheckinCard>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final successColor =
-        isDark ? AppColors.darkChartSuccess : AppColors.lightChartSuccess;
-    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+        context.chartSuccess;
+    final primary = context.primary;
     final warningColor =
-        isDark ? AppColors.darkChartWarning : AppColors.lightChartWarning;
+        context.chartWarning;
 
     final options = [
       _CheckinOptionData(

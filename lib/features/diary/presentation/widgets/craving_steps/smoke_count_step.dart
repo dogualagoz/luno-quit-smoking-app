@@ -16,8 +16,7 @@ class SmokeCountStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+    final primaryColor = context.primary;
 
     return Padding(
       padding: AppSpacing.pageHorizontal,

@@ -96,9 +96,9 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen>
   Widget _buildIdleMode(BuildContext context, CrisisState state) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final logsState = ref.watch(historyLogsProvider);
-    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+    final primary = context.primary;
     final successColor =
-        isDark ? AppColors.darkChartSuccess : AppColors.lightChartSuccess;
+        context.chartSuccess;
 
     int totalCravings = 0;
     int weekCravings = 0;
@@ -232,8 +232,7 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen>
 
   // ─────────────────────── BREATHING ───────────────────────
   Widget _buildBreathingMode(BuildContext context, CrisisState state) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
+    final primary = context.primary;
     final phaseLabel = _breathPhaseLabels[state.breath]!;
     final totalPhaseDuration = breathPhaseSeconds(state.breath);
     final progress = 1.0 - (state.phaseSecondsLeft / totalPhaseDuration);
@@ -370,9 +369,7 @@ class _CrisisScreenState extends ConsumerState<CrisisScreen>
 
   // ─────────────────────── SUCCESS ───────────────────────
   Widget _buildSuccessMode(BuildContext context, CrisisState state) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final successColor =
-        isDark ? AppColors.darkChartSuccess : AppColors.lightChartSuccess;
+    final successColor = context.chartSuccess;
 
     final minutes = state.totalElapsedSeconds ~/ 60;
     final seconds = state.totalElapsedSeconds % 60;

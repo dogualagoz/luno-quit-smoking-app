@@ -34,7 +34,7 @@ class LunoErrorWidget extends StatelessWidget {
             child: SvgPicture.asset(
               AssetConstants.cigeritoDefault, // İleride cigeritoSad ile değişebilir
               height: 120,
-              // colorFilter: ColorFilter.mode(theme.colorScheme.error.withOpacity(0.5), BlendMode.srcIn),
+              // colorFilter: ColorFilter.mode(theme.colorScheme.error.withValues(alpha: 0.5), BlendMode.srcIn),
             ),
           ),
           const SizedBox(height: AppSpacing.p24),
