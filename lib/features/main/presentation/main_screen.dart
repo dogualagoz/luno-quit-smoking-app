@@ -17,6 +17,8 @@ import 'package:luno_quit_smoking_app/features/main/data/models/quit_stats.dart'
 import 'package:luno_quit_smoking_app/features/main/presentation/widgets/daily_checkin_sheet.dart';
 import 'package:luno_quit_smoking_app/features/main/presentation/widgets/main_header.dart';
 import 'package:luno_quit_smoking_app/features/main/presentation/widgets/smart_add_sheet.dart';
+import 'package:luno_quit_smoking_app/core/services/sync_service.dart';
+import 'package:luno_quit_smoking_app/features/auth/data/auth_repository.dart';
 import 'package:luno_quit_smoking_app/features/onboarding/data/onboarding_repository.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
@@ -26,15 +28,35 @@ class MainScreen extends ConsumerStatefulWidget {
   ConsumerState<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends ConsumerState<MainScreen> {
+class _MainScreenState extends ConsumerState<MainScreen>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && !_hasLogForToday()) {
         showDailyCheckinSheet(context, ref);
       }
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      final user = ref.read(authStateProvider).value;
+      if (user != null) {
+        final syncService = ref.read(syncServiceProvider);
+        syncService.syncUserProfile(user).ignore();
+        syncService.syncDailyLogs(user).ignore();
+      }
+    }
   }
 
   @override
